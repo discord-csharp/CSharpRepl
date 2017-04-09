@@ -39,6 +39,11 @@ private static readonly Assembly[] DefaultReferences =
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
 {
     var code = await req.Content.ReadAsStringAsync();
+    if (code.Contains("Process.") || code.Contains("Environment."))
+    {
+        return req.CreateResponse(HttpStatusCode.BadRequest, "Class not allowed");
+    }
+
     object result = null;
     var successful = false;
     try
@@ -52,7 +57,8 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
                     "System.Xml",
                     "System.Xml.Linq",
                 })
-                .WithReferences(DefaultReferences));
+                .WithReferences(DefaultReferences),
+                cancellationToken: new System.Threading.CancellationTokenSource(20000).Token);
         successful = true;
     }
     catch (Exception ex)
