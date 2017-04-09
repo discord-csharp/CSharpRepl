@@ -36,29 +36,40 @@ private static readonly Assembly[] DefaultReferences =
     typeof(List<string>).Assembly
 };
 
+private static readonly string[] BlockedTokens =
+{
+    "Process.",
+    "Thread.",
+    "Thread(",
+    "File.",
+    "Directory.",
+    "StreamReader(",
+    "StreamWriter(",
+    "Environment.",
+    "WebClient(",
+    "HttpClient("
+};
+
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
 {
     var code = await req.Content.ReadAsStringAsync();
-    if (code.Contains("Process.") || code.Contains("Environment."))
+    
+    if (BlockedTokens.Any(a => code.Contains(a)))
     {
-        return req.CreateResponse(HttpStatusCode.BadRequest, "Class not allowed");
+        log.Error("Forbidden token in request");
+        return req.CreateResponse(HttpStatusCode.Forbidden, "Class not allowed");
     }
 
     object result = null;
     var successful = false;
+    var options = ScriptOptions.Default
+                .WithImports(DefaultImports)
+                .WithReferences(DefaultReferences);
+                
     try
     {
-        result = await CSharpScript.EvaluateAsync(code,
-            ScriptOptions.Default
-                .WithImports(DefaultImports)
-                .WithReferences(new[] {
-                    "System",
-                    "System.Core",
-                    "System.Xml",
-                    "System.Xml.Linq",
-                })
-                .WithReferences(DefaultReferences),
-                cancellationToken: new System.Threading.CancellationTokenSource(20000).Token);
+        var cts = new System.Threading.CancellationTokenSource(5000);
+        result = await CSharpScript.EvaluateAsync(code, options, cancellationToken: cts.Token);
         successful = true;
     }
     catch (Exception ex)
@@ -69,10 +80,12 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
 
     if (successful)
     {
+        log.Info($"executed '{code}'");
         return req.CreateResponse(HttpStatusCode.OK, result);
     }
     else
     {
+        log.Warning($"failed to execute '{code}");
         return req.CreateResponse(HttpStatusCode.BadRequest, result);
     }
 }
