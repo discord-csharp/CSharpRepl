@@ -67,8 +67,6 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         result = $"{ex.Message}{Environment.NewLine}{ex.StackTrace}";
     }
 
-    var resultText = result?.ToString() ?? "null";
-
     if (successful)
     {
         return req.CreateResponse(HttpStatusCode.OK, result);
