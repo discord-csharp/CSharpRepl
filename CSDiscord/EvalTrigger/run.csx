@@ -61,8 +61,7 @@ private static readonly string[] BlockedTokens =
     ".CreateDelegate",
     "Expression.Call",
     ".Compile()",
-    ".Emit(",
-    "asdasddsasdaTESTaslkdjalks"
+    ".Emit("
 };
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
