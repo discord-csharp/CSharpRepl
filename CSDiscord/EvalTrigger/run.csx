@@ -17,6 +17,7 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.Azure.WebJobs.Host;
 using System.Web;
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 
 private static readonly string[] DefaultImports =
 {
@@ -49,7 +50,10 @@ private static readonly string[] BlockedTokens =
     "Environment.",
     "WebClient(",
     "HttpClient(",
-    "WebRequest."
+    "WebRequest.",
+    "Activator.CreateInstance",
+    ".Invoke(",
+    "unsafe"
 };
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
@@ -63,23 +67,27 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     }
 
     ScriptState<object> result = null;
-    var options = ScriptOptions.Default
-                .WithImports(DefaultImports)
-                .WithReferences(DefaultReferences);
 
     Exception evalException = null;
     Stopwatch sw = null;
+
     try
     {
         sw = Stopwatch.StartNew();
-        result = await CSharpScript.RunAsync(code, options);
+        result = await new Runner().Run(code);
         sw.Stop();
     }
     catch (Exception ex)
     {
-        sw?.Stop();
         evalException = ex;
         log.Error(ex.ToString());
+    }
+    finally
+    {
+        if (sw?.IsRunning ?? false)
+        {
+            sw?.Stop();
+        }
     }
 
     if (result != null && result.Exception == null)
@@ -91,6 +99,19 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
     {
         log.Warning($"failed to execute '{code}'");
         return req.CreateResponse(HttpStatusCode.BadRequest, new Result(result, sw.Elapsed, evalException));
+    }
+}
+
+public class Runner
+{
+    [HandleProcessCorruptedStateExceptions]
+    public async Task<ScriptState<object>> Run(string code)
+    {
+        var options = ScriptOptions.Default
+              .WithImports(DefaultImports)
+              .WithReferences(DefaultReferences);
+              
+        return await CSharpScript.RunAsync(code, options);
     }
 }
 
@@ -107,18 +128,21 @@ public class Result
 
         if (state == null)
         {
-            Exception = ex;
+            Exception = ex.Message;
+            ExceptionType = ex.GetType().Name;
             return;
         }
 
         ReturnValue = state.ReturnValue;
         Code = state.Script.Code;
-        Exception = state.Exception ?? ex;
+        Exception = state.Exception?.Message ?? ex?.Message;
     }
 
     public object ReturnValue { get; set; }
 
-    public Exception Exception { get; set; }
+    public string Exception { get; set; }
+
+    public string ExceptionType { get; set; }
 
     public string Code { get; set; }
 
