@@ -58,7 +58,9 @@ private static readonly string[] BlockedTokens =
     "DllImport(",
     "Assembly.Load",
     ".DynamicInvoke",
-    ".CreateDelegate"
+    ".CreateDelegate",
+    "Expression.Call",
+    ".Compile()"
 };
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
