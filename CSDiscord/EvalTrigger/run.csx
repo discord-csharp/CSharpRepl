@@ -41,6 +41,7 @@ private static readonly Assembly[] DefaultReferences =
 private static readonly string[] BlockedTokens =
 {
     "Process.",
+    "Process(",
     "Thread.",
     "Thread(",
     "File.",
@@ -52,8 +53,12 @@ private static readonly string[] BlockedTokens =
     "HttpClient(",
     "WebRequest.",
     "Activator.CreateInstance",
-    ".Invoke(",
-    "unsafe"
+    "Invoke(",
+    "unsafe",
+    "DllImport(",
+    "Assembly.Load",
+    ".DynamicInvoke",
+    ".CreateDelegate"
 };
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
@@ -65,7 +70,7 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         log.Error("Forbidden token in request");
         return req.CreateResponse(HttpStatusCode.Forbidden, "Class not allowed");
     }
-
+    
     ScriptState<object> result = null;
 
     Exception evalException = null;
@@ -104,7 +109,6 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
 
 public class Runner
 {
-    [HandleProcessCorruptedStateExceptions]
     public async Task<ScriptState<object>> Run(string code)
     {
         var options = ScriptOptions.Default
