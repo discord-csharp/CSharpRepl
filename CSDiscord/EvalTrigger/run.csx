@@ -16,6 +16,7 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.Azure.WebJobs.Host;
 using System.Web;
+using System.Diagnostics;
 
 private static readonly string[] DefaultImports =
 {
@@ -47,45 +48,79 @@ private static readonly string[] BlockedTokens =
     "StreamWriter(",
     "Environment.",
     "WebClient(",
-    "HttpClient("
+    "HttpClient(",
+    "WebRequest."
 };
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
 {
     var code = await req.Content.ReadAsStringAsync();
-    
+
     if (BlockedTokens.Any(a => code.Contains(a)))
     {
         log.Error("Forbidden token in request");
         return req.CreateResponse(HttpStatusCode.Forbidden, "Class not allowed");
     }
 
-    object result = null;
-    var successful = false;
+    ScriptState<object> result = null;
     var options = ScriptOptions.Default
                 .WithImports(DefaultImports)
                 .WithReferences(DefaultReferences);
-                
+
+    Exception evalException = null;
+    Stopwatch sw = null;
     try
     {
-        var cts = new System.Threading.CancellationTokenSource(5000);
-        result = await CSharpScript.EvaluateAsync(code, options, cancellationToken: cts.Token);
-        successful = true;
+        sw = Stopwatch.StartNew();
+        result = await CSharpScript.RunAsync(code, options);
+        sw.Stop();
     }
     catch (Exception ex)
     {
+        sw?.Stop();
+        evalException = ex;
         log.Error(ex.ToString());
-        result = $"{ex.Message}{Environment.NewLine}{ex.StackTrace}";
     }
 
-    if (successful)
+    if (result != null && result.Exception == null)
     {
         log.Info($"executed '{code}'");
-        return req.CreateResponse(HttpStatusCode.OK, result);
+        return req.CreateResponse(HttpStatusCode.OK, new Result(result, sw.Elapsed, evalException));
     }
     else
     {
-        log.Warning($"failed to execute '{code}");
-        return req.CreateResponse(HttpStatusCode.BadRequest, result);
+        log.Warning($"failed to execute '{code}'");
+        return req.CreateResponse(HttpStatusCode.BadRequest, new Result(result, sw.Elapsed, evalException));
     }
+}
+
+public class Result
+{
+    public Result(ScriptState<object> state, TimeSpan executionTime, Exception ex = null)
+    {
+        if (state == null && ex == null)
+        {
+            throw new ArgumentNullException(nameof(state));
+        }
+
+        ExecutionTime = executionTime;
+
+        if (state == null)
+        {
+            Exception = ex;
+            return;
+        }
+
+        ReturnValue = state.ReturnValue;
+        Code = state.Script.Code;
+        Exception = state.Exception ?? ex;
+    }
+
+    public object ReturnValue { get; set; }
+
+    public Exception Exception { get; set; }
+
+    public string Code { get; set; }
+
+    public TimeSpan ExecutionTime { get; set; }
 }
