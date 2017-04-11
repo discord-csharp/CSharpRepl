@@ -63,7 +63,9 @@ private static readonly string[] BlockedTokens =
     ".Compile()",
     ".Emit(",
     "MethodRental.",
-    "using"
+    "using",
+    "InvokeMember(",
+    "InvokeMethod("
 };
 
 
