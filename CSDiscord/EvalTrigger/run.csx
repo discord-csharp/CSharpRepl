@@ -65,7 +65,9 @@ private static readonly string[] BlockedTokens =
     "MethodRental.",
     "using",
     "InvokeMember(",
-    "InvokeMethod("
+    "InvokeMethod(",
+    ".Socket",
+    "Socket("
 };
 
 
