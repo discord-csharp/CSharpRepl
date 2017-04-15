@@ -1,0 +1,21 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+before_build:
+- ps: nuget restore CSDiscord.sln
+build:
+  project: CSDiscord.sln
+  publish_wap: true
+  parallel: true
+  verbosity: normal
+deploy:
+- provider: WebDeploy
+  server: https://csharpdiscordfn.scm.azurewebsites.net:443/msdeploy.axd?site=csharpdiscordfn
+  website: csharpdiscordfn
+  username: $csharpdiscordfn
+  password:
+    secure: vb/vDSKqXJhCGcwVLREgeNHiu6BW5Ej7h+zJv7zAj5SbQ8q75rdxIKDt/fO3uq7FpXhqEl4LUWS1KZtXzLA1gA==
+  artifact: CSDiscordFunction
+  remove_files: true
+  app_offline: true

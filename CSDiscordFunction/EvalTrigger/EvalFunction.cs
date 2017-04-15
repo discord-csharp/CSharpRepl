@@ -11,6 +11,7 @@ using Microsoft.Azure.WebJobs.Host;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using System.Web.Http;
+
 namespace CSDiscordFunction
 {
     public class EvalFunction
@@ -41,7 +42,7 @@ namespace CSDiscordFunction
 
         private static readonly string[] BlockedTokens =
         {
-            ".GetEnvironmentVariable",
+            ".GetEnvironmentVariable"
         };
 
 
