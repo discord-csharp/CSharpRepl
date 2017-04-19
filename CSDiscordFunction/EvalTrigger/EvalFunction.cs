@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -9,8 +10,10 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.Azure.WebJobs.Host;
 using System.Diagnostics;
+using System.Threading;
 using Newtonsoft.Json;
 using System.Web.Http;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CSDiscordFunction
 {
@@ -40,16 +43,21 @@ namespace CSDiscordFunction
             typeof(string).Assembly
         };
 
-        private static readonly string[] BlockedTokens =
-        {
-            ".GetEnvironmentVariable"
-        };
+        private static readonly ScriptOptions Options =
+            ScriptOptions.Default
+                .WithImports(DefaultImports)
+                .WithReferences(DefaultReferences);
 
+        private static readonly ImmutableArray<DiagnosticAnalyzer> Analyzers =
+            ImmutableArray.Create<DiagnosticAnalyzer>(new BlacklistedTypesAnalyzer());
 
         public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
         {
             var code = await req.Content.ReadAsStringAsync();
-            if (BlockedTokens.Any(a => code.Contains(a)))
+            var eval = CSharpScript.Create(code, Options);
+            var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
+            var diagnostics = await compilation.GetAnalyzerDiagnosticsAsync(Analyzers, CancellationToken.None);
+            if (!diagnostics.IsEmpty)
             {
                 log.Error("Forbidden token in request");
                 return req.CreateResponse(HttpStatusCode.Forbidden, "Class not allowed");
@@ -63,7 +71,7 @@ namespace CSDiscordFunction
             try
             {
                 sw = Stopwatch.StartNew();
-                result = await new Runner().Run(code);
+                result = await eval.RunAsync();
                 sw.Stop();
             }
             catch (Exception ex)
@@ -88,18 +96,6 @@ namespace CSDiscordFunction
             {
                 log.Warning($"failed to execute '{code}'");
                 return req.CreateResponse(HttpStatusCode.BadRequest, new Result(result, sw.Elapsed, evalException));
-            }
-        }
-
-        public class Runner
-        {
-            public async Task<ScriptState<object>> Run(string code)
-            {
-                var options = ScriptOptions.Default
-                      .WithImports(DefaultImports)
-                      .WithReferences(DefaultReferences);
-
-                return await CSharpScript.RunAsync(code, options);
             }
         }
 
