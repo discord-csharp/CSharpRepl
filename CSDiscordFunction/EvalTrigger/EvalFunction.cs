@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -9,8 +10,10 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.Azure.WebJobs.Host;
 using System.Diagnostics;
+using System.Threading;
 using Newtonsoft.Json;
 using System.Web.Http;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CSDiscordFunction
 {
@@ -40,16 +43,20 @@ namespace CSDiscordFunction
             typeof(string).Assembly
         };
 
-        private static readonly string[] BlockedTokens =
-        {
-            ".GetEnvironmentVariable"
-        };
+        private static readonly ScriptOptions Options =
+            ScriptOptions.Default
+                .WithImports(DefaultImports)
+                .WithReferences(DefaultReferences);
 
+        private static readonly ImmutableArray<DiagnosticAnalyzer> Analyzers =
+            ImmutableArray.Create<DiagnosticAnalyzer>(new BlacklistedTypesAnalyzer());
 
         public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
         {
             var code = await req.Content.ReadAsStringAsync();
-            if (BlockedTokens.Any(a => code.Contains(a)))
+            var compilation = CSharpScript.Create(code, Options).GetCompilation().WithAnalyzers(Analyzers);
+            var diagnostics = await compilation.GetAnalyzerDiagnosticsAsync(Analyzers, CancellationToken.None);
+            if (!diagnostics.IsEmpty)
             {
                 log.Error("Forbidden token in request");
                 return req.CreateResponse(HttpStatusCode.Forbidden, "Class not allowed");
@@ -95,11 +102,7 @@ namespace CSDiscordFunction
         {
             public async Task<ScriptState<object>> Run(string code)
             {
-                var options = ScriptOptions.Default
-                      .WithImports(DefaultImports)
-                      .WithReferences(DefaultReferences);
-
-                return await CSharpScript.RunAsync(code, options);
+                return await CSharpScript.RunAsync(code, Options);
             }
         }
 

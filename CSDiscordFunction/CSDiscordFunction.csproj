@@ -246,6 +246,7 @@
     <Content Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EvalTrigger\BlacklistedTypesAnalyzer.cs" />
     <Compile Include="EvalTrigger\EvalFunction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
