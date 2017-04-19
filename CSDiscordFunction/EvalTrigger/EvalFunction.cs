@@ -54,7 +54,8 @@ namespace CSDiscordFunction
         public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
         {
             var code = await req.Content.ReadAsStringAsync();
-            var compilation = CSharpScript.Create(code, Options).GetCompilation().WithAnalyzers(Analyzers);
+            var eval = CSharpScript.Create(code, Options);
+            var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
             var diagnostics = await compilation.GetAnalyzerDiagnosticsAsync(Analyzers, CancellationToken.None);
             if (!diagnostics.IsEmpty)
             {
@@ -70,7 +71,7 @@ namespace CSDiscordFunction
             try
             {
                 sw = Stopwatch.StartNew();
-                result = await new Runner().Run(code);
+                result = await eval.RunAsync();
                 sw.Stop();
             }
             catch (Exception ex)
@@ -95,14 +96,6 @@ namespace CSDiscordFunction
             {
                 log.Warning($"failed to execute '{code}'");
                 return req.CreateResponse(HttpStatusCode.BadRequest, new Result(result, sw.Elapsed, evalException));
-            }
-        }
-
-        public class Runner
-        {
-            public async Task<ScriptState<object>> Run(string code)
-            {
-                return await CSharpScript.RunAsync(code, Options);
             }
         }
 
