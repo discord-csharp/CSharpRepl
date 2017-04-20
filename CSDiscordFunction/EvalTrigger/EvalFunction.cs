@@ -54,9 +54,12 @@ namespace CSDiscordFunction
         public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
         {
             var code = await req.Content.ReadAsStringAsync();
+            var sw = Stopwatch.StartNew();
             var eval = CSharpScript.Create(code, Options);
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
             var diagnostics = await compilation.GetAnalyzerDiagnosticsAsync(Analyzers, CancellationToken.None);
+            sw.Stop();
+            var compileTime = sw.Elapsed;
             if (!diagnostics.IsEmpty)
             {
                 log.Error("Forbidden token in request");
@@ -66,11 +69,10 @@ namespace CSDiscordFunction
             ScriptState<object> result = null;
 
             Exception evalException = null;
-            Stopwatch sw = null;
-
+            
             try
             {
-                sw = Stopwatch.StartNew();
+                sw.Restart();
                 result = await eval.RunAsync();
                 sw.Stop();
             }
@@ -90,18 +92,18 @@ namespace CSDiscordFunction
             if (result != null && result.Exception == null)
             {
                 log.Info($"executed '{code}'");
-                return req.CreateResponse(HttpStatusCode.OK, new Result(result, sw.Elapsed, evalException));
+                return req.CreateResponse(HttpStatusCode.OK, new Result(result, sw.Elapsed, compileTime, evalException));
             }
             else
             {
                 log.Warning($"failed to execute '{code}'");
-                return req.CreateResponse(HttpStatusCode.BadRequest, new Result(result, sw.Elapsed, evalException));
+                return req.CreateResponse(HttpStatusCode.BadRequest, new Result(result, sw.Elapsed, compileTime, evalException));
             }
         }
 
         public class Result
         {
-            public Result(ScriptState<object> state, TimeSpan executionTime, Exception ex = null)
+            public Result(ScriptState<object> state, TimeSpan executionTime, TimeSpan compileTime, Exception ex = null)
             {
                 if (state == null && ex == null)
                 {
@@ -109,6 +111,7 @@ namespace CSDiscordFunction
                 }
 
                 ExecutionTime = executionTime;
+                CompileTime = compileTime;
 
                 if (state == null)
                 {
@@ -131,6 +134,8 @@ namespace CSDiscordFunction
             public string Code { get; set; }
 
             public TimeSpan ExecutionTime { get; set; }
+
+            public TimeSpan CompileTime { get; set; }
         }
     }
 }
