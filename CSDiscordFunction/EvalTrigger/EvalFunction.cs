@@ -14,12 +14,13 @@ using System.Threading;
 using Newtonsoft.Json;
 using System.Web.Http;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System.IO;
+using System.Text;
 
 namespace CSDiscordFunction
 {
     public class EvalFunction
     {
-
         private static readonly string[] DefaultImports =
         {
             "System",
@@ -51,29 +52,41 @@ namespace CSDiscordFunction
         private static readonly ImmutableArray<DiagnosticAnalyzer> Analyzers =
             ImmutableArray.Create<DiagnosticAnalyzer>(new BlacklistedTypesAnalyzer());
 
+        private static readonly Random random = new Random();
         public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
         {
             var code = await req.Content.ReadAsStringAsync();
             var sw = Stopwatch.StartNew();
-            var eval = CSharpScript.Create(code, Options);
+
+            var eval = CSharpScript.Create(code, Options, typeof(Globals));
+
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
+
             var diagnostics = await compilation.GetAnalyzerDiagnosticsAsync(Analyzers, CancellationToken.None);
             sw.Stop();
             var compileTime = sw.Elapsed;
             if (!diagnostics.IsEmpty)
             {
-                log.Error("Forbidden token in request");
-                return req.CreateResponse(HttpStatusCode.Forbidden, "Class not allowed");
+                log.Error($"Forbidden token(s) in request: {string.Join(", ", diagnostics.Select(a => a.GetMessage()))}");
+                return req.CreateResponse(HttpStatusCode.Forbidden, "Forbidden token in request");
             }
 
             ScriptState<object> result = null;
 
             Exception evalException = null;
-            
+
+            var sb = new StringBuilder();
+            var textWr = new StringWriter(sb);
+            var globals = new Globals
+            {
+                Console = textWr,
+                Random = random
+            };
+
             try
             {
                 sw.Restart();
-                result = await eval.RunAsync();
+                result = await eval.RunAsync(globals: globals, catchException: (e) => { evalException = e; return true; });
                 sw.Stop();
             }
             catch (Exception ex)
@@ -89,21 +102,27 @@ namespace CSDiscordFunction
                 }
             }
 
-            if (result != null && result.Exception == null)
+            if (result.Exception == null)
             {
                 log.Info($"executed '{code}'");
-                return req.CreateResponse(HttpStatusCode.OK, new Result(result, sw.Elapsed, compileTime, evalException));
+                return req.CreateResponse(HttpStatusCode.OK, new Result(result, sb.ToString(), sw.Elapsed, compileTime, evalException));
             }
             else
             {
                 log.Warning($"failed to execute '{code}'");
-                return req.CreateResponse(HttpStatusCode.BadRequest, new Result(result, sw.Elapsed, compileTime, evalException));
+                return req.CreateResponse(HttpStatusCode.BadRequest, new Result(result, sb.ToString(), sw.Elapsed, compileTime, evalException));
             }
+        }
+
+        public class Globals
+        {
+            public TextWriter Console { get; set; }
+            public Random Random { get; set; }
         }
 
         public class Result
         {
-            public Result(ScriptState<object> state, TimeSpan executionTime, TimeSpan compileTime, Exception ex = null)
+            public Result(ScriptState<object> state, string consoleOut, TimeSpan executionTime, TimeSpan compileTime, Exception ex = null)
             {
                 if (state == null && ex == null)
                 {
@@ -120,6 +139,7 @@ namespace CSDiscordFunction
                     return;
                 }
 
+                ConsoleOut = consoleOut;
                 ReturnValue = state.ReturnValue;
                 Code = state.Script.Code;
                 Exception = state.Exception?.Message ?? ex?.Message;
@@ -132,6 +152,8 @@ namespace CSDiscordFunction
             public string ExceptionType { get; set; }
 
             public string Code { get; set; }
+
+            public string ConsoleOut { get; set; }
 
             public TimeSpan ExecutionTime { get; set; }
 
