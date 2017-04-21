@@ -58,13 +58,13 @@ namespace CSDiscordFunction
         {
             var code = await req.Content.ReadAsStringAsync();
             var sw = Stopwatch.StartNew();
-            
+
             var eval = CSharpScript.Create(code, Options, typeof(Globals));
-            
+
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
             var compileResult = await compilation.GetAllDiagnosticsAsync();
             var compileErrors = compileResult.Where(a => a.Severity == DiagnosticSeverity.Error).ToImmutableArray();
-            
+
             sw.Stop();
             var compileTime = sw.Elapsed;
 
@@ -83,7 +83,7 @@ namespace CSDiscordFunction
                     ReturnValue = null
                 });
             }
-            
+
             ScriptState<object> result = null;
 
             var sb = new StringBuilder();
@@ -93,36 +93,20 @@ namespace CSDiscordFunction
                 Console = textWr,
                 Random = random
             };
-            Exception evalException = null;
 
-            try
-            {
-                sw.Restart();
-                result = await eval.RunAsync(globals, ex => true);
-                sw.Stop();
-            }
-            catch (Exception ex)
-            {
-                evalException = ex;
-                log.Error(ex.ToString());
-            }
-            finally
-            {
-                if (sw?.IsRunning ?? false)
-                {
-                    sw?.Stop();
-                }
-            }
+            sw.Restart();
+            result = await eval.RunAsync(globals, ex => true);
+            sw.Stop();
 
             if (result.Exception == null)
             {
                 log.Info($"executed '{code}'");
-                return req.CreateResponse(HttpStatusCode.OK, new Result(result, sb.ToString(), sw.Elapsed, compileTime, evalException));
+                return req.CreateResponse(HttpStatusCode.OK, new Result(result, sb.ToString(), sw.Elapsed, compileTime));
             }
             else
             {
                 log.Warning($"failed to execute '{code}'");
-                return req.CreateResponse(HttpStatusCode.BadRequest, new Result(result, sb.ToString(), sw.Elapsed, compileTime, evalException));
+                return req.CreateResponse(HttpStatusCode.BadRequest, new Result(result, sb.ToString(), sw.Elapsed, compileTime));
             }
         }
 
@@ -136,30 +120,22 @@ namespace CSDiscordFunction
         {
             public Result()
             {
-
             }
 
-            public Result(ScriptState<object> state, string consoleOut, TimeSpan executionTime, TimeSpan compileTime, Exception ex = null)
+            public Result(ScriptState<object> state, string consoleOut, TimeSpan executionTime, TimeSpan compileTime)
             {
-                if (state == null && ex == null)
+                if (state == null)
                 {
                     throw new ArgumentNullException(nameof(state));
                 }
 
                 ExecutionTime = executionTime;
                 CompileTime = compileTime;
-
-                if (state == null)
-                {
-                    Exception = ex.Message;
-                    ExceptionType = ex.GetType().Name;
-                    return;
-                }
-
                 ConsoleOut = consoleOut;
                 ReturnValue = state.ReturnValue;
                 Code = state.Script.Code;
-                Exception = state.Exception?.Message ?? ex?.Message;
+                Exception = state.Exception?.Message;
+                ExceptionType = state.Exception?.GetType().Name;
             }
 
             public object ReturnValue { get; set; }
