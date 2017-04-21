@@ -16,6 +16,7 @@ using System.Web.Http;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.IO;
 using System.Text;
+using Microsoft.CodeAnalysis;
 
 namespace CSDiscordFunction
 {
@@ -57,23 +58,33 @@ namespace CSDiscordFunction
         {
             var code = await req.Content.ReadAsStringAsync();
             var sw = Stopwatch.StartNew();
-
+            
             var eval = CSharpScript.Create(code, Options, typeof(Globals));
-
+            
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
-
-            var diagnostics = await compilation.GetAnalyzerDiagnosticsAsync(Analyzers, CancellationToken.None);
+            var compileResult = await compilation.GetAllDiagnosticsAsync();
+            var compileErrors = compileResult.Where(a => a.Severity == DiagnosticSeverity.Error).ToImmutableArray();
+            
             sw.Stop();
             var compileTime = sw.Elapsed;
-            if (!diagnostics.IsEmpty)
+
+            if (compileErrors.Length > 0)
             {
-                log.Error($"Forbidden token(s) in request: {string.Join(", ", diagnostics.Select(a => a.GetMessage()))}");
-                return req.CreateResponse(HttpStatusCode.Forbidden, "Forbidden token in request");
+                log.Warning($"failed to compile '{code}'");
+                var ex = new CompilationErrorException(string.Join("\n", compileErrors.Select(a => a.GetMessage())), compileErrors);
+                return req.CreateResponse(HttpStatusCode.BadRequest, new Result
+                {
+                    Code = code,
+                    CompileTime = sw.Elapsed,
+                    ConsoleOut = string.Empty,
+                    Exception = ex.Message,
+                    ExceptionType = ex.GetType().Name,
+                    ExecutionTime = TimeSpan.FromMilliseconds(0),
+                    ReturnValue = null
+                });
             }
-
+            
             ScriptState<object> result = null;
-
-            Exception evalException = null;
 
             var sb = new StringBuilder();
             var textWr = new StringWriter(sb);
@@ -82,11 +93,12 @@ namespace CSDiscordFunction
                 Console = textWr,
                 Random = random
             };
+            Exception evalException = null;
 
             try
             {
                 sw.Restart();
-                result = await eval.RunAsync(globals: globals, catchException: (e) => { evalException = e; return true; });
+                result = await eval.RunAsync(globals, ex => true);
                 sw.Stop();
             }
             catch (Exception ex)
@@ -122,6 +134,11 @@ namespace CSDiscordFunction
 
         public class Result
         {
+            public Result()
+            {
+
+            }
+
             public Result(ScriptState<object> state, string consoleOut, TimeSpan executionTime, TimeSpan compileTime, Exception ex = null)
             {
                 if (state == null && ex == null)
