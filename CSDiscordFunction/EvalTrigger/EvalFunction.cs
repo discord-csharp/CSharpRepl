@@ -15,11 +15,16 @@ namespace CSDiscordFunction
     {
         static EvalFunction()
         {
-            string assemblyBase = ResolveActualAssemblyPath() + ".config";
+            string assemblyBase = ResolveActualAssemblyPath();
+            string configBase = assemblyBase;
+            if (configBase.Contains("wwwroot"))
+            {
+                configBase = Path.Combine(Directory.GetParent(Path.GetDirectoryName(configBase)).FullName, "web.config");
+            }
 
             var setup = new AppDomainSetup()
             {
-                ConfigurationFile = assemblyBase,
+                ConfigurationFile = configBase,
                 ApplicationBase = Path.GetDirectoryName(assemblyBase),
                 ApplicationName = "Sandbox",
                 DisallowCodeDownload = true,
@@ -85,6 +90,7 @@ namespace CSDiscordFunction
                 var codebase = Assembly.GetAssembly(typeof(Eval)).CodeBase.Replace("file:///", string.Empty).Replace("/", "\\");
                 assemblyBase = codebase;
             }
+
             Console.WriteLine($"Resolved Assembly path to {assemblyBase}");
             return assemblyBase;
         }
