@@ -82,8 +82,8 @@ namespace CSDiscordFunction
             var assemblyBase = Assembly.GetExecutingAssembly().Location;
             if (assemblyBase.Contains(Environment.GetEnvironmentVariable("temp")))
             {
-                var assemblyFile = Path.GetFileName(Assembly.GetExecutingAssembly().Location);
-                assemblyBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyFile);
+                var codebase = Assembly.GetAssembly(typeof(Eval)).CodeBase.Replace("file:///", string.Empty).Replace("/", "\\");
+                assemblyBase = codebase;
             }
             Console.WriteLine($"Resolved Assembly path to {assemblyBase}");
             return assemblyBase;
