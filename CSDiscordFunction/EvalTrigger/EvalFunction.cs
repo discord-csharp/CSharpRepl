@@ -45,6 +45,7 @@ namespace CSDiscordFunction
 
         public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
         {
+            log.Info(ResolveActualAssemblyPath());
 
             var evalType = typeof(Eval);
             var eval = (Eval)domain.CreateInstanceAndUnwrap(evalType.Assembly.FullName, evalType.FullName);
