@@ -16,11 +16,13 @@ namespace CSDiscordFunction
         static EvalFunction()
         {
             string assemblyBase = ResolveActualAssemblyPath();
-            string configBase = assemblyBase;
+            string configBase = assemblyBase + ".config";
             if (configBase.Contains("wwwroot"))
             {
                 configBase = Path.Combine(Directory.GetParent(Path.GetDirectoryName(configBase)).FullName, "web.config");
             }
+            Console.WriteLine($"Using {configBase} for config");
+            Console.WriteLine($"Using {assemblyBase} for application base");
 
             var setup = new AppDomainSetup()
             {
