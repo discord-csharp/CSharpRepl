@@ -71,8 +71,6 @@ namespace CSDiscordFunction
             return req.CreateResponse(result.Exception == null ? HttpStatusCode.OK : HttpStatusCode.BadRequest, Result.FromEvalResult(result));
         }
 
-        private static Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>();
-
         private static Assembly AssemblyResolve(object sender, ResolveEventArgs args)
         {
             Assembly assembly = null;
