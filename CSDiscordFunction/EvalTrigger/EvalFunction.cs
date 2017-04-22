@@ -51,6 +51,15 @@ namespace CSDiscordFunction
             var code = await req.Content.ReadAsStringAsync();
             var result = eval.RunEval(code);
 
+            if (result.Exception == null)
+            {
+                log.Info($"Executed {code}");
+            }
+            else
+            {
+                log.Warning($"Failed to execute {code}");
+            }
+
             return req.CreateResponse(result.Exception == null ? HttpStatusCode.OK : HttpStatusCode.BadRequest, Result.FromEvalResult(result));
         }
 
@@ -75,7 +84,7 @@ namespace CSDiscordFunction
                 var assemblyFile = Path.GetFileName(Assembly.GetExecutingAssembly().Location);
                 assemblyBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyFile);
             }
-
+            Console.WriteLine($"Resolved Assembly path to {assemblyBase}");
             return assemblyBase;
         }
 
