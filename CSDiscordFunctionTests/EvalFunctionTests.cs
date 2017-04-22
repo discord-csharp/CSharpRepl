@@ -14,7 +14,7 @@ namespace CSDiscordFunctionTests
         [InlineData("return 1+1;", 2L)]
         [InlineData("return Random.Next(1,2);", 1L)]
         [InlineData(@"var a = ""thing""; return a;", "thing")]
-
+        [InlineData("Math.Pow(1,2)", 1D)]
         public async Task Eval_WellFormattedCodeExecutes(string expr, object expected)
         {
             var (result, statusCode) = await Execute(expr);
