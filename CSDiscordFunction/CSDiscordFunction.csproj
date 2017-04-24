@@ -184,6 +184,7 @@
     <Compile Include="EvalTrigger\EvalResult.cs" />
     <Compile Include="EvalTrigger\Globals.cs" />
     <Compile Include="EvalTrigger\Result.cs" />
+    <Compile Include="EvalTrigger\TaskExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

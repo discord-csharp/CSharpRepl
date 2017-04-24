@@ -1,7 +1,7 @@
 ﻿{
   "disabled": false,
   "scriptFile": "..\\bin\\CSDiscordFunction.dll",
-  "entryPoint": "CSDiscordFunction.EvalFunction.Run",
+  "entryPoint": "CSDiscordFunction.EvalTrigger.EvalFunction.Run",
   "bindings": [
     {
       "authLevel": "function",

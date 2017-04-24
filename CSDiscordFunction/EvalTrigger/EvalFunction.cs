@@ -7,9 +7,8 @@ using Microsoft.Azure.WebJobs.Host;
 using System.IO;
 using System.Security.Policy;
 using System.Security;
-using System.Collections.Generic;
 
-namespace CSDiscordFunction
+namespace CSDiscordFunction.EvalTrigger
 {
     public class EvalFunction
     {

@@ -1,7 +1,8 @@
 ﻿using System;
 using Microsoft.CodeAnalysis.Scripting;
+using Newtonsoft.Json;
 
-namespace CSDiscordFunction
+namespace CSDiscordFunction.EvalTrigger
 {
     [Serializable]
     public class EvalResult
@@ -20,13 +21,14 @@ namespace CSDiscordFunction
             ExecutionTime = executionTime;
             CompileTime = compileTime;
             ConsoleOut = consoleOut;
-            ReturnValue = state.ReturnValue;
+            ReturnValue = state.ReturnValue == null ? null : JsonConvert.SerializeObject(state.ReturnValue);
+            Type = state.ReturnValue?.GetType();
             Code = state.Script.Code;
             Exception = state.Exception?.Message;
             ExceptionType = state.Exception?.GetType().Name;
         }
 
-        public object ReturnValue { get; set; }
+        public string ReturnValue { get; set; }
 
         public string Exception { get; set; }
 
@@ -35,6 +37,8 @@ namespace CSDiscordFunction
         public string Code { get; set; }
 
         public string ConsoleOut { get; set; }
+        
+        public Type Type { get; set; }
 
         public TimeSpan ExecutionTime { get; set; }
 

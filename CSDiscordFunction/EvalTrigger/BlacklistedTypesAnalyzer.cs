@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace CSDiscordFunction
+namespace CSDiscordFunction.EvalTrigger
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class BlacklistedTypesAnalyzer : DiagnosticAnalyzer

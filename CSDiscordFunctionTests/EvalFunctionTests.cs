@@ -1,4 +1,4 @@
-﻿using CSDiscordFunction;
+﻿using CSDiscordFunction.EvalTrigger;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Xunit;

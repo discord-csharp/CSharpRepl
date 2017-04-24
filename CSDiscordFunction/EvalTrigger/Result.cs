@@ -1,6 +1,7 @@
 ﻿using System;
+using Newtonsoft.Json;
 
-namespace CSDiscordFunction
+namespace CSDiscordFunction.EvalTrigger
 {
     public class Result
     {
@@ -20,9 +21,9 @@ namespace CSDiscordFunction
 
         public static Result FromEvalResult(EvalResult er)
         {
-            return new Result
+            var result = new Result
             {
-                ReturnValue = er.ReturnValue,
+
                 Code = er.Code,
                 CompileTime = er.CompileTime,
                 ConsoleOut = er.ConsoleOut,
@@ -30,6 +31,13 @@ namespace CSDiscordFunction
                 ExceptionType = er.ExceptionType,
                 ExecutionTime = er.ExecutionTime
             };
+
+            if (er.Type != null && er.ReturnValue != null)
+            {
+                result.ReturnValue = JsonConvert.DeserializeObject(er.ReturnValue, er.Type);
+            }
+
+            return result;
         }
     }
 

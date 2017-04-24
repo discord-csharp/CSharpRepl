@@ -13,7 +13,7 @@ using System.IO;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
-namespace CSDiscordFunction
+namespace CSDiscordFunction.EvalTrigger
 {
     public class Eval : MarshalByRefObject
     {
@@ -37,7 +37,8 @@ namespace CSDiscordFunction
             typeof(List<string>).Assembly,
             typeof(JsonConvert).Assembly,
             typeof(HttpConfiguration).Assembly,
-            typeof(string).Assembly
+            typeof(string).Assembly,
+            typeof(ValueTuple).Assembly
         };
 
         private static readonly ScriptOptions Options =
@@ -52,15 +53,16 @@ namespace CSDiscordFunction
 
         public EvalResult RunEval(string code)
         {
+            var sb = new StringBuilder();
+            var textWr = new StringWriter(sb);
+
             var sw = Stopwatch.StartNew();
-
             var eval = CSharpScript.Create(code, Options, typeof(Globals));
-
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
-            var compileResult = compilation.GetAllDiagnosticsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            var compileResult = compilation.GetAllDiagnosticsAsync().AsSync(true);
             var compileErrors = compileResult.Where(a => a.Severity == DiagnosticSeverity.Error).ToImmutableArray();
-
             sw.Stop();
+
             var compileTime = sw.Elapsed;
 
             if (compileErrors.Length > 0)
@@ -70,18 +72,15 @@ namespace CSDiscordFunction
                 {
                     Code = code,
                     CompileTime = sw.Elapsed,
-                    ConsoleOut = string.Empty,
+                    ConsoleOut = sb.ToString(),
                     Exception = ex.Message,
                     ExceptionType = ex.GetType().Name,
                     ExecutionTime = TimeSpan.FromMilliseconds(0),
-                    ReturnValue = null
+                    ReturnValue = null,
+                    Type = null
                 };
             }
-
-            ScriptState<object> result = null;
-
-            var sb = new StringBuilder();
-            var textWr = new StringWriter(sb);
+            
             var globals = new Globals
             {
                 Console = textWr,
@@ -89,7 +88,7 @@ namespace CSDiscordFunction
             };
 
             sw.Restart();
-            result = eval.RunAsync(globals, ex => true).ConfigureAwait(false).GetAwaiter().GetResult();
+            var result = eval.RunAsync(globals, ex => true).AsSync(false);
             sw.Stop();
 
             if (result.Exception == null)

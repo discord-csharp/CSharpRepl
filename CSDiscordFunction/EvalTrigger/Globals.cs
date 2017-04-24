@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace CSDiscordFunction
+namespace CSDiscordFunction.EvalTrigger
 {
     public class Globals
     {
