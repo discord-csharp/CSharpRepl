@@ -7,15 +7,16 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using System.Diagnostics;
 using Newtonsoft.Json;
-using System.Web.Http;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.IO;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using System.Threading.Tasks;
+using System.Net.Http;
 
-namespace CSDiscordFunction.EvalTrigger
+namespace CSDiscordService
 {
-    public class Eval : MarshalByRefObject
+    public class Eval
     {
         private static readonly string[] DefaultImports =
         {
@@ -33,12 +34,12 @@ namespace CSDiscordFunction.EvalTrigger
 
         private static readonly Assembly[] DefaultReferences =
         {
-            typeof(Enumerable).Assembly,
-            typeof(List<string>).Assembly,
-            typeof(JsonConvert).Assembly,
-            typeof(HttpConfiguration).Assembly,
-            typeof(string).Assembly,
-            typeof(ValueTuple).Assembly
+            typeof(Enumerable).GetTypeInfo().Assembly,
+            typeof(List<string>).GetTypeInfo().Assembly,
+            typeof(JsonConvert).GetTypeInfo().Assembly,
+            typeof(string).GetTypeInfo().Assembly,
+            typeof(ValueTuple).GetTypeInfo().Assembly,
+            typeof(HttpClient).GetTypeInfo().Assembly
         };
 
         private static readonly ScriptOptions Options =
@@ -51,7 +52,7 @@ namespace CSDiscordFunction.EvalTrigger
 
         private static readonly Random random = new Random();
 
-        public EvalResult RunEval(string code)
+        public async Task<EvalResult> RunEvalAsync(string code)
         {
             var sb = new StringBuilder();
             var textWr = new StringWriter(sb);
@@ -59,7 +60,7 @@ namespace CSDiscordFunction.EvalTrigger
             var sw = Stopwatch.StartNew();
             var eval = CSharpScript.Create(code, Options, typeof(Globals));
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
-            var compileResult = compilation.GetAllDiagnosticsAsync().AsSync(true);
+            var compileResult = await compilation.GetAllDiagnosticsAsync();
             var compileErrors = compileResult.Where(a => a.Severity == DiagnosticSeverity.Error).ToImmutableArray();
             sw.Stop();
 
@@ -77,7 +78,7 @@ namespace CSDiscordFunction.EvalTrigger
                     ExceptionType = ex.GetType().Name,
                     ExecutionTime = TimeSpan.FromMilliseconds(0),
                     ReturnValue = null,
-                    Type = null
+                    ReturnTypeName = null
                 };
             }
             
@@ -88,7 +89,7 @@ namespace CSDiscordFunction.EvalTrigger
             };
 
             sw.Restart();
-            var result = eval.RunAsync(globals, ex => true).AsSync(false);
+            var result = await eval.RunAsync(globals, ex => true);
             sw.Stop();
 
             if (result.Exception == null)

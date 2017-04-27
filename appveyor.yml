@@ -11,11 +11,11 @@ build:
   verbosity: normal
 deploy:
 - provider: WebDeploy
-  server: https://csharpdiscordfn.scm.azurewebsites.net:443/msdeploy.axd?site=csharpdiscordfn
-  website: csharpdiscordfn
-  username: $csharpdiscordfn
+  server: https://csdiscordservice.scm.azurewebsites.net:443/msdeploy.axd?site=csdiscordservice
+  website: csdiscordservice
+  username: $csdiscordservice
   password:
-    secure: vb/vDSKqXJhCGcwVLREgeNHiu6BW5Ej7h+zJv7zAj5SbQ8q75rdxIKDt/fO3uq7FpXhqEl4LUWS1KZtXzLA1gA==
-  artifact: CSDiscordFunction
+    secure: 7ZZv5auxcejdquiVPI7WEu+gJ7DHESAN0yudFAYMpMd4enJChl20Fw5XVNyYW8HB+OGP4THbSqCN/qorYExNBw==
+  artifact: CSDiscordService
   remove_files: true
   app_offline: true

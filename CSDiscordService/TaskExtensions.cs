@@ -2,7 +2,7 @@
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
-namespace CSDiscordFunction.EvalTrigger
+namespace CSDiscordService
 {
     public static class TaskExtensions
     {

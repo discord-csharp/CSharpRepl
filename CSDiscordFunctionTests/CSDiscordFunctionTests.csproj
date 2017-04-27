@@ -173,12 +173,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CSDiscordFunction\CSDiscordFunction.csproj">
-      <Project>{7D338C62-22E5-4BFE-8FAB-C5371257D9CF}</Project>
-      <Name>CSDiscordFunction</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
