@@ -44,8 +44,8 @@ namespace CSDiscordService
             ExceptionType = state.Exception?.GetType().Name;
 
 
-            var genericArgs = type.GetGenericArguments();
-            if (genericArgs.Length > 0)
+            var genericArgs = type?.GetGenericArguments();
+            if (genericArgs != null && genericArgs.Length > 0)
             {
                 ReturnTypeName = ReturnTypeName.Replace($"`{genericArgs.Length}", $"<{string.Join(", ", genericArgs.Select(a => a.Name))}>");
             }
