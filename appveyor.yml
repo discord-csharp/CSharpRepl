@@ -5,7 +5,7 @@ platform: Any CPU
 before_build:
 - ps: nuget restore CSDiscord.sln
 build:
-  project: CSDiscordService/CSDiscordService.csproj
+  project: CSDiscord.sln
   publish_wap: true
   parallel: true
   verbosity: normal
