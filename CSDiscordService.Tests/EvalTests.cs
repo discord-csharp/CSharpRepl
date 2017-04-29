@@ -1,12 +1,41 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CSDiscordService
 {
-    public class EvalFunctionTests
+    public class EvalTests : IDisposable
     {
+        private static readonly JsonSerializerSettings JsonSettings =
+            new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
+
+        public EvalTests(ITestOutputHelper outputHelper)
+        {
+            var config = new ConfigurationBuilder()
+                .Build();
+
+            var host = new WebHostBuilder()
+                .UseConfiguration(config)
+                .UseStartup<Startup>();
+
+            Log = outputHelper;
+            Server = new TestServer(host);
+            Client = Server.CreateClient();
+        }
+
+        private ITestOutputHelper Log { get; }
+
+        private TestServer Server { get; }
+
+        private HttpClient Client { get; }
+
         [Theory]
         [InlineData("1+1", 2L)]
         [InlineData("return 1+1;", 2L)]
@@ -19,7 +48,7 @@ namespace CSDiscordService
             var (result, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
-            Assert.Equal<string>(expr, result.Code);
+            Assert.Equal(expr, result.Code);
             Assert.Equal(expected, result.ReturnValue);
         }
 
@@ -79,13 +108,33 @@ namespace CSDiscordService
             Assert.Equal("abcdefg", result.ReturnValue);
         }
 
-        private async Task<(Result, HttpStatusCode)> Execute(string expr)
+        private async Task<(EvalResult, HttpStatusCode)> Execute(string expr)
         {
-            ;
+            using (var response = await Client.PostAsPlainTextAsync("/eval", expr))
+            {
+                EvalResult result = null;
+                if (response.Content != null)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
 
-            var result = await EvalFunction.Run(request, new DummyWriter(TraceLevel.Off));
-            var resultObj = JsonConvert.DeserializeObject<Result>(result.AsString());
-            return (resultObj, result.StatusCode);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        result = JsonConvert.DeserializeObject<EvalResult>(content, JsonSettings);
+                    }
+                    else
+                    {
+                        Log.WriteLine(content);
+                    }
+                }
+
+                return (result, response.StatusCode);
+            }
+        }
+
+        public void Dispose()
+        {
+            Client.Dispose();
+            Server.Dispose();
         }
     }
 }
