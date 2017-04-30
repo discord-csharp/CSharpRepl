@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
+using System.Linq;
 
 namespace CSDiscordService
 {
@@ -70,14 +72,14 @@ namespace CSDiscordService
         }
         
         [Theory]
-        [InlineData("return 1 +1", "CompilationErrorException", "; expected")]
+        [InlineData("return 1+1", "CompilationErrorException", "; expected")]
         [InlineData(@"throw new Exception(""test"");", "Exception", "test")]
         [InlineData("return Environment.MachineName;", "CompilationErrorException", "Usage of this API is prohibited")]
         [InlineData("return DoesNotCompile()", "CompilationErrorException", "; expected\nThe name 'DoesNotCompile' does not exist in the current context")]
         public async Task Eval_FaultyCodeThrowsExpectedException(string expr, string exception, string message)
         {
             var (result, statusCode) = await Execute(expr);
-
+            
             Assert.Equal(HttpStatusCode.BadRequest, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Equal(exception, result.ExceptionType);

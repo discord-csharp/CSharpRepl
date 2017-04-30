@@ -6,15 +6,23 @@ before_build:
   - ps: dotnet --info
   - ps: dotnet restore --configfile .nuget/nuget.config
 build:
-  project: CSDiscord.sln
-  publish_wap: true
-  parallel: true
-  verbosity: normal
+  - ps: dotnet build CSDiscord.sln --configuration Release
+  - ps: Push-Location
+  - ps: cd ./CSDiscordService/
+  - ps: dotnet publish --configuration Release
+  - ps: copy ..\manifest.xml bin\Release\netcoreapp1.1\manifest.xml
+  - ps: mkdir ..\artifacts
+  - ps: &"c:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" '-verb:sync' '-source:archiveDir="c:\projects\csdiscordservice\bin\Release\netcoreapp1.1"' '-dest:package="c:\projects\artifacts\CSDiscordService.zip"' '-declareParam:name="IIS Web Application Name",defaultValue="csdiscordservice",tags="IisApp"' '-declareParam:name="IIS Web Application Name",type="ProviderPath",scope="IisApp",match="^.*csdiscordservice$"' '-declareParam:name="IIS Web Application Name",type="ProviderPath",scope="setAcl",match="^.*csdiscordservice'
+  - ps: Pop-Location
 test_script:
   - ps: Push-Location
   - ps: cd ./CSDiscordService.Tests/
   - ps: dotnet xunit
   - ps: Pop-Location
+artifacts:
+- path: artifacts/CSDiscordService.zip
+  name: CSDiscordFunction
+  type: WebDeployPackage
 deploy:
 - provider: WebDeploy
   server: https://csdiscordservice.scm.azurewebsites.net:443/msdeploy.axd?site=csdiscordservice
@@ -22,6 +30,6 @@ deploy:
   username: $csdiscordservice
   password:
     secure: 7ZZv5auxcejdquiVPI7WEu+gJ7DHESAN0yudFAYMpMd4enJChl20Fw5XVNyYW8HB+OGP4THbSqCN/qorYExNBw==
-  artifact: CSDiscordService
+  artifact: CSDiscordFunction
   remove_files: true
   app_offline: true

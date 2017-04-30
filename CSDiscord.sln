@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repository", "Repository", "{6A062ACF-A939-480C-838A-9F14D728DB71}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
+		manifest.xml = manifest.xml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{443496A8-A004-4C46-8C8F-66FD55AB6402}"
