@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
+using Newtonsoft.Json.Linq;
 
 namespace CSDiscordService
 {
@@ -53,19 +54,18 @@ namespace CSDiscordService
         }
 
         [Theory]
-        [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"")", "@", 1)]
-        [InlineData(@"return Enumerable.Range(0,1).Select(a=>""@"");", "@", 1)]
-        public async Task Eval_EnuymerablesReturnArraysOf(string expr, object expected, int count)
+        [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"")", "@", 1, "List<String>")]
+        [InlineData(@"return Enumerable.Range(0,1).Select(a=>""@"");", "@", 1, "List<String>")]
+        public async Task Eval_EnuymerablesReturnArraysOf(string expr, object expected, int count, string type)
         {
             var (result, statusCode) = await Execute(expr);
 
-            Assert.IsType<object[]>(result.ReturnValue);
-
-            var res = result.ReturnValue as object[];
+            var res = result.ReturnValue as JArray;
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal(expected, res[0]);
-            Assert.Equal(count, res.Length);
+            Assert.Equal(expected, res[0].Value<string>());
+            Assert.Equal(count, res.Count);
+            Assert.Equal(type, result.ReturnTypeName);
         }
 
 
@@ -117,13 +117,14 @@ namespace CSDiscordService
                 {
                     var content = await response.Content.ReadAsStringAsync();
 
-                    if (response.IsSuccessStatusCode)
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest)
                     {
                         result = JsonConvert.DeserializeObject<EvalResult>(content, JsonSettings);
                     }
                     else
                     {
                         Log.WriteLine(content);
+                        throw new WebException($"Unexpected status code: {response.StatusCode}");
                     }
                 }
 

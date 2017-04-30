@@ -23,7 +23,7 @@ namespace CSDiscordService
             ReturnValue = state.ReturnValue;
             var type = state.ReturnValue?.GetType();
             
-            if (type?.GetTypeInfo()?.ImplementedInterfaces?.Contains(typeof(IEnumerator)) ?? false)
+            if (type?.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerator)) ?? false)
             {
                 var genericParams = type.GetGenericArguments();
 
