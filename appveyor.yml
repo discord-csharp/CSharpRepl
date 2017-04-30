@@ -3,16 +3,18 @@ image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
 before_build:
-- ps: nuget restore CSDiscord.sln
+  - ps: dotnet --info
+  - ps: dotnet restore --configfile .nuget/nuget.config
 build:
   project: CSDiscord.sln
   publish_wap: true
   parallel: true
   verbosity: normal
-before_test:
-  - dotnet --version
 test_script:
-  - dotnet xunit
+  - ps: Push-Location
+  - ps: cd ./CSDiscordService.Tests/
+  - ps: dotnet xunit
+  - ps: Pop-Location
 deploy:
 - provider: WebDeploy
   server: https://csdiscordservice.scm.azurewebsites.net:443/msdeploy.axd?site=csdiscordservice
