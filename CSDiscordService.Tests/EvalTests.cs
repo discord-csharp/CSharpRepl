@@ -38,19 +38,20 @@ namespace CSDiscordService
         private HttpClient Client { get; }
 
         [Theory]
-        [InlineData("1+1", 2L)]
-        [InlineData("return 1+1;", 2L)]
-        [InlineData("return Random.Next(1,2);", 1L)]
-        [InlineData(@"var a = ""thing""; return a;", "thing")]
-        [InlineData("Math.Pow(1,2)", 1D)]
-        [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"");", null)]
-        public async Task Eval_WellFormattedCodeExecutes(string expr, object expected)
+        [InlineData("1+1", 2L, "Int32")]
+        [InlineData("return 1+1;", 2L, "Int32")]
+        [InlineData("return Random.Next(1,2);", 1L, "Int32")]
+        [InlineData(@"var a = ""thing""; return a;", "thing", "String")]
+        [InlineData("Math.Pow(1,2)", 1D, "Double")]
+        [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"");", null, null)]
+        public async Task Eval_WellFormattedCodeExecutes(string expr, object expected, string type)
         {
             var (result, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Equal(expected, result.ReturnValue);
+            Assert.Equal(type, result.ReturnTypeName);
         }
 
         [Theory]
@@ -67,8 +68,7 @@ namespace CSDiscordService
             Assert.Equal(count, res.Count);
             Assert.Equal(type, result.ReturnTypeName);
         }
-
-
+        
         [Theory]
         [InlineData("return 1 +1", "CompilationErrorException", "; expected")]
         [InlineData(@"throw new Exception(""test"");", "Exception", "test")]
@@ -106,6 +106,7 @@ namespace CSDiscordService
             Assert.Equal(expr, result.Code);
             Assert.Equal("test\r\n", result.ConsoleOut);
             Assert.Equal("abcdefg", result.ReturnValue);
+            Assert.Equal("String", result.ReturnTypeName);
         }
 
         private async Task<(EvalResult, HttpStatusCode)> Execute(string expr)
