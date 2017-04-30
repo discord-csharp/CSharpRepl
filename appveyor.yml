@@ -33,3 +33,5 @@ deploy:
   artifact: CSDiscordFunction
   remove_files: true
   app_offline: true
+after_deploy:
+- ps: iwr -uri http://csdiscordservice.azurewebsites.net/Eval -UseBasicParsing -Body "1+1" -Method Post -ContentType text/plain
