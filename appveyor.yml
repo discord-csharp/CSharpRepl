@@ -9,6 +9,10 @@ build:
   publish_wap: true
   parallel: true
   verbosity: normal
+before_test:
+  - dotnet --version
+test_script:
+  - dotnet xunit
 deploy:
 - provider: WebDeploy
   server: https://csdiscordservice.scm.azurewebsites.net:443/msdeploy.axd?site=csdiscordservice
