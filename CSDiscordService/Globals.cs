@@ -5,8 +5,20 @@ namespace CSDiscordService
 {
     public class Globals
     {
-        public TextWriter Console { get; set; }
-        public Random Random { get; set; }
+        // ReSharper disable once InconsistentNaming
+        private static readonly Random random = new Random();
+
+        public Globals(TextWriter consoleWriter)
+        {
+            if (consoleWriter == null)
+                throw new ArgumentNullException(nameof(consoleWriter));
+
+            __Console = consoleWriter;
+        }
+
+        // ReSharper disable once InconsistentNaming
+        public TextWriter __Console { get; }
+        public Random Random => random;
     }
 
 }

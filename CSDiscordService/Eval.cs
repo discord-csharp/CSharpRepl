@@ -50,8 +50,6 @@ namespace CSDiscordService
         private static readonly ImmutableArray<DiagnosticAnalyzer> Analyzers =
             ImmutableArray.Create<DiagnosticAnalyzer>(new BlacklistedTypesAnalyzer());
 
-        private static readonly Random random = new Random();
-
         public async Task<EvalResult> RunEvalAsync(string code)
         {
             var sb = new StringBuilder();
@@ -81,12 +79,8 @@ namespace CSDiscordService
                     ReturnTypeName = null
                 };
             }
-            
-            var globals = new Globals
-            {
-                Console = textWr,
-                Random = random
-            };
+
+            var globals = new Globals(textWr);
 
             sw.Restart();
             var result = await eval.RunAsync(globals, ex => true);
