@@ -91,16 +91,8 @@ namespace CSDiscordService
             sw.Restart();
             var result = await eval.RunAsync(globals, ex => true);
             sw.Stop();
-
-            if (result.Exception == null)
-            {
-                return new EvalResult(result, sb.ToString(), sw.Elapsed, compileTime);
-            }
-            else
-            {
-                return new EvalResult(result, sb.ToString(), sw.Elapsed, compileTime);
-            }
-
+            
+            return new EvalResult(result, sb.ToString(), sw.Elapsed, compileTime);
         }
     }
 
