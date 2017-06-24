@@ -5,7 +5,7 @@ namespace CSDiscordService
 {
     public class Globals
     {
-        public TextWriter Console { get; set; }
+        public ConsoleLikeStringWriter Console { get; set; }
         public Random Random { get; set; }
     }
 
