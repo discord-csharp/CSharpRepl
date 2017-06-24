@@ -6,16 +6,16 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.0-beta6" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0-preview2-25708" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0-preview3-25879" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" Version="3.0.0-dev-61717-03" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0-preview2-25708" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0-preview3-25879" />
     <PackageReference Include="Microsoft.Net.Compilers.netcore" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Microsoft.NETCore.Compilers" Version="3.0.0-beta1-61823-08" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0-preview1-25305-02" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0-preview2-25319-04" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0-preview1-final" />
