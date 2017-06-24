@@ -18,7 +18,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta3-build3705" />
       <PackageReference Include="Microsoft.Net.Compilers.netcore" Version="3.0.0-dev-61717-03" />
       <PackageReference Include="Microsoft.NETCore.Compilers" Version="3.0.0-beta1-61823-08" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.2.0-beta1-build3642" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta1-build3642" />
   </ItemGroup>
 
   <ItemGroup>
