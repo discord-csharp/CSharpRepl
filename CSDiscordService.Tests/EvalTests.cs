@@ -9,8 +9,6 @@ using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 using Newtonsoft.Json.Linq;
-using System.Reflection;
-using System.Linq;
 
 namespace CSDiscordService
 {
@@ -109,6 +107,29 @@ namespace CSDiscordService
             Assert.Equal("test\r\n", result.ConsoleOut);
             Assert.Equal("abcdefg", result.ReturnValue);
             Assert.Equal("String", result.ReturnTypeName);
+        }
+
+        //[Fact] --disabled until c# 7.1 support is in roslyn nightlies
+        //public async Task Eval_CSharp71Supported()
+        //{
+        //    var expr = @"int thing = default; return thing;";
+        //    var (result, statusCode) = await (Execute(expr));
+
+        //    Assert.Equal(HttpStatusCode.OK, statusCode);
+        //    Assert.Equal(expr, result.Code);
+        //    Assert.Equal("0", result.ReturnValue);
+        //    Assert.Equal("Int32", result.ReturnTypeName);
+        //}
+        
+        [Fact]
+        public async Task Eval_CanUseSystemDrawing()
+        {
+            var expr = @"Console.WriteLine(System.Drawing.Color.Red);";
+            var (result, statusCode) = await (Execute(expr));
+            
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Equal("Color [Red]\r\n", result.ConsoleOut);
         }
 
         private async Task<(EvalResult, HttpStatusCode)> Execute(string expr)
