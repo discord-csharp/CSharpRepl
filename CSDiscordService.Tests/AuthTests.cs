@@ -81,7 +81,8 @@ namespace CSDiscordService
         
         private HttpClient GetClient()
         {
-            var client = Server.CreateClient();
+            var client = new HttpClient(Server.CreateHandler(), true);
+            client.BaseAddress = new Uri("http://localhsot");
             return client;
         }
 
