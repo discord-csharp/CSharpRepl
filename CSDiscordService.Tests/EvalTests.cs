@@ -4,11 +4,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 using Newtonsoft.Json.Linq;
+using System.Net.Http.Headers;
 
 namespace CSDiscordService
 {
@@ -19,16 +19,15 @@ namespace CSDiscordService
 
         public EvalTests(ITestOutputHelper outputHelper)
         {
-            var config = new ConfigurationBuilder()
-                .Build();
-
+            Environment.SetEnvironmentVariable("tokens", "test");
             var host = new WebHostBuilder()
-                .UseConfiguration(config)
+                .UseApplicationInsights()
                 .UseStartup<Startup>();
 
             Log = outputHelper;
             Server = new TestServer(host);
             Client = Server.CreateClient();
+            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", "test");
         }
 
         private ITestOutputHelper Log { get; }
@@ -68,7 +67,7 @@ namespace CSDiscordService
             Assert.Equal(count, res.Count);
             Assert.Equal(type, result.ReturnTypeName);
         }
-        
+
         [Theory]
         [InlineData("return 1+1", "CompilationErrorException", "; expected")]
         [InlineData(@"throw new Exception(""test"");", "Exception", "test")]
@@ -77,7 +76,7 @@ namespace CSDiscordService
         public async Task Eval_FaultyCodeThrowsExpectedException(string expr, string exception, string message)
         {
             var (result, statusCode) = await Execute(expr);
-            
+
             Assert.Equal(HttpStatusCode.BadRequest, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Equal(exception, result.ExceptionType);
@@ -88,7 +87,7 @@ namespace CSDiscordService
         public async Task Eval_ConsoleOutputIsCaptured()
         {
             var expr = @"Console.WriteLine(""test"");";
-            var (result, statusCode) = await (Execute(expr));
+            var (result, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
@@ -100,7 +99,7 @@ namespace CSDiscordService
         public async Task Eval_ConsoleOutputIsCapturedAndValueReturned()
         {
             var expr = @"Console.WriteLine(""test""); return ""abcdefg"";";
-            var (result, statusCode) = await (Execute(expr));
+            var (result, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
@@ -120,13 +119,13 @@ namespace CSDiscordService
         //    Assert.Equal("0", result.ReturnValue);
         //    Assert.Equal("Int32", result.ReturnTypeName);
         //}
-        
+
         [Fact]
         public async Task Eval_CanUseSystemDrawing()
         {
             var expr = @"Console.WriteLine(System.Drawing.Color.Red);";
-            var (result, statusCode) = await (Execute(expr));
-            
+            var (result, statusCode) = await Execute(expr);
+
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Equal("Color [Red]\r\n", result.ConsoleOut);

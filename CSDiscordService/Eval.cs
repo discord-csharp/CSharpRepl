@@ -13,6 +13,8 @@ using Microsoft.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace CSDiscordService
 {
@@ -30,7 +32,8 @@ namespace CSDiscordService
             "System.Threading",
             "System.Threading.Tasks",
             "System.Net.Http",
-            "Newtonsoft.Json"
+            "Newtonsoft.Json",
+            "Newtonsoft.Json.Linq"
         };
 
         private static readonly Assembly[] DefaultReferences =
@@ -57,7 +60,7 @@ namespace CSDiscordService
         {
             var sb = new StringBuilder();
             var textWr = new ConsoleLikeStringWriter(sb);
-            
+
             var sw = Stopwatch.StartNew();
             var eval = CSharpScript.Create(code, Options, typeof(Globals));
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
@@ -70,7 +73,7 @@ namespace CSDiscordService
             if (compileErrors.Length > 0)
             {
                 var ex = new CompilationErrorException(string.Join("\n", compileErrors.Select(a => a.GetMessage())), compileErrors);
-                return new EvalResult
+                var errorResult = new EvalResult
                 {
                     Code = code,
                     CompileTime = sw.Elapsed,
@@ -81,8 +84,10 @@ namespace CSDiscordService
                     ReturnValue = null,
                     ReturnTypeName = null
                 };
+
+                return errorResult;
             }
-            
+
             var globals = new Globals
             {
                 Console = textWr,
@@ -92,7 +97,7 @@ namespace CSDiscordService
             sw.Restart();
             var result = await eval.RunAsync(globals, ex => true);
             sw.Stop();
-            
+
             return new EvalResult(result, sb.ToString(), sw.Elapsed, compileTime);
         }
     }

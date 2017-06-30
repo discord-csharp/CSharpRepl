@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Text;
+using CSDiscordService.Middleware;
+using System.Linq;
 
 namespace CSDiscordService
 {
@@ -18,26 +20,30 @@ namespace CSDiscordService
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+
+            if (env.IsDevelopment())
+            {
+                builder.AddUserSecrets("CSDiscord");
+            }
             Configuration = builder.Build();
         }
 
         public IConfigurationRoot Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
             services.AddTransient<Eval>();
+            services.AddTokenAuthentication(o => o.ValidTokens = Configuration["tokens"].Split(";").ToList());
+            
             services.AddMvc(o =>
             {
                 o.RespectBrowserAcceptHeader = true;
                 o.InputFormatters.Clear();
                 o.InputFormatters.Add(new PlainTextInputFormatter());
             })
-                .AddJsonOptions(o => o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+             .AddJsonOptions(o => o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
@@ -51,7 +57,7 @@ namespace CSDiscordService
                 }
                 catch (Exception ex)
                 {
-                    var exception = JsonConvert.SerializeObject(ex, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
+                    var exception = JsonConvert.SerializeObject(ex, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
                     var exBytes = Encoding.UTF8.GetBytes(exception);
                     context.Response.StatusCode = 500;
                     await context.Response.Body.WriteAsync(exBytes, 0, exBytes.Length);
