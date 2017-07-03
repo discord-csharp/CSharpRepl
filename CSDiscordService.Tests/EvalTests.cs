@@ -56,7 +56,7 @@ namespace CSDiscordService
         [Theory]
         [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"")", "@", 1, "List<String>")]
         [InlineData(@"return Enumerable.Range(0,1).Select(a=>""@"");", "@", 1, "List<String>")]
-        public async Task Eval_EnuymerablesReturnArraysOf(string expr, object expected, int count, string type)
+        public async Task Eval_EnumerablesReturnArraysOf(string expr, object expected, int count, string type)
         {
             var (result, statusCode) = await Execute(expr);
 
