@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.Net.Compilers.netcore" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Microsoft.NETCore.Compilers" Version="3.0.0-beta1-61903-06" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0-preview2-25503-02" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0-preview2-25405-01" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0-preview1-final" />
