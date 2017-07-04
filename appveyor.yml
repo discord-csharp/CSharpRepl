@@ -47,3 +47,4 @@ environment:
   api_token:
     secure: GroejrzfkoqNfBomrM4kTrBhT9PoueDewcScZe81dYrqU42xc4WRH2gbNib7wDTz
   CLI_VERSION: 2.0.0-preview2-006497
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
