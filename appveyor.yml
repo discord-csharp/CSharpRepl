@@ -11,10 +11,7 @@ install:
   - ps: '& "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1" -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR'
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
 before_build:
-  - ps: Push-Location
-  - ps: cd ./CSDiscordService/
   - ps: dotnet --info
-  - ps: Pop-Location
   - ps: dotnet restore --configfile .nuget/nuget.config
 build_script:
   - ps: dotnet build CSDiscord.sln --configuration Release
