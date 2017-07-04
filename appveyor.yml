@@ -5,7 +5,7 @@ platform: Any CPU
 pull_requests:
   do_not_increment_build_number: true
 install:
-  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
+  - ps: $env:DOTNET_INSTALL_DIR = "..\.dotnetsdk"
   - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
   - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0-preview2/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1"
   - ps: '& "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1" -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR'
