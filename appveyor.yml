@@ -13,7 +13,7 @@ install:
 before_build:
   - ps: dotnet --info
   - ps: pwd
-  - ps: dotnet restore --configfile .\.nuget\nuget.config
+  - ps: dotnet restore --configfile C:\projects\csdiscord\.nuget\nuget.config
 build_script:
   - ps: pwd
   - ps: dotnet build CSDiscord.sln --configuration Release
