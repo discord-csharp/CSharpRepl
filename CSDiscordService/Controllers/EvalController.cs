@@ -41,8 +41,7 @@ namespace CSDiscordService.Controllers
 
             evt.Metrics.Add("CompileTime", result.CompileTime.TotalMilliseconds);
             evt.Metrics.Add("ExecutionTime", result.ExecutionTime.TotalMilliseconds);
-
-            evt.Properties.Add("Code", result.Code);
+            
             evt.Properties.Add("ConsoleOut", result.ConsoleOut);
             evt.Properties.Add("ReturnValue", JsonConvert.SerializeObject(result.ReturnValue, Formatting.Indented));
             evt.Properties.Add("ExceptionType", result.ExceptionType);
