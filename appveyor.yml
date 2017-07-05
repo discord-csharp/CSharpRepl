@@ -12,10 +12,8 @@ install:
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
 before_build:
   - ps: dotnet --info
-  - ps: pwd
   - ps: dotnet restore --configfile ..\.nuget\nuget.config
 build_script:
-  - ps: pwd
   - ps: dotnet build CSDiscord.sln --configuration Release
   - ps: cd .\CSDiscordService\
   - ps: dotnet publish --configuration Release
@@ -24,9 +22,9 @@ build_script:
   - ps: '&"c:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" ''-verb:sync'' ''-source:archiveDir="C:\projects\csdiscord\CSDiscordService\bin\Any CPU\Release\netcoreapp2.0"'' ''-dest:package="c:\projects\csdiscord\artifacts\CSDiscordService.zip"'' ''-declareParam:name="IIS Web Application Name",defaultValue="csdiscordservice",tags="IisApp"'' ''-declareParam:name="IIS Web Application Name",type="ProviderPath",scope="IisApp",match="^.*csdiscordservice$"'' ''-declareParam:name="IIS Web Application Name",type="ProviderPath",scope="setAcl",match="^.*csdiscordservice'''
   - ps: cd ..
 test_script:
-  - ps: cd .\CSDiscordService.Tests\
-  - ps: dotnet xunit -parallel collections
-  - ps: cd ..
+  - cd .\CSDiscordService.Tests\
+  - dotnet xunit -parallel collections
+  - cd ..
 artifacts:
 - path: artifacts\CSDiscordService.zip
   name: CSDiscordFunction
