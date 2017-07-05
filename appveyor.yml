@@ -14,12 +14,12 @@ before_build:
   - ps: dotnet --info
   - ps: dotnet restore --configfile ..\.nuget\nuget.config
 build_script:
-  - ps: dotnet build CSDiscord.sln --configuration Release
+  - ps: dotnet build CSDiscord.sln --configuration Release -r win7-x64
   - ps: cd .\CSDiscordService\
-  - ps: dotnet publish --configuration Release
-  - ps: copy ..\manifest.xml "bin\Any CPU\Release\netcoreapp2.0\manifest.xml"
+  - ps: dotnet publish --configuration Release -r win7-x64
+  - ps: copy ..\manifest.xml "bin\Any CPU\Release\netcoreapp2.0\win7-x64\manifest.xml"
   - ps: mkdir c:\projects\csdiscord\artifacts
-  - ps: '&"c:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" ''-verb:sync'' ''-source:archiveDir="C:\projects\csdiscord\CSDiscordService\bin\Any CPU\Release\netcoreapp2.0"'' ''-dest:package="c:\projects\csdiscord\artifacts\CSDiscordService.zip"'' ''-declareParam:name="IIS Web Application Name",defaultValue="csdiscordservice",tags="IisApp"'' ''-declareParam:name="IIS Web Application Name",type="ProviderPath",scope="IisApp",match="^.*csdiscordservice$"'' ''-declareParam:name="IIS Web Application Name",type="ProviderPath",scope="setAcl",match="^.*csdiscordservice'''
+  - ps: '&"c:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" ''-verb:sync'' ''-source:archiveDir="C:\projects\csdiscord\CSDiscordService\bin\Any CPU\Release\netcoreapp2.0\win7-x64"'' ''-dest:package="c:\projects\csdiscord\artifacts\CSDiscordService.zip"'' ''-declareParam:name="IIS Web Application Name",defaultValue="csdiscordservice",tags="IisApp"'' ''-declareParam:name="IIS Web Application Name",type="ProviderPath",scope="IisApp",match="^.*csdiscordservice$"'' ''-declareParam:name="IIS Web Application Name",type="ProviderPath",scope="setAcl",match="^.*csdiscordservice'''
   - ps: cd ..
 test_script:
   - cd .\CSDiscordService.Tests\
