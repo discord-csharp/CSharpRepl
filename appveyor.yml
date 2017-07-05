@@ -7,13 +7,13 @@ pull_requests:
 install:
   - ps: $env:DOTNET_INSTALL_DIR = "..\.dotnetsdk"
   - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
-  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0-preview2/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1"
-  - ps: '& "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1" -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR'
+  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0-preview2/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1"
+  - ps: '& "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR'
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
 before_build:
   - ps: dotnet --info
   - ps: pwd
-  - ps: dotnet restore --configfile C:\projects\csdiscord\.nuget\nuget.config
+  - ps: dotnet restore --configfile ..\.nuget\nuget.config
 build_script:
   - ps: pwd
   - ps: dotnet build CSDiscord.sln --configuration Release
@@ -25,7 +25,7 @@ build_script:
   - ps: cd ..
 test_script:
   - ps: cd .\CSDiscordService.Tests\
-  - ps: dotnet xunit
+  - ps: dotnet xunit -parallel collections
   - ps: cd ..
 artifacts:
 - path: artifacts\CSDiscordService.zip
