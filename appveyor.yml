@@ -40,7 +40,7 @@ deploy:
   remove_files: true
   app_offline: true
 after_deploy:
-- ps: iwr -uri http://csdiscordservice.azurewebsites.net/Eval -UseBasicParsing -Body "1+1" -Method Post -ContentType text/plain -Headers @{"Authorize"="Token $env:api_token"}
+- ps: iwr -uri http://csdiscordservice.azurewebsites.net/Eval -UseBasicParsing -Body "1+1" -Method Post -ContentType text/plain -Headers @{"Authorization"="Token $env:api_token"}
 environment:
   api_token:
     secure: GroejrzfkoqNfBomrM4kTrBhT9PoueDewcScZe81dYrqU42xc4WRH2gbNib7wDTz
