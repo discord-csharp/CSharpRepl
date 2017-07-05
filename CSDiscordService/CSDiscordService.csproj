@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
       <LangVersion>7.1</LangVersion>
       <UserSecretsId>03629088-8bb9-4faf-8162-debf93066bc4</UserSecretsId>
+      <ApplicationInsightsResourceId>/subscriptions/a46288ed-15a1-40ee-8fb2-d8867d876013/resourcegroups/CSharpDiscord/providers/microsoft.insights/components/CSDiscordService</ApplicationInsightsResourceId>
+      <ApplicationInsightsAnnotationResourceId>/subscriptions/a46288ed-15a1-40ee-8fb2-d8867d876013/resourcegroups/CSharpDiscord/providers/microsoft.insights/components/CSDiscordService</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.0" />
@@ -23,6 +25,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 
 </Project>

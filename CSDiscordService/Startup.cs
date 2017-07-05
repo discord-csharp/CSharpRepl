@@ -8,6 +8,7 @@ using System;
 using System.Text;
 using CSDiscordService.Middleware;
 using System.Linq;
+using System.Reflection;
 
 namespace CSDiscordService
 {
@@ -23,7 +24,8 @@ namespace CSDiscordService
 
             if (env.IsDevelopment())
             {
-                builder.AddUserSecrets("CSDiscord");
+                builder.AddUserSecrets("03629088-8bb9-4faf-8162-debf93066bc4");
+                builder.AddApplicationInsightsSettings(developerMode: true);
             }
             Configuration = builder.Build();
         }

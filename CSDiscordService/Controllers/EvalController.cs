@@ -30,7 +30,6 @@ namespace CSDiscordService.Controllers
             {
                 throw new ArgumentNullException(nameof(code));
             }
-            _telemetryClient.Context.Properties.Add("Code", code);
 
             var result = await _eval.RunEvalAsync(code);
 
@@ -41,7 +40,8 @@ namespace CSDiscordService.Controllers
 
             evt.Metrics.Add("CompileTime", result.CompileTime.TotalMilliseconds);
             evt.Metrics.Add("ExecutionTime", result.ExecutionTime.TotalMilliseconds);
-            
+
+            evt.Properties.Add("Code", result.Code);
             evt.Properties.Add("ConsoleOut", result.ConsoleOut);
             evt.Properties.Add("ReturnValue", JsonConvert.SerializeObject(result.ReturnValue, Formatting.Indented));
             evt.Properties.Add("ExceptionType", result.ExceptionType);
