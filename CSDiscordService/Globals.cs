@@ -7,6 +7,7 @@ namespace CSDiscordService
     {
         //public ConsoleLikeStringWriter Console { get; set; }
         public Random Random { get; set; }
+        public ConsoleLikeStringWriter Console { get; internal set; }
     }
 
 }
