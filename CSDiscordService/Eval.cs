@@ -60,7 +60,8 @@ namespace CSDiscordService
         {
             var sb = new StringBuilder();
             var textWr = new ConsoleLikeStringWriter(sb);
-
+            Console.SetOut(textWr);
+            Console.SetError(textWr);
             var sw = Stopwatch.StartNew();
             var eval = CSharpScript.Create(code, Options, typeof(Globals));
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
@@ -68,7 +69,7 @@ namespace CSDiscordService
             var compileResult = await compilation.GetAllDiagnosticsAsync();
             var compileErrors = compileResult.Where(a => a.Severity == DiagnosticSeverity.Error).ToImmutableArray();
             sw.Stop();
-
+            
             var compileTime = sw.Elapsed;
             if (compileErrors.Length > 0)
             {
@@ -90,7 +91,6 @@ namespace CSDiscordService
 
             var globals = new Globals
             {
-                Console = textWr,
                 Random = random
             };
 

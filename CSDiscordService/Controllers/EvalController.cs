@@ -33,6 +33,20 @@ namespace CSDiscordService.Controllers
 
             var result = await _eval.RunEvalAsync(code);
 
+            TrackResult(result);
+
+            if (string.IsNullOrWhiteSpace(result.Exception))
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        private void TrackResult(EvalResult result)
+        {
             var evt = new EventTelemetry("eval")
             {
                 Timestamp = DateTimeOffset.UtcNow
@@ -48,15 +62,6 @@ namespace CSDiscordService.Controllers
             evt.Properties.Add("Exception", result.Exception);
 
             _telemetryClient.TrackEvent(evt);
-
-            if (string.IsNullOrWhiteSpace(result.Exception))
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest(result);
-            }
         }
     }
 }

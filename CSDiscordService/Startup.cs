@@ -48,7 +48,7 @@ namespace CSDiscordService
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole();
+            //loggerFactory.AddConsole();
             loggerFactory.AddDebug();
 
             app.Use(async (context, next) =>
