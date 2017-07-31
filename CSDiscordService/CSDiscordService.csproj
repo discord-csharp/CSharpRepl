@@ -6,7 +6,12 @@
       <UserSecretsId>03629088-8bb9-4faf-8162-debf93066bc4</UserSecretsId>
       <ApplicationInsightsResourceId>/subscriptions/a46288ed-15a1-40ee-8fb2-d8867d876013/resourcegroups/CSharpDiscord/providers/microsoft.insights/components/CSDiscordService</ApplicationInsightsResourceId>
       <ApplicationInsightsAnnotationResourceId>/subscriptions/a46288ed-15a1-40ee-8fb2-d8867d876013/resourcegroups/CSharpDiscord/providers/microsoft.insights/components/CSDiscordService</ApplicationInsightsAnnotationResourceId>
+      <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Dockerfile-dev" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0-preview2-final" />
@@ -25,9 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 
 </Project>

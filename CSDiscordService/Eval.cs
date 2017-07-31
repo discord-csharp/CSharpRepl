@@ -13,8 +13,6 @@ using Microsoft.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 
 namespace CSDiscordService
 {
