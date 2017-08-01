@@ -15,7 +15,6 @@ build:
   verbosity: minimal
 test_script:
   - docker run -d -e "tokens=test" -p 80:80/tcp --name CSDiscord --net nat csdiscordservice
-  - ps: sleep -Seconds 60
   - ps: '$json = (& "docker" "inspect" "CSDiscord" | ConvertFrom-Json); $address= $json.NetworkSettings.Networks.nat.ipaddress; iwr -uri "http://$address/Eval" -method POST -contentType "text/plain" -body "1+1" -UseBasicParsing -Headers @{"Authorization"="Token test"}'
   - docker stop CSDiscord
   - docker rm CSDiscord
