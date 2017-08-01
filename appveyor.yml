@@ -30,6 +30,9 @@ deploy_script:
       docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
       docker tag csdiscordservice cisien/csdiscord:$tag
       docker push cisien/csdiscord:$tag
+artifacts:
+- path: '**\*'
+  name: everything
 deploy:
 - provider: Environment
   name: docker
