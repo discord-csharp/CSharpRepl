@@ -30,7 +30,7 @@ deploy_script:
       docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
       docker tag csdiscordservice cisien/csdiscord:$tag
       docker push cisien/csdiscord:$tag
-  - 7z deploy-script.zip before-deploy.ps1
+  - 7z a deploy-script.zip before-deploy.ps1
 artifacts:
 - path: deploy-script.zip
   name: deploy-script
