@@ -37,6 +37,8 @@ artifacts:
 deploy:
 - provider: Environment
   name: docker
+  on:
+    branch: master
 environment:
   CLI_VERSION: 2.0.0-preview2-006497
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
