@@ -9,17 +9,16 @@ install:
   - ps: choco install docker-compose
 before_build:
   - dotnet restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
-  - dotnet restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
 build:
   project: CSDiscord.sln
   verbosity: minimal
 test_script:
   - cd .\CSDiscordService.Tests\
-  - dotnet xunit
+  - dotnet xunit --configfile ..\.nuget\nuget.config
   - cd ..
-  - docker run -d -e "tokens=test" -p 80:80/tcp --name CSDiscord --ip 172.17.240.10 --net nat csdiscordservice
+  - docker run -d -e "tokens=test" -p 80:80/tcp --name CSDiscord --net nat csdiscordservice
   - ps: sleep -Seconds 60
-  - ps: iwr -uri http://172.17.240.10/Eval -method POST -contentType 'text/plain' -body '1+1' -UseBasicParsing -Headers @{"Authorization"="Token test"}
+  - ps: '$json = (& "docker" "inspect" "CSDiscord" | ConvertFrom-Json); $address= $json.NetworkSettings.Networks.nat.ipaddress; iwr -uri "http://$address/Eval" -method POST -contentType "text/plain" -body "1+1" -UseBasicParsing -Headers @{"Authorization"="Token test"}''
   - docker stop CSDiscord
   - docker rm CSDiscord
 deploy_script:
