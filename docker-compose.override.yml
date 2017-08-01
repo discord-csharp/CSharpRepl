@@ -8,7 +8,6 @@ services:
       - "80"
     build:
       context: ./CSDiscordService
-      dockerfile: Dockerfile-dev
 networks:
   default:
     external:
