@@ -14,6 +14,6 @@ $env | out-host
 Write-Host Starting deploy
 docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
 
-docker tag onibot cisien/csdiscord:$tag
+docker tag csdiscordservice cisien/csdiscord:$tag
 
 docker push cisien/csdiscord:$tag
