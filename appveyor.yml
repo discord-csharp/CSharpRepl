@@ -25,9 +25,8 @@ test_script:
 after_build:
   - ps: |
       $tag = $env:APPVEYOR_REPO_BRANCH
-      if([System.String]::IsNullOrWhitespace($tag)) {
-        $tag = "untagged"
-      }
+      if(-not [System.String]::IsNullOrWhitespace($env:APPVEYOR_PULL_REQUEST_NUMBER)) { $tag = "$tag-pr-${$env:APPVEYOR_PULL_REQUEST_NUMBER}" }
+      if([System.String]::IsNullOrWhitespace($tag)) { $tag = "untagged" }
       docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
       docker tag csdiscordservice cisien/csdiscord:$tag
       docker push cisien/csdiscord:$tag

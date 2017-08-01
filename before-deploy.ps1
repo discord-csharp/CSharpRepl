@@ -1,6 +1,10 @@
 $ErrorActionPreference = 'Stop';
 
 $tag = $env:APPVEYOR_REPO_BRANCH
+if(-not [System.String]::IsNullOrWhitespace($env:APPVEYOR_PULL_REQUEST_NUMBER)) {
+	$tag = "$tag-pr-${$env:APPVEYOR_PULL_REQUEST_NUMBER}"
+}
+
 if([System.String]::IsNullOrWhitespace($tag)) {
     $tag = "untagged"
 }
