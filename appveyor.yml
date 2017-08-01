@@ -32,8 +32,8 @@ deploy_script:
       docker push cisien/csdiscord:$tag
   - 7z a deploy-script.zip before-deploy.ps1
 artifacts:
-- path: deploy-script.zip
-  name: deploy-script
+  - path: deploy-script.zip
+    name: deploy-script
 deploy:
   - provider: Environment
     name: docker
