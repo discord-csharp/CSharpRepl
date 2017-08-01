@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop';
 
-$tag = $env:APPVEYOR_REPO_TAG_NAME
+$tag = $env:APPVEYOR_REPO_BRANCH
 if([System.String]::IsNullOrWhitespace($tag)) {
     $tag = "untagged"
 }
