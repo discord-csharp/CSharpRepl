@@ -31,7 +31,7 @@ deploy_script:
       docker tag csdiscordservice cisien/csdiscord:$tag
       docker push cisien/csdiscord:$tag
 artifacts:
-- path: 'CSDiscordService\obj\Docker\publish\**\*'
+- path: 'CSDiscordService\obj\Docker\publish'
   name: everything
 deploy:
 - provider: Environment
