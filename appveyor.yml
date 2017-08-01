@@ -5,6 +5,7 @@ platform: Any CPU
 pull_requests:
   do_not_increment_build_number: true
 install:
+  - dotnet --info
   - ps: choco install docker-compose
 before_build:
   - nuget restore CSDiscord.sln -configfile .nuget\nuget.config
