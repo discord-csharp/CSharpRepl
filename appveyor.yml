@@ -11,6 +11,7 @@ install:
   - ps: '& "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR'
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
 before_build:
+  - xcopy "c:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\Sdks\Microsoft.Docker.Sdk" "c:\Program Files\dotnet\sdk\2.0.0-preview2-006497\Sdks\Microsoft.Docker.Sdk\" /e
   - ps: dotnet --info
   - ps: dotnet restore CSDiscord.sln --configfile ..\.nuget\nuget.config
 build_script:
