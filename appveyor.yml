@@ -5,45 +5,24 @@ platform: Any CPU
 pull_requests:
   do_not_increment_build_number: true
 install:
-  - ps: $env:DOTNET_INSTALL_DIR = "..\.dotnetsdk"
-  - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
-  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0-preview2/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1"
-  - ps: '& "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR'
-  - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+  - ps: choco install docker-compose
 before_build:
-  - xcopy "c:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\Sdks\Microsoft.Docker.Sdk" "c:\projects\.dotnetsdk\sdk\2.0.0-preview2-006497\Sdks\Microsoft.Docker.Sdk\" /e
-  - ps: dotnet --info
-  - ps: dotnet restore CSDiscord.sln --configfile ..\.nuget\nuget.config
-build_script:
-  - ps: dotnet build CSDiscord.sln --configuration Release -r win7-x64
-  - ps: cd .\CSDiscordService\
-  - ps: dotnet publish --configuration Release -r win7-x64
-  - ps: copy ..\manifest.xml "bin\Any CPU\Release\netcoreapp2.0\win7-x64\manifest.xml"
-  - ps: mkdir c:\projects\csdiscord\artifacts
-  - ps: '&"c:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" ''-verb:sync'' ''-source:archiveDir="C:\projects\csdiscord\CSDiscordService\bin\Any CPU\Release\netcoreapp2.0\win7-x64"'' ''-dest:package="c:\projects\csdiscord\artifacts\CSDiscordService.zip"'' ''-declareParam:name="IIS Web Application Name",defaultValue="csdiscordservice",tags="IisApp"'' ''-declareParam:name="IIS Web Application Name",type="ProviderPath",scope="IisApp",match="^.*csdiscordservice$"'' ''-declareParam:name="IIS Web Application Name",type="ProviderPath",scope="setAcl",match="^.*csdiscordservice'''
-  - ps: cd ..
+  - nuget restore CSDiscord.sln --configfile ..\.nuget\nuget.config
+build:
+  project: CSDiscord.sln
+  verbosity: minimal
 test_script:
   - cd .\CSDiscordService.Tests\
   - dotnet xunit -parallel collections
   - cd ..
-artifacts:
-- path: artifacts\CSDiscordService.zip
-  name: CSDiscordFunction
-  type: WebDeployPackage
-deploy:
-- provider: WebDeploy
-  server: https://csdiscordservice.scm.azurewebsites.net:443/msdeploy.axd?site=csdiscordservice
-  website: csdiscordservice
-  username: $csdiscordservice
-  password:
-    secure: 7ZZv5auxcejdquiVPI7WEu+gJ7DHESAN0yudFAYMpMd4enJChl20Fw5XVNyYW8HB+OGP4THbSqCN/qorYExNBw==
-  artifact: CSDiscordFunction
-  remove_files: true
-  app_offline: true
-after_deploy:
-- ps: iwr -uri http://csdiscordservice.azurewebsites.net/Eval -UseBasicParsing -Body "1+1" -Method Post -ContentType text/plain -Headers @{"Authorization"="Token $env:api_token"}
+deploy_script:
+  - ps: .\deploy.ps1
 environment:
   api_token:
     secure: GroejrzfkoqNfBomrM4kTrBhT9PoueDewcScZe81dYrqU42xc4WRH2gbNib7wDTz
   CLI_VERSION: 2.0.0-preview2-006497
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+    DOCKER_USER:
+    secure: ry9x9cQ9gzMNaPOd45RSHQ==
+  DOCKER_PASS:
+    secure: AXXeju7g+0ZE1ZMW2TKcXfW6+CMT70ZDh5iWYE5Bg80=
