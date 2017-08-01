@@ -7,7 +7,7 @@ pull_requests:
 install:
   - ps: choco install docker-compose
 before_build:
-  - nuget restore CSDiscord.sln -configfile ..\.nuget\nuget.config
+  - nuget restore CSDiscord.sln -configfile .nuget\nuget.config
 build:
   project: CSDiscord.sln
   verbosity: minimal
