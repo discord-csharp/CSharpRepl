@@ -9,8 +9,8 @@ install:
   - ps: choco install docker-compose
 
 before_build:
-  - dotnet restore CSDiscordService\CSDiscordService.csproj -configfile ..\.nuget\nuget.config
-  - dotnet restore CSDiscordService.Tests\CSDiscordService.Tests.csproj -configfile ..\.nuget\nuget.config
+  - dotnet restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
+  - dotnet restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
 build:
   project: CSDiscord.sln
   verbosity: minimal
