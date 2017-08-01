@@ -13,7 +13,7 @@
     <None Remove="Dockerfile-dev" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0-preview2-final" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.0.0-dev-61717-03" />
@@ -21,7 +21,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" Version="3.0.0-dev-61717-03" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0-preview2-final" />
     <PackageReference Include="Microsoft.Net.Compilers.netcore" Version="3.0.0-dev-61717-03" />
-    <PackageReference Include="Microsoft.NETCore.Compilers" Version="3.0.0-beta1-61903-06" />
+    <PackageReference Include="Microsoft.NETCore.Compilers" Version="3.0.0-beta1-61924-07" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0-preview2-25405-01" />
   </ItemGroup>
