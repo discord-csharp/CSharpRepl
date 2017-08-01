@@ -7,7 +7,6 @@ pull_requests:
 install:
   - dotnet --info
   - ps: choco install docker-compose
-
 before_build:
   - dotnet restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
   - dotnet restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
@@ -16,7 +15,7 @@ build:
   verbosity: minimal
 test_script:
   - cd .\CSDiscordService.Tests\
-  - dotnet xunit -parallel collections
+  - dotnet xunit
   - cd ..
 deploy_script:
   - ps: .\deploy.ps1
