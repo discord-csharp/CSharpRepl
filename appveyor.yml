@@ -22,7 +22,7 @@ test_script:
       iwr -uri "http://$address/Eval" -method POST -contentType "text/plain" -body "1+1" -UseBasicParsing -Headers @{"Authorization"="Token test"}
   - docker stop CSDiscord
   - docker rm CSDiscord
-deploy_script:
+after_build:
   - ps: |
       $tag = $env:APPVEYOR_REPO_TAG_NAME
       if([System.String]::IsNullOrWhitespace($tag)) {
