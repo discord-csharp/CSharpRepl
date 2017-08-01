@@ -18,14 +18,12 @@ test_script:
   - cd ..
   - docker run -d -e "tokens=test" -p 80:80/tcp --name CSDiscord --net nat csdiscordservice
   - ps: sleep -Seconds 60
-  - ps: '$json = (& "docker" "inspect" "CSDiscord" | ConvertFrom-Json); $address= $json.NetworkSettings.Networks.nat.ipaddress; iwr -uri "http://$address/Eval" -method POST -contentType "text/plain" -body "1+1" -UseBasicParsing -Headers @{"Authorization"="Token test"}''
+  - ps: '$json = (& "docker" "inspect" "CSDiscord" | ConvertFrom-Json); $address= $json.NetworkSettings.Networks.nat.ipaddress; iwr -uri "http://$address/Eval" -method POST -contentType "text/plain" -body "1+1" -UseBasicParsing -Headers @{"Authorization"="Token test"}'
   - docker stop CSDiscord
   - docker rm CSDiscord
 deploy_script:
   - ps: .\deploy.ps1
 environment:
-  api_token:
-    secure: GroejrzfkoqNfBomrM4kTrBhT9PoueDewcScZe81dYrqU42xc4WRH2gbNib7wDTz
   CLI_VERSION: 2.0.0-preview2-006497
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOCKER_USER:
