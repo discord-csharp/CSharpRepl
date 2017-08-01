@@ -33,6 +33,7 @@ deploy_script:
 artifacts:
 - path: 'before-deploy.ps1'
   name: deploy-script
+  type: zip
 deploy:
 - provider: Environment
   name: docker
