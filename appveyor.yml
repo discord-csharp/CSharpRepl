@@ -19,7 +19,7 @@ test_script:
   - cd ..
   - docker run -d -e "tokens=test" -p 80:80/tcp --name CSDiscord --ip 172.17.240.10 --net nat csdiscordservice
   - ps: sleep -Seconds 60
-  - ps: iwr -uri http://172.16.20.10/Eval -method POST -contentType 'text/plain' -body '1+1' -UseBasicParsing -Headers @{"Authorization"="Token test"}
+  - ps: iwr -uri http://172.17.240.10/Eval -method POST -contentType 'text/plain' -body '1+1' -UseBasicParsing -Headers @{"Authorization"="Token test"}
   - docker stop CSDiscord
   - docker rm CSDiscord
 deploy_script:
