@@ -19,9 +19,9 @@ namespace CSDiscordService
 
         public EvalTests(ITestOutputHelper outputHelper)
         {
-            Environment.SetEnvironmentVariable("tokens", "test");
             var host = new WebHostBuilder()
                 .UseApplicationInsights()
+                .UseSetting("tokens", "test")
                 .UseStartup<Startup>();
 
             Log = outputHelper;

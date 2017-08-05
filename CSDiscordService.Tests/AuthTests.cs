@@ -5,7 +5,6 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -24,9 +23,9 @@ namespace CSDiscordService
 
         public AuthTests(ITestOutputHelper outputHelper)
         {
-            Environment.SetEnvironmentVariable("tokens", "test;token2;token3");
             var host = new WebHostBuilder()
                 .UseApplicationInsights()
+                .UseSetting("tokens", "test;token2;token3")
                 .UseStartup<Startup>();
 
             Server = new TestServer(host);
