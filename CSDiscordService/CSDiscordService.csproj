@@ -7,6 +7,8 @@
       <ApplicationInsightsResourceId>/subscriptions/a46288ed-15a1-40ee-8fb2-d8867d876013/resourcegroups/CSharpDiscord/providers/microsoft.insights/components/CSDiscordService</ApplicationInsightsResourceId>
       <ApplicationInsightsAnnotationResourceId>/subscriptions/a46288ed-15a1-40ee-8fb2-d8867d876013/resourcegroups/CSharpDiscord/providers/microsoft.insights/components/CSDiscordService</ApplicationInsightsAnnotationResourceId>
       <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+      <ServerGarbageCollection>true</ServerGarbageCollection>
+      <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>
