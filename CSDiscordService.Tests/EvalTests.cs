@@ -19,9 +19,9 @@ namespace CSDiscordService
 
         public EvalTests(ITestOutputHelper outputHelper)
         {
-            Environment.SetEnvironmentVariable("tokens", "test");
             var host = new WebHostBuilder()
                 .UseApplicationInsights()
+                .UseSetting("tokens", "test")
                 .UseStartup<Startup>();
 
             Log = outputHelper;
@@ -108,17 +108,17 @@ namespace CSDiscordService
             Assert.Equal("String", result.ReturnTypeName);
         }
 
-        //[Fact] --disabled until c# 7.1 support is in roslyn nightlies
-        //public async Task Eval_CSharp71Supported()
-        //{
-        //    var expr = @"int thing = default; return thing;";
-        //    var (result, statusCode) = await (Execute(expr));
+        [Fact]
+        public async Task Eval_CSharp71Supported()
+        {
+            var expr = @"int thing = default; return thing;";
+            var (result, statusCode) = await (Execute(expr));
 
-        //    Assert.Equal(HttpStatusCode.OK, statusCode);
-        //    Assert.Equal(expr, result.Code);
-        //    Assert.Equal("0", result.ReturnValue);
-        //    Assert.Equal("Int32", result.ReturnTypeName);
-        //}
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Equal(0L, result.ReturnValue);
+            Assert.Equal("Int32", result.ReturnTypeName);
+        }
 
         [Fact]
         public async Task Eval_CanUseSystemDrawing()
@@ -139,6 +139,7 @@ namespace CSDiscordService
                 if (response.Content != null)
                 {
                     var content = await response.Content.ReadAsStringAsync();
+                    Log.WriteLine(content);
 
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest)
                     {
@@ -146,7 +147,6 @@ namespace CSDiscordService
                     }
                     else
                     {
-                        Log.WriteLine(content);
                         throw new WebException($"Unexpected status code: {response.StatusCode}");
                     }
                 }

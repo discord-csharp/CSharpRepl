@@ -18,31 +18,31 @@ namespace CSDiscordService
 {
     public class Eval
     {
-        private static readonly string[] DefaultImports =
-        {
-            "System",
-            "System.IO",
-            "System.Linq",
-            "System.Collections.Generic",
-            "System.Text",
-            "System.Text.RegularExpressions",
-            "System.Net",
-            "System.Threading",
-            "System.Threading.Tasks",
-            "System.Net.Http",
-            "Newtonsoft.Json",
-            "Newtonsoft.Json.Linq"
-        };
+        private static readonly ImmutableArray<string> DefaultImports =
+            ImmutableArray.Create(
+                "System",
+                "System.IO",
+                "System.Linq",
+                "System.Collections.Generic",
+                "System.Text",
+                "System.Text.RegularExpressions",
+                "System.Net",
+                "System.Threading",
+                "System.Threading.Tasks",
+                "System.Net.Http",
+                "Newtonsoft.Json",
+                "Newtonsoft.Json.Linq"
+            );
 
-        private static readonly Assembly[] DefaultReferences =
-        {
-            typeof(Enumerable).GetTypeInfo().Assembly,
-            typeof(List<string>).GetTypeInfo().Assembly,
-            typeof(JsonConvert).GetTypeInfo().Assembly,
-            typeof(string).GetTypeInfo().Assembly,
-            typeof(ValueTuple).GetTypeInfo().Assembly,
-            typeof(HttpClient).GetTypeInfo().Assembly
-        };
+        private static readonly ImmutableArray<Assembly> DefaultReferences =
+            ImmutableArray.Create(
+                typeof(Enumerable).GetTypeInfo().Assembly,
+                typeof(List<string>).GetTypeInfo().Assembly,
+                typeof(JsonConvert).GetTypeInfo().Assembly,
+                typeof(string).GetTypeInfo().Assembly,
+                typeof(ValueTuple).GetTypeInfo().Assembly,
+                typeof(HttpClient).GetTypeInfo().Assembly
+            );
 
         private static readonly ScriptOptions Options =
             ScriptOptions.Default
@@ -60,7 +60,9 @@ namespace CSDiscordService
             var textWr = new ConsoleLikeStringWriter(sb);
 
             var sw = Stopwatch.StartNew();
-            var eval = CSharpScript.Create(code, Options, typeof(Globals));
+            var eval = CSharpScript.Create(code, Options, typeof(Globals))
+                .WithLanguageVersion(LanguageVersion.CSharp7_1);
+            
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
 
             var compileResult = await compilation.GetAllDiagnosticsAsync();
@@ -70,20 +72,7 @@ namespace CSDiscordService
             var compileTime = sw.Elapsed;
             if (compileErrors.Length > 0)
             {
-                var ex = new CompilationErrorException(string.Join("\n", compileErrors.Select(a => a.GetMessage())), compileErrors);
-                var errorResult = new EvalResult
-                {
-                    Code = code,
-                    CompileTime = sw.Elapsed,
-                    ConsoleOut = sb.ToString(),
-                    Exception = ex.Message,
-                    ExceptionType = ex.GetType().Name,
-                    ExecutionTime = TimeSpan.FromMilliseconds(0),
-                    ReturnValue = null,
-                    ReturnTypeName = null
-                };
-
-                return errorResult;
+                return EvalResult.CreateErrorResult(code, sb.ToString(), sw.Elapsed, compileErrors);
             }
 
             var globals = new Globals

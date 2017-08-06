@@ -4,6 +4,9 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using System.Text;
+using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 
 namespace CSDiscordService
 {
@@ -49,6 +52,23 @@ namespace CSDiscordService
             {
                 ReturnTypeName = ReturnTypeName.Replace($"`{genericArgs.Length}", $"<{string.Join(", ", genericArgs.Select(a => a.Name))}>");
             }
+        }
+        
+        public static EvalResult CreateErrorResult(string code, string consoleOut, TimeSpan compileTime, ImmutableArray<Diagnostic> compileErrors)
+        {
+            var ex = new CompilationErrorException(string.Join("\n", compileErrors.Select(a => a.GetMessage())), compileErrors);
+            var errorResult = new EvalResult
+            {
+                Code = code,
+                CompileTime = compileTime,
+                ConsoleOut = consoleOut,
+                Exception = ex.Message,
+                ExceptionType = ex.GetType().Name,
+                ExecutionTime = TimeSpan.FromMilliseconds(0),
+                ReturnValue = null,
+                ReturnTypeName = null
+            };
+            return errorResult;
         }
 
         public object ReturnValue { get; set; }
