@@ -9,6 +9,9 @@ using Xunit;
 using Xunit.Abstractions;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.ApplicationInsights;
+using CSDiscordService.Eval.ResultModels;
 
 namespace CSDiscordService
 {
@@ -17,12 +20,13 @@ namespace CSDiscordService
         private static readonly JsonSerializerSettings JsonSettings =
             new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
 
+        public static TelemetryClient _dummyTelemetryClient = new TelemetryClient();
         public EvalTests(ITestOutputHelper outputHelper)
         {
             var host = new WebHostBuilder()
-                .UseApplicationInsights()
                 .UseSetting("tokens", "test")
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .ConfigureServices(a => a.AddSingleton(_dummyTelemetryClient));
 
             Log = outputHelper;
             Server = new TestServer(host);

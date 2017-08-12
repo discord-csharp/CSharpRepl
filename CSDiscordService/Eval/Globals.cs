@@ -1,7 +1,7 @@
 ﻿using System;
-using System.IO;
+using CSDiscordService.Eval.ResultModels;
 
-namespace CSDiscordService
+namespace CSDiscordService.Eval
 {
     public class Globals
     {

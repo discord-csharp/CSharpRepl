@@ -12,12 +12,11 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0-preview-20170727-01" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0-preview-20170810-02" />
         <PackageReference Include="xunit" Version="2.3.0-beta3-build3705" />
         <PackageReference Include="xunit.runner.reporters" Version="2.3.0-beta3-build3705" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta3-build3705" />
-        <PackageReference Include="Microsoft.Net.Compilers" Version="3.0.0-dev-61717-03" />
-        <PackageReference Include="Microsoft.NETCore.Compilers" Version="3.0.0-beta1-61924-07" />
+        <PackageReference Include="Microsoft.Net.Compilers" Version="2.6.0-beta1-62012-01" />
         <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta3-build3705" />
     </ItemGroup>
 

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using CSDiscordService.Eval;
+using CSDiscordService.Eval.ResultModels;
 
 namespace CSDiscordService.Controllers
 { 
@@ -12,10 +14,10 @@ namespace CSDiscordService.Controllers
     [Route("[controller]")]
     public class EvalController : Controller
     {
-        private Eval _eval;
+        private CSharpEval _eval;
         private TelemetryClient _telemetryClient;
 
-        public EvalController(Eval eval, TelemetryClient telemetryClient)
+        public EvalController(CSharpEval eval, TelemetryClient telemetryClient)
         {
             _eval = eval;
             _telemetryClient = telemetryClient;

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using CSDiscordService.Eval.ResultModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Net;
@@ -24,9 +26,9 @@ namespace CSDiscordService
         public AuthTests(ITestOutputHelper outputHelper)
         {
             var host = new WebHostBuilder()
-                .UseApplicationInsights()
                 .UseSetting("tokens", "test;token2;token3")
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .ConfigureServices(a => a.AddSingleton(EvalTests._dummyTelemetryClient));
 
             Server = new TestServer(host);
             Log = outputHelper;

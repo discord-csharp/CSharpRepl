@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSDiscordService", "CSDisco
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSDiscordService.Tests", "CSDiscordService.Tests\CSDiscordService.Tests.csproj", "{429C6E16-F570-418D-8924-0E4594C37D1D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4D80D7A4-3B5A-4C3F-8AA4-73EEE3C5C552}"
-EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{C858A03E-09A7-4902-A6DA-D61CC76C3DE3}"
 EndProject
 Global

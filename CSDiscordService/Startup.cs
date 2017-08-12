@@ -8,8 +8,8 @@ using System;
 using System.Text;
 using CSDiscordService.Middleware;
 using System.Linq;
-using System.Reflection;
 using Newtonsoft.Json.Serialization;
+using CSDiscordService.Eval;
 
 namespace CSDiscordService
 {
@@ -36,7 +36,7 @@ namespace CSDiscordService
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<Eval>();
+            services.AddTransient<CSharpEval>();
             services.AddTokenAuthentication(o => o.ValidTokens = Configuration["tokens"].Split(";").ToList());
 
             services.AddMvc(o =>

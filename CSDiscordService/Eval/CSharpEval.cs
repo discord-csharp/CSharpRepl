@@ -13,10 +13,11 @@ using Microsoft.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Microsoft.CodeAnalysis.CSharp;
+using CSDiscordService.Eval.ResultModels;
 
-namespace CSDiscordService
+namespace CSDiscordService.Eval
 {
-    public class Eval
+    public class CSharpEval
     {
         private static readonly ImmutableArray<string> DefaultImports =
             ImmutableArray.Create(
@@ -60,8 +61,7 @@ namespace CSDiscordService
             var textWr = new ConsoleLikeStringWriter(sb);
 
             var sw = Stopwatch.StartNew();
-            var eval = CSharpScript.Create(code, Options, typeof(Globals))
-                .WithLanguageVersion(LanguageVersion.CSharp7_1);
+            var eval = CSharpScript.Create(code, Options, typeof(Globals));
             
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
 
