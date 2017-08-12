@@ -39,7 +39,7 @@ deploy:
     on:
       branch: master
 environment:
-  CLI_VERSION: 2.0.0-preview2-006497
+  CLI_VERSION: 2.0.0
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOCKER_USER:
     secure: ry9x9cQ9gzMNaPOd45RSHQ==
