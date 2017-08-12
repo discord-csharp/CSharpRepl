@@ -19,8 +19,9 @@ before_build:
 build_script:
   - ps: |
       cd CSDiscordService
-      dotnet publish --configuration Release --output obj/Discord/publish
+      dotnet publish --configuration Release --output obj/Docker/publish
       cd ..
+      docker-compose build
 test_script:
   - docker run -d -e "tokens=test" -p 80:80/tcp --name CSDiscord --net nat csdiscordservice
   - ps: |
