@@ -37,11 +37,11 @@ namespace CSDiscordService
         private HttpClient Client { get; }
 
         [Theory]
-        [InlineData("1+1", 2L, "Int32")]
-        [InlineData("return 1+1;", 2L, "Int32")]
-        [InlineData("return Random.Next(1,2);", 1L, "Int32")]
-        [InlineData(@"var a = ""thing""; return a;", "thing", "String")]
-        [InlineData("Math.Pow(1,2)", 1D, "Double")]
+        [InlineData("1+1", 2L, "int")]
+        [InlineData("return 1+1;", 2L, "int")]
+        [InlineData("return Random.Next(1,2);", 1L, "int")]
+        [InlineData(@"var a = ""thing""; return a;", "thing", "string")]
+        [InlineData("Math.Pow(1,2)", 1D, "double")]
         [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"");", null, null)]
         public async Task Eval_WellFormattedCodeExecutes(string expr, object expected, string type)
         {
@@ -54,8 +54,8 @@ namespace CSDiscordService
         }
 
         [Theory]
-        [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"")", "@", 1, "List<String>")]
-        [InlineData(@"return Enumerable.Range(0,1).Select(a=>""@"");", "@", 1, "List<String>")]
+        [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"")", "@", 1, "List<string>")]
+        [InlineData(@"return Enumerable.Range(0,1).Select(a=>""@"");", "@", 1, "List<string>")]
         public async Task Eval_EnumerablesReturnArraysOf(string expr, object expected, int count, string type)
         {
             var (result, statusCode) = await Execute(expr);
@@ -105,7 +105,7 @@ namespace CSDiscordService
             Assert.Equal(expr, result.Code);
             Assert.Equal("test\r\n", result.ConsoleOut);
             Assert.Equal("abcdefg", result.ReturnValue);
-            Assert.Equal("String", result.ReturnTypeName);
+            Assert.Equal("string", result.ReturnTypeName);
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace CSDiscordService
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Equal(0L, result.ReturnValue);
-            Assert.Equal("Int32", result.ReturnTypeName);
+            Assert.Equal("int", result.ReturnTypeName);
         }
 
         [Fact]

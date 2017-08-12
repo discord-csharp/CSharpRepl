@@ -9,6 +9,7 @@ using System.Text;
 using CSDiscordService.Middleware;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json.Serialization;
 
 namespace CSDiscordService
 {
@@ -37,14 +38,18 @@ namespace CSDiscordService
         {
             services.AddTransient<Eval>();
             services.AddTokenAuthentication(o => o.ValidTokens = Configuration["tokens"].Split(";").ToList());
-            
+
             services.AddMvc(o =>
             {
                 o.RespectBrowserAcceptHeader = true;
                 o.InputFormatters.Clear();
                 o.InputFormatters.Add(new PlainTextInputFormatter());
             })
-             .AddJsonOptions(o => o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+             .AddJsonOptions(o =>
+             {
+                 o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                 o.SerializerSettings.ContractResolver = new DefaultContractResolver();
+             });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -60,7 +65,12 @@ namespace CSDiscordService
                 }
                 catch (Exception ex)
                 {
-                    var exception = JsonConvert.SerializeObject(ex, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+                    var exception = JsonConvert.SerializeObject(ex, new JsonSerializerSettings
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        ContractResolver = new DefaultContractResolver()
+                    });
+
                     var exBytes = Encoding.UTF8.GetBytes(exception);
                     context.Response.StatusCode = 500;
                     await context.Response.Body.WriteAsync(exBytes, 0, exBytes.Length);

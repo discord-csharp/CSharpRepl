@@ -25,7 +25,7 @@ namespace CSDiscordService
 
             ReturnValue = state.ReturnValue;
             var type = state.ReturnValue?.GetType();
-            
+
             if (type?.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerator)) ?? false)
             {
                 var genericParams = type.GetGenericArguments();
@@ -38,22 +38,15 @@ namespace CSDiscordService
                 }
             }
 
-            ReturnTypeName = type?.Name;
+            ReturnTypeName = type?.ParseGenericArgs();
             ExecutionTime = executionTime;
             CompileTime = compileTime;
             ConsoleOut = consoleOut;
             Code = state.Script.Code;
             Exception = state.Exception?.Message;
             ExceptionType = state.Exception?.GetType().Name;
-
-
-            var genericArgs = type?.GetGenericArguments();
-            if (genericArgs != null && genericArgs.Length > 0)
-            {
-                ReturnTypeName = ReturnTypeName.Replace($"`{genericArgs.Length}", $"<{string.Join(", ", genericArgs.Select(a => a.Name))}>");
-            }
         }
-        
+
         public static EvalResult CreateErrorResult(string code, string consoleOut, TimeSpan compileTime, ImmutableArray<Diagnostic> compileErrors)
         {
             var ex = new CompilationErrorException(string.Join("\n", compileErrors.Select(a => a.GetMessage())), compileErrors);
