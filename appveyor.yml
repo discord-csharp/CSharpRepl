@@ -1,23 +1,25 @@
 version: 1.0.{build}
-image: Visual Studio 2017 Preview
+image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
 pull_requests:
   do_not_increment_build_number: true
 install:
-  - ps: $env:DOTNET_INSTALL_DIR = "..\.dotnetsdk"
-  - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
-  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1"
-  - ps: '& "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR'
-  - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
-  - ps: dotnet --info
+  - ps: |
+      $env:DOTNET_INSTALL_DIR = "..\.dotnetsdk"
+      mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
+      Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1"
+      & "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR
+      $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+      dotnet --info
 before_build:
   - dotnet restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
   - dotnet restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
   - 7z a deploy-script.zip before-deploy.ps1
-build:
-  project: CSDiscord.sln
-  verbosity: minimal
+build_script:
+  - ps: | cd CSDiscordService
+      dotnet publish --configuration Release --output obj/Discord/publish
+      cd ..
 test_script:
   - docker run -d -e "tokens=test" -p 80:80/tcp --name CSDiscord --net nat csdiscordservice
   - ps: |
