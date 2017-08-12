@@ -5,8 +5,12 @@ platform: Any CPU
 pull_requests:
   do_not_increment_build_number: true
 install:
-  - dotnet --info
-  - ps: choco install docker-compose
+  - ps: $env:DOTNET_INSTALL_DIR = "..\.dotnetsdk"
+  - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
+  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1"
+  - ps: '& "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR'
+  - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+  - ps: dotnet --info
 before_build:
   - dotnet restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
   - dotnet restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config

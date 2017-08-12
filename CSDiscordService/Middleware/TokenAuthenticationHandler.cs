@@ -11,7 +11,7 @@ namespace CSDiscordService.Middleware
 {
     public class TokenAuthenticationHandler : AuthenticationHandler<TokenAuthenticationOptions>
     {
-        public TokenAuthenticationHandler(IOptionsSnapshot<TokenAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        public TokenAuthenticationHandler(IOptionsMonitor<TokenAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
         }
 
