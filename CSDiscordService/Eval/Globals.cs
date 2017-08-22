@@ -5,9 +5,13 @@ namespace CSDiscordService.Eval
 {
     public class Globals
     {
-        //public ConsoleLikeStringWriter Console { get; set; }
         public Random Random { get; set; }
         public ConsoleLikeStringWriter Console { get; internal set; }
+
+        public void ResetButton()
+        {
+            Environment.Exit(0);
+        }
     }
 
 }
