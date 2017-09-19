@@ -83,8 +83,10 @@ namespace CSDiscordService
         
         private HttpClient GetClient()
         {
-            var client = new HttpClient(Server.CreateHandler(), true);
-            client.BaseAddress = new Uri("http://localhsot");
+            var client = new HttpClient(Server.CreateHandler(), true)
+            {
+                BaseAddress = new Uri("http://localhsot")
+            };
             return client;
         }
 
@@ -96,15 +98,11 @@ namespace CSDiscordService
                 if (response.Content != null)
                 {
                     var content = await response.Content.ReadAsStringAsync();
+                    Log.WriteLine(content);
 
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
                     {
                         result = JsonConvert.DeserializeObject<EvalResult>(content, JsonSettings);
-                    }
-                    else
-                    {
-                        Log.WriteLine(content);
-                        throw new WebException($"Unexpected status code: {response.StatusCode}");
                     }
                 }
 

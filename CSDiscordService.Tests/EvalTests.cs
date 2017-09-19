@@ -12,6 +12,8 @@ using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights;
 using CSDiscordService.Eval.ResultModels;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace CSDiscordService
 {
@@ -57,6 +59,18 @@ namespace CSDiscordService
             Assert.Equal(type, result.ReturnTypeName);
         }
 
+        // disabled until json.net updates to support serializing broken iserializables
+        //[Theory]
+        //[InlineData(@"Directory.CreateDirectory(""C:\\this\\doesnt\\exist"")", "DirectoryInfo")]
+        //public async Task Eval_WellFormedCodeExecutesIgnoreReturnValue(string expr, string type)
+        //{
+        //    var (result, statusCode) = await Execute(expr);
+
+        //    Assert.Equal(HttpStatusCode.OK, statusCode);
+        //    Assert.Equal(expr, result.Code);
+        //    Assert.Equal(type, result.ReturnTypeName);
+        //}
+        
         [Theory]
         [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"")", "@", 1, "List<string>")]
         [InlineData(@"return Enumerable.Range(0,1).Select(a=>""@"");", "@", 1, "List<string>")]
@@ -143,15 +157,11 @@ namespace CSDiscordService
                 if (response.Content != null)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    Log.WriteLine(content);
+                    Log.WriteLine(content.Replace(@"\r\n", Environment.NewLine));
 
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest)
                     {
                         result = JsonConvert.DeserializeObject<EvalResult>(content, JsonSettings);
-                    }
-                    else
-                    {
-                        throw new WebException($"Unexpected status code: {response.StatusCode}");
                     }
                 }
 
