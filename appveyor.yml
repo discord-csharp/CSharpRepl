@@ -34,11 +34,14 @@ test_script:
 after_build:
   - ps: |
       if(-not [System.String]::IsNullOrWhitespace($env:APPVEYOR_PULL_REQUEST_NUMBER)) {	return; }
-      $tag = $env:APPVEYOR_REPO_BRANCH
-      if([System.String]::IsNullOrWhitespace($tag)) { $tag = "untagged" }
+      $branchtag = $env:APPVEYOR_REPO_BRANCH
+      $committag = $env:APPVEYOR_REPO_COMMIT
+      if([System.String]::IsNullOrWhitespace($branchtag)) { $branchtag = "untagged" }
       docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
-      docker tag csdiscordservice cisien/csdiscord:$tag
-      docker push cisien/csdiscord:$tag
+      docker tag csdiscordservice cisien/csdiscord:$branchtag
+      docker tag csdiscordservice cisien/csdiscord:$committag
+      docker push cisien/csdiscord:$branchtag
+      docker push cisien/csdiscord:$committag
 artifacts:
   - path: deploy-script.zip
     name: deploy-script
