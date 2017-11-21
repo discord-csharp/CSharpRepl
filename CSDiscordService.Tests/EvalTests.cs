@@ -130,11 +130,35 @@ namespace CSDiscordService
         public async Task Eval_CSharp71Supported()
         {
             var expr = @"int thing = default; return thing;";
-            var (result, statusCode) = await (Execute(expr));
+            var (result, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Equal(0L, result.ReturnValue);
+            Assert.Equal("int", result.ReturnTypeName);
+        }
+
+        [Fact]
+        public async Task Eval_CSharp72Supported()
+        {
+            var expr = @"public class BaseClass
+                        {
+                            private protected int myValue = 42;
+                        }
+                        public class DerivedClass1 : BaseClass
+                        {
+                            public int Access()
+                            {
+                                return myValue;
+                            }
+                        }
+                        return new DerivedClass1().Access();";
+
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Equal(42L, result.ReturnValue);
             Assert.Equal("int", result.ReturnTypeName);
         }
 

@@ -1,31 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>netcoreapp2.0</TargetFramework>
-        <RootNamespace>CSDiscordService</RootNamespace>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RootNamespace>CSDiscordService</RootNamespace>
+    <LangVersion>Latest</LangVersion>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <LangVersion>7.1</LangVersion>
-        <TreatSpecificWarningsAsErrors />
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatSpecificWarningsAsErrors />
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0-preview-20170810-02" />
-        <PackageReference Include="xunit" Version="2.3.0-beta3-build3705" />
-        <PackageReference Include="xunit.runner.reporters" Version="2.3.0-beta3-build3705" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta3-build3705" />
-        <PackageReference Include="Microsoft.Net.Compilers" Version="2.6.0-beta1-62012-01" />
-        <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta3-build3705" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.reporters" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta3-build3705" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\CSDiscordService\CSDiscordService.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CSDiscordService\CSDiscordService.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-    </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
 
 </Project>
