@@ -13,5 +13,5 @@ if (Enter-OncePerDeployment "install_docker_image")
 	docker pull "cisien/csdiscord:$tag"
 	docker stop CSDiscord
 	docker rm CSDiscord
-	docker run -d -e "tokens=$env:TOKENS" -p 80:80/tcp --name=CSDiscord --net=nat --net-alias=CSDiscord --hostname=CSDiscord --restart=always --memory=4g --health-interval=2m "cisien/csdiscord:$tag"
+	docker run -d -e "tokens=$env:TOKENS" -e "log_webhook_token=$env:LOG_WEBHOOK_TOKEN" -p 80:80/tcp --name=CSDiscord --net=nat --net-alias=CSDiscord --hostname=CSDiscord --restart=always --memory=4g --health-interval=2m "cisien/csdiscord:$tag"
 }

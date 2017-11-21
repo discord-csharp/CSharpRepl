@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using CSDiscordService.Eval;
 using CSDiscordService.Eval.ResultModels;
+using Microsoft.Extensions.Logging;
 
 namespace CSDiscordService.Controllers
 { 
@@ -16,11 +17,13 @@ namespace CSDiscordService.Controllers
     {
         private CSharpEval _eval;
         private TelemetryClient _telemetryClient;
+        private ILogger<EvalController> _logger;
 
-        public EvalController(CSharpEval eval, TelemetryClient telemetryClient)
+        public EvalController(CSharpEval eval, TelemetryClient telemetryClient, ILogger<EvalController> logger)
         {
             _eval = eval;
             _telemetryClient = telemetryClient;
+            _logger = logger;
         }
 
         [HttpPost]

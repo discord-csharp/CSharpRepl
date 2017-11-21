@@ -56,6 +56,12 @@ namespace CSDiscordService
         {
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
+            var webhookToken = Configuration["log_webhook_token"];
+            if (!string.IsNullOrWhiteSpace(webhookToken))
+            {
+                var webhookId = ulong.Parse(Configuration["log_webhook_id"]);
+                loggerFactory.AddDiscordWebhook(webhookId, webhookToken);
+            }
 
             app.Use(async (context, next) =>
             {

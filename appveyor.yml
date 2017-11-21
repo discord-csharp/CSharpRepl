@@ -59,3 +59,5 @@ environment:
     secure: AXXeju7g+0ZE1ZMW2TKcXfW6+CMT70ZDh5iWYE5Bg80=
   TOKENS:
     secure: 20GDZBJStUXBheGueyX+iIXiRK6E/npU6vn2OA6s+NzIq96C+33xZblQbSwUt6BtYCr3duMGuiwaCayUR20SYVWCYo1I2IBZq+uUUtTZVfk=
+  LOG_WEBHOOK_TOKEN:
+    secure: /QjuIMGkGJIDgoyw+zeIsQQKjcbnrmydGAjcOhzYvFPHy2CFoev9vd2Bq8gv+oA/dUVv8mFShqPqvzFq+1PkwdUMIYVB21wcTRENTA4FjjQ=
