@@ -58,11 +58,10 @@ namespace CSDiscordService
             Assert.Equal(expected, result.ReturnValue);
             Assert.Equal(type, result.ReturnTypeName);
         }
-
-        // disabled until json.net updates to support serializing broken iserializables
+        
         //[Theory]
         //[InlineData(@"Directory.CreateDirectory(""C:\\this\\doesnt\\exist"")", "DirectoryInfo")]
-        //public async Task Eval_WellFormedCodeExecutesIgnoreReturnValue(string expr, string type)
+        //public async Task Eval_JsonNetSerializesISerializableAgain(string expr, string type)
         //{
         //    var (result, statusCode) = await Execute(expr);
 
@@ -70,7 +69,7 @@ namespace CSDiscordService
         //    Assert.Equal(expr, result.Code);
         //    Assert.Equal(type, result.ReturnTypeName);
         //}
-        
+
         [Theory]
         [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"")", "@", 1, "List<string>")]
         [InlineData(@"return Enumerable.Range(0,1).Select(a=>""@"");", "@", 1, "List<string>")]
@@ -161,6 +160,25 @@ namespace CSDiscordService
             Assert.Equal(42L, result.ReturnValue);
             Assert.Equal("int", result.ReturnTypeName);
         }
+
+        //until c# 8 support is in roslyn
+        //[Fact]
+        //public async Task Eval_CSharp80Supported()
+        //{
+        //    var expr = @"public class BaseClass
+        //                {
+        //                    public string? myValue = null;
+        //                }
+                       
+        //                return new BaseClass().myValue;";
+
+        //    var (result, statusCode) = await Execute(expr);
+
+        //    Assert.Equal(HttpStatusCode.OK, statusCode);
+        //    Assert.Equal(expr, result.Code);
+        //    Assert.Null(result.ReturnValue);
+        //    Assert.Equal("string", result.ReturnTypeName);
+        //}
 
         [Fact]
         public async Task Eval_CanUseSystemDrawing()

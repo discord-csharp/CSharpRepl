@@ -50,7 +50,7 @@ namespace CSDiscordService.Infrastructure.Logging
                 .AddField(new EmbedFieldBuilder()
                     .WithIsInline(false)
                     .WithName($"LogLevel: {logLevel}")
-                    .WithValue(Format.Code($"{formatter(state, exception)}\n{exception?.ToString()}")));
+                    .WithValue(Format.Code($"{formatter(state, exception)}\n{exception?.ToString()}".TruncateTo(1010))));
 
             webhookClient.SendMessageAsync(string.Empty, embeds: new[] { message.Build() }, username: "CSDiscord Logger");
         }
