@@ -10,6 +10,8 @@ using CSDiscordService.Middleware;
 using System.Linq;
 using Newtonsoft.Json.Serialization;
 using CSDiscordService.Eval;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace CSDiscordService
 {
@@ -62,28 +64,10 @@ namespace CSDiscordService
                 var webhookId = ulong.Parse(Configuration["log_webhook_id"]);
                 loggerFactory.AddDiscordWebhook(webhookId, webhookToken);
             }
-
-            app.Use(async (context, next) =>
-            {
-                try
-                {
-                    await next();
-                }
-                catch (Exception ex)
-                {
-                    var exception = JsonConvert.SerializeObject(ex, new JsonSerializerSettings
-                    {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        ContractResolver = new DefaultContractResolver()
-                    });
-
-                    var exBytes = Encoding.UTF8.GetBytes(exception);
-                    context.Response.StatusCode = 500;
-                    await context.Response.Body.WriteAsync(exBytes, 0, exBytes.Length);
-                }
-            });
+          
 
             app.UseMvc();
         }
     }
+    
 }
