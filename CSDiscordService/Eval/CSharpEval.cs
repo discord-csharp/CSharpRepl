@@ -84,8 +84,27 @@ namespace CSDiscordService.Eval
             sw.Restart();
             var result = await eval.RunAsync(globals, ex => true);
             sw.Stop();
+            var evalResult = new EvalResult(result, sb.ToString(), sw.Elapsed, compileTime);
 
-            return new EvalResult(result, sb.ToString(), sw.Elapsed, compileTime);
+            //this hack is to test if we're about to send an object that can't be serialized back to the caller.
+            //if the object can't be serialized, return a failure instead.
+            try
+            {
+                JsonConvert.SerializeObject(evalResult);
+            }
+            catch(JsonSerializationException jse)
+            {
+                evalResult = new EvalResult
+                {
+                    Code = code,
+                    CompileTime = compileTime,
+                    ConsoleOut = sb.ToString(),
+                    ExecutionTime = sw.Elapsed,
+                    ReturnTypeName = result.ReturnValue.GetType().Name,
+                    ReturnValue = $"Unable to serialize the response: {jse.Message}"
+                };
+            }
+            return evalResult;
         }
     }
 }

@@ -58,17 +58,17 @@ namespace CSDiscordService
             Assert.Equal(expected, result.ReturnValue);
             Assert.Equal(type, result.ReturnTypeName);
         }
-        
-        //[Theory]
-        //[InlineData(@"Directory.CreateDirectory(""C:\\this\\doesnt\\exist"")", "DirectoryInfo")]
-        //public async Task Eval_JsonNetSerializesISerializableAgain(string expr, string type)
-        //{
-        //    var (result, statusCode) = await Execute(expr);
 
-        //    Assert.Equal(HttpStatusCode.OK, statusCode);
-        //    Assert.Equal(expr, result.Code);
-        //    Assert.Equal(type, result.ReturnTypeName);
-        //}
+        [Theory]
+        [InlineData(@"new DirectoryInfo(""C:\\"")", "Unable to serialize the response: Unable to serialize instance of 'System.IO.DirectoryInfo'.")]
+        public async Task Eval_JsonNetSerializesISerializableAgain(string expr, string message)
+        {
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Equal(message, result.ReturnValue);
+        }
 
         [Theory]
         [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"")", "@", 1, "List<string>")]
@@ -169,7 +169,7 @@ namespace CSDiscordService
         //                {
         //                    public string? myValue = null;
         //                }
-                       
+
         //                return new BaseClass().myValue;";
 
         //    var (result, statusCode) = await Execute(expr);
