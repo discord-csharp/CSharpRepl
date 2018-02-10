@@ -10,7 +10,7 @@ using CSDiscordService.Eval.ResultModels;
 using Microsoft.Extensions.Logging;
 
 namespace CSDiscordService.Controllers
-{ 
+{
     [Authorize(AuthenticationSchemes = "Token")]
     [Route("[controller]")]
     public class EvalController : Controller
@@ -52,21 +52,28 @@ namespace CSDiscordService.Controllers
 
         private void TrackResult(EvalResult result)
         {
-            var evt = new EventTelemetry("eval")
+            try
             {
-                Timestamp = DateTimeOffset.UtcNow
-            };
+                var evt = new EventTelemetry("eval")
+                {
+                    Timestamp = DateTimeOffset.UtcNow
+                };
 
-            evt.Metrics.Add("CompileTime", result.CompileTime.TotalMilliseconds);
-            evt.Metrics.Add("ExecutionTime", result.ExecutionTime.TotalMilliseconds);
+                evt.Metrics.Add("CompileTime", result.CompileTime.TotalMilliseconds);
+                evt.Metrics.Add("ExecutionTime", result.ExecutionTime.TotalMilliseconds);
 
-            evt.Properties.Add("Code", result.Code);
-            evt.Properties.Add("ConsoleOut", result.ConsoleOut);
-            evt.Properties.Add("ReturnValue", JsonConvert.SerializeObject(result.ReturnValue, Formatting.Indented));
-            evt.Properties.Add("ExceptionType", result.ExceptionType);
-            evt.Properties.Add("Exception", result.Exception);
+                evt.Properties.Add("Code", result.Code);
+                evt.Properties.Add("ConsoleOut", result.ConsoleOut);
+                evt.Properties.Add("ReturnValue", JsonConvert.SerializeObject(result.ReturnValue, Formatting.Indented));
+                evt.Properties.Add("ExceptionType", result.ExceptionType);
+                evt.Properties.Add("Exception", result.Exception);
 
-            _telemetryClient.TrackEvent(evt);
+                _telemetryClient.TrackEvent(evt);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"Failed to record telemetry event: {ex}");
+            }
         }
     }
 }
