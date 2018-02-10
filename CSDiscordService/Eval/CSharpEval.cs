@@ -92,7 +92,7 @@ namespace CSDiscordService.Eval
             {
                 JsonConvert.SerializeObject(evalResult);
             }
-            catch(JsonSerializationException jse)
+            catch(Exception ex)
             {
                 evalResult = new EvalResult
                 {
@@ -101,7 +101,7 @@ namespace CSDiscordService.Eval
                     ConsoleOut = sb.ToString(),
                     ExecutionTime = sw.Elapsed,
                     ReturnTypeName = result.ReturnValue.GetType().Name,
-                    ReturnValue = $"Unable to serialize the response: {jse.Message}"
+                    ReturnValue = $"An exception occurred when serializing the response: {ex.GetType().Name}: {ex.Message}"
                 };
             }
             return evalResult;

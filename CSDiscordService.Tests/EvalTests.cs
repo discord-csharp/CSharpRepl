@@ -12,8 +12,6 @@ using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights;
 using CSDiscordService.Eval.ResultModels;
-using System.IO;
-using System.Runtime.Serialization;
 
 namespace CSDiscordService
 {
@@ -60,8 +58,9 @@ namespace CSDiscordService
         }
 
         [Theory]
-        [InlineData(@"new DirectoryInfo(""C:\\"")", "Unable to serialize the response: Unable to serialize instance of 'System.IO.DirectoryInfo'.")]
-        public async Task Eval_JsonNetSerializesISerializableAgain(string expr, string message)
+        [InlineData(@"new DirectoryInfo(""C:\\"")", "An exception occurred when serializing the response: JsonSerializationException: Unable to serialize instance of 'System.IO.DirectoryInfo'.")]
+        [InlineData(@"return 4896.ToString().Select(Char.GetNumericValue).Cast<int>();", "An exception occurred when serializing the response: InvalidCastException: Unable to cast object of type 'System.Double' to type 'System.Int32'.")]
+        public async Task Eval_JsonNetSerializationFailureHandled(string expr, string message)
         {
             var (result, statusCode) = await Execute(expr);
 
