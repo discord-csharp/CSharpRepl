@@ -137,6 +137,28 @@ namespace CSDiscordService
         }
 
         [Fact]
+        public async Task Eval_BlackCentipedesBlackMagicWorks()
+        {
+            var expr = @"
+            var a = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(""D""), AssemblyBuilderAccess.Run);
+            var b = a.DefineDynamicModule(""D"");
+            var c = b.DefineType(""DO"", TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.AutoClass | TypeAttributes.Abstract | TypeAttributes.Sealed);
+            var d = c.DefineMethod(""AddUp"", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.NewSlot | MethodAttributes.Static, CallingConventions.Standard, typeof(int), new[] { typeof(int), typeof(int) });
+            var e = d.GetILGenerator();
+            e.Emit(OpCodes.Ldarg_0);
+            e.Emit(OpCodes.Ldarg_1);
+            e.Emit(OpCodes.Add);
+            e.Emit(OpCodes.Ret);
+            var f = c.CreateTypeInfo().GetMethod(""AddUp"").Invoke(null, new object[] { 1, 2 });
+            Console.WriteLine(""1 + 2: {0}"", f);
+            Console.ReadLine(); ";
+
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+        }
+
+        [Fact]
         public async Task Eval_CSharp72Supported()
         {
             var expr = @"public class BaseClass

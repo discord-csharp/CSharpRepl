@@ -24,6 +24,7 @@ namespace CSDiscordService.Eval
                 "System",
                 "System.IO",
                 "System.Linq",
+                "System.Linq.Expressions",
                 "System.Collections.Generic",
                 "System.Text",
                 "System.Text.RegularExpressions",
@@ -32,7 +33,9 @@ namespace CSDiscordService.Eval
                 "System.Threading.Tasks",
                 "System.Net.Http",
                 "Newtonsoft.Json",
-                "Newtonsoft.Json.Linq"
+                "Newtonsoft.Json.Linq",
+                "System.Reflection",
+                "System.Reflection.Emit"
             );
 
         private static readonly ImmutableArray<Assembly> DefaultReferences =
