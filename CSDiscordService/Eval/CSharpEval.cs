@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using Microsoft.CodeAnalysis.CSharp;
 using CSDiscordService.Eval.ResultModels;
+using Newtonsoft.Json.Serialization;
 
 namespace CSDiscordService.Eval
 {
@@ -41,7 +42,7 @@ namespace CSDiscordService.Eval
         private static readonly ImmutableArray<Assembly> DefaultReferences =
             ImmutableArray.Create(
                 typeof(Enumerable).GetTypeInfo().Assembly,
-                typeof(List<string>).GetTypeInfo().Assembly,
+                typeof(List<>).GetTypeInfo().Assembly,
                 typeof(JsonConvert).GetTypeInfo().Assembly,
                 typeof(string).GetTypeInfo().Assembly,
                 typeof(ValueTuple).GetTypeInfo().Assembly,
@@ -58,6 +59,12 @@ namespace CSDiscordService.Eval
 
         private static readonly Random random = new Random();
 
+        private static readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            ContractResolver = new DefaultContractResolver()
+        };
+
         public async Task<EvalResult> RunEvalAsync(string code)
         {
             var sb = new StringBuilder();
@@ -65,13 +72,13 @@ namespace CSDiscordService.Eval
 
             var sw = Stopwatch.StartNew();
             var eval = CSharpScript.Create(code, Options, typeof(Globals));
-            
+
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
 
             var compileResult = await compilation.GetAllDiagnosticsAsync();
             var compileErrors = compileResult.Where(a => a.Severity == DiagnosticSeverity.Error).ToImmutableArray();
             sw.Stop();
-            
+
             var compileTime = sw.Elapsed;
             if (compileErrors.Length > 0)
             {
@@ -93,9 +100,9 @@ namespace CSDiscordService.Eval
             //if the object can't be serialized, return a failure instead.
             try
             {
-                JsonConvert.SerializeObject(evalResult);
+                JsonConvert.SerializeObject(evalResult, jsonSettings);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 evalResult = new EvalResult
                 {

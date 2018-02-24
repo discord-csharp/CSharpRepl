@@ -136,11 +136,8 @@ namespace CSDiscordService
             Assert.Equal("int", result.ReturnTypeName);
         }
 
-        [Fact]
-        public async Task Eval_BlackCentipedesBlackMagicWorks()
-        {
-            var expr = @"
-            var a = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(""D""), AssemblyBuilderAccess.Run);
+        [Theory]
+        [InlineData(@"var a = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(""D""), AssemblyBuilderAccess.Run);
             var b = a.DefineDynamicModule(""D"");
             var c = b.DefineType(""DO"", TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.AutoClass | TypeAttributes.Abstract | TypeAttributes.Sealed);
             var d = c.DefineMethod(""AddUp"", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.NewSlot | MethodAttributes.Static, CallingConventions.Standard, typeof(int), new[] { typeof(int), typeof(int) });
@@ -151,7 +148,10 @@ namespace CSDiscordService
             e.Emit(OpCodes.Ret);
             var f = c.CreateTypeInfo().GetMethod(""AddUp"").Invoke(null, new object[] { 1, 2 });
             Console.WriteLine(""1 + 2: {0}"", f);
-            Console.ReadLine(); ";
+            Console.ReadLine(); ")]
+        public async Task Eval_BlackCentipedesBlackMagicWorks(string code)
+        {
+            var expr = code;
 
             var (result, statusCode) = await Execute(expr);
 

@@ -4,14 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Text;
 using CSDiscordService.Middleware;
 using System.Linq;
 using Newtonsoft.Json.Serialization;
 using CSDiscordService.Eval;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace CSDiscordService
 {
@@ -38,7 +34,8 @@ namespace CSDiscordService
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<CSharpEval>();
+            services.AddSingleton<CSharpEval>();
+            services.AddSingleton<DisassemblyService>();
             services.AddTokenAuthentication(o => o.ValidTokens = Configuration["tokens"].Split(";").ToList());
 
             services.AddMvc(o =>

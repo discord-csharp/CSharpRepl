@@ -10,7 +10,9 @@ namespace CSDiscordService
         {
             using (var httpContent = new StringContent(text ?? string.Empty, Encoding.UTF8, "text/plain"))
             {
-                return await client.PostAsync(url, httpContent);
+                var result = await client.PostAsync(url, httpContent);
+
+                return result;
             }
         }
     }

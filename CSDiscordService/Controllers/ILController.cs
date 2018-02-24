@@ -3,29 +3,28 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using CSDiscordService.Eval;
 using Microsoft.Extensions.Logging;
-using CSDiscordService.Infrastructure;
+using CSDiscordService.Eval;
 
 namespace CSDiscordService.Controllers
 {
     [Authorize(AuthenticationSchemes = "Token")]
     [Route("[controller]")]
-    public class EvalController : Controller
+    public class ILController : Controller
     {
-        private CSharpEval _eval;
         private TelemetryClient _telemetryClient;
-        private ILogger<EvalController> _logger;
+        private ILogger<ILController> _logger;
+        private DisassemblyService _dasmService;
 
-        public EvalController(CSharpEval eval, TelemetryClient telemetryClient, ILogger<EvalController> logger)
+        public ILController(DisassemblyService dasmService, TelemetryClient telemetryClient, ILogger<ILController> logger)
         {
-            _eval = eval;
             _telemetryClient = telemetryClient;
             _logger = logger;
+            _dasmService = dasmService;
         }
 
         [HttpPost]
-        [Produces("application/json")]
+        [Produces("text/plain")]
         [Consumes("text/plain")]
         public async Task<IActionResult> Post([FromBody] string code)
         {
@@ -33,19 +32,12 @@ namespace CSDiscordService.Controllers
             {
                 throw new ArgumentNullException(nameof(code));
             }
+            var final = _dasmService.GetIl(code);
 
-            var result = await _eval.RunEvalAsync(code);
+            _logger.LogInformation(final);
 
-            result.TrackResult(_telemetryClient, _logger);
-
-            if (string.IsNullOrWhiteSpace(result.Exception))
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest(result);
-            }
+            return Ok(final);
         }
     }
 }
+
