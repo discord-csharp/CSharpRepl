@@ -33,6 +33,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.9.0-beta1-62609-10" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>

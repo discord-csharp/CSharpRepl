@@ -3,10 +3,12 @@ using ICSharpCode.Decompiler.Disassembler;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -29,7 +31,8 @@ namespace CSDiscordService.Eval
         MetadataReference.CreateFromFile(typeof(string).GetTypeInfo().Assembly.Location),
         MetadataReference.CreateFromFile(typeof(HttpClient).GetTypeInfo().Assembly.Location),
         MetadataReference.CreateFromFile(typeof(Regex).GetTypeInfo().Assembly.Location),
-        MetadataReference.CreateFromFile(typeof(BinaryExpression).GetTypeInfo().Assembly.Location)
+        MetadataReference.CreateFromFile(typeof(BinaryExpression).GetTypeInfo().Assembly.Location),
+        MetadataReference.CreateFromFile(typeof(Console).GetTypeInfo().Assembly.Location)
     );
 
         private static readonly ImmutableArray<string> Imports = ImmutableArray.Create(
@@ -52,12 +55,16 @@ namespace CSDiscordService.Eval
 
         public string GetIl(string code)
         {
+            code = code.Trim().EndsWith(";") ? code : $"return {code};";
+            var codeLines = code.Split("\\r\\n", StringSplitOptions.RemoveEmptyEntries);
+            var retval = codeLines.Last().Contains("return") ? "object" : "void";
+           
             string toExecute = $@"
             namespace Eval
             {{
               public class Code
               {{
-                public object Main() 
+                public {retval} Main() 
                 {{
                   {code}
                 }}
@@ -73,9 +80,10 @@ namespace CSDiscordService.Eval
             var compilation = CSharpCompilation.Create(Guid.NewGuid().ToString(), options: compOpts, references: References).AddSyntaxTrees(scriptSyntaxTree);
 
             var sb = new StringBuilder();
+            using (var pdb = new MemoryStream())
             using (var dll = new MemoryStream())
             {
-                var result = compilation.Emit(dll);
+                var result = compilation.Emit(dll, pdb);
                 if (!result.Success)
                 {
                     sb.AppendLine("Emit Failed");
