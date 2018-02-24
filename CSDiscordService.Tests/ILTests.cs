@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit.Abstractions;
 using Microsoft.ApplicationInsights;
 using System.Net.Http;
@@ -47,6 +45,7 @@ namespace CSDiscordService
         [Theory]
         [InlineData("return 1+1;")]
         [InlineData("int Thing() {return 1+1;} return Thing();")]
+        [InlineData("void N(){ ref int M(out int x){x = 10; return ref x;}ref int i = ref M(out _);}N(); return 0;")]
         public async Task TestIfWorks(string script)
         {
             var (result, code) = await Execute(script);

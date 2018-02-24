@@ -93,8 +93,13 @@ namespace CSDiscordService.Eval
                         {
                             DetectControlStructure = false
                         };
-                        var methods = module.Types.SelectMany(a => a.Methods);
-                        rd.DisassembleMethod(methods.Single(a => a.Name == "Main"));
+                        var ignoredMethods = new[] { ".ctor" };
+                        var methods = module.Types.SelectMany(a => a.Methods).Where(a => !ignoredMethods.Contains(a.Name));
+                        foreach (var method in methods)
+                        {
+                            rd.DisassembleMethod(method);
+                            plainOutput.WriteLine();
+                        }
                     }
                 }
 
