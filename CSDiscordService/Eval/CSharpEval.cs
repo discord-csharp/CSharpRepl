@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -36,7 +36,8 @@ namespace CSDiscordService.Eval
                 "Newtonsoft.Json",
                 "Newtonsoft.Json.Linq",
                 "System.Reflection",
-                "System.Reflection.Emit"
+                "System.Reflection.Emit",
+                "System.Globalization"
             );
 
         private static readonly ImmutableArray<Assembly> DefaultReferences =
