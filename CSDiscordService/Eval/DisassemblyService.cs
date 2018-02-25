@@ -32,7 +32,8 @@ namespace CSDiscordService.Eval
         MetadataReference.CreateFromFile(typeof(HttpClient).GetTypeInfo().Assembly.Location),
         MetadataReference.CreateFromFile(typeof(Regex).GetTypeInfo().Assembly.Location),
         MetadataReference.CreateFromFile(typeof(BinaryExpression).GetTypeInfo().Assembly.Location),
-        MetadataReference.CreateFromFile(typeof(Console).GetTypeInfo().Assembly.Location)
+        MetadataReference.CreateFromFile(typeof(Console).GetTypeInfo().Assembly.Location),
+        MetadataReference.CreateFromFile(Assembly.Load("System.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a").Location)
     );
 
         private static readonly ImmutableArray<string> Imports = ImmutableArray.Create(
