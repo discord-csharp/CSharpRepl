@@ -70,6 +70,7 @@ namespace CSDiscordService.Eval
         {
             var sb = new StringBuilder();
             var textWr = new ConsoleLikeStringWriter(sb);
+            var env = new BasicEnvironment();
 
             var sw = Stopwatch.StartNew();
             var eval = CSharpScript.Create(code, Options, typeof(Globals));
@@ -89,7 +90,8 @@ namespace CSDiscordService.Eval
             var globals = new Globals
             {
                 Random = random,
-                Console = textWr
+                Console = textWr,
+                Environment = env
             };
 
             sw.Restart();
