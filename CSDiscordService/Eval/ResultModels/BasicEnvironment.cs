@@ -1,47 +1,98 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace CSDiscordService.Eval.ResultModels
 {
     public class BasicEnvironment
     {
-        public string CommandLine { get; } = @"C:\thing.exe --do-stuff";
-        public string CurrentDirectory { get; set; } = @"C:\";
+        public string CommandLine { get; } = Environment.CommandLine;
+        public string CurrentDirectory { get; set; } = Environment.CurrentDirectory;
         public int CurrentManagedThreadId { get; } = Environment.CurrentManagedThreadId;
-        public int ExitCode { get; set; }
-        public bool HasShutdownStarted { get; } = false;
+        public int ExitCode { get; set; } = Environment.ExitCode;
+        public bool HasShutdownStarted { get; } = Environment.HasShutdownStarted;
         public bool Is64BitOperatingSystem { get; } = Environment.Is64BitOperatingSystem;
         public bool Is64BitProcess { get; } = Environment.Is64BitProcess;
-        public string MachineName { get; } = "SOMEONE-ELSES-MACHINE";
+        public string MachineName { get; } = Environment.MachineName;
         public string NewLine { get; } = Environment.NewLine;
         public OperatingSystem OSVersion { get; } = Environment.OSVersion;
         public int ProcessorCount { get; } = Environment.ProcessorCount;
-        public string StackTrace { get; } = string.Empty;
+        public string StackTrace { get; } = Environment.StackTrace;
         public string SystemDirectory { get; } = Environment.SystemDirectory;
         public int SystemPageSize { get; } = Environment.SystemPageSize;
         public int TickCount { get; } = Environment.TickCount;
-        public string UserDomainName { get; } = "SOMEONE-ELSES-MACHINE";
-        public bool UserInteractive { get; } = false;
-        public string UserName { get; } = "SomeoneElse";
+        public string UserDomainName { get; } = Environment.UserDomainName;
+        public bool UserInteractive { get; } = Environment.UserInteractive;
+        public string UserName { get; } = Environment.UserName;
         public Version Version { get; } = Environment.Version;
         public long WorkingSet { get; } = Environment.WorkingSet;
 
-        private const string AccessDenied = "Usage of this API is prohibited";
+        // The last two are marked static to reproduce a real environment, where user and machine variables persists between executions.
+        private Dictionary<string, string> _processEnv = new Dictionary<string, string>();
+        private static Dictionary<string, string> _userEnv = new Dictionary<string, string>();
+        private static Dictionary<string, string> _machineEnv = new Dictionary<string, string>();
 
-        public void Exit(int exitCode) => throw new MethodAccessException(AccessDenied);
-        public string ExpandEnvironmentVariables(string name) => throw new MethodAccessException(AccessDenied);
-        public void FailFast(string message) => throw new Exception(message);
-        public void FailFast(string message, Exception exception) => throw exception;
-        public string[] GetCommandLineArgs() => CommandLine.Split(' ');
-        public string GetEnvironmentVariable(string variable) => throw new MethodAccessException(AccessDenied);
-        public string GetEnvironmentVariable(string variable, EnvironmentVariableTarget target) => throw new MethodAccessException(AccessDenied);
-        public IDictionary GetEnvironmentVariables() => throw new MethodAccessException(AccessDenied);
-        public IDictionary GetEnvironmentVariables(EnvironmentVariableTarget target) => throw new MethodAccessException(AccessDenied);
-        public string GetFolderPath(SpecialFolder folder) => Environment.GetFolderPath((Environment.SpecialFolder)folder);
-        public string GetFolderPath(SpecialFolder folder, SpecialFolderOption option) => Environment.GetFolderPath((Environment.SpecialFolder)folder, (Environment.SpecialFolderOption)option);
+
+        public void Exit(int exitCode) => throw new ExitException(exitCode);
+        public void FailFast(string message, Exception exception = null) => throw new FailFastException(message, exception);
+        public string[] GetCommandLineArgs() => Environment.GetCommandLineArgs();
+        public string GetFolderPath(SpecialFolder folder, SpecialFolderOption option = SpecialFolderOption.None) => Environment.GetFolderPath((Environment.SpecialFolder)folder, (Environment.SpecialFolderOption)option);
         public string[] GetLogicalDrives => Environment.GetLogicalDrives();
-        public void SetEnvironmentVariable(string variable, string value) => throw new MethodAccessException(AccessDenied);
-        public void SetEnvironmentVariable(string variable, string value, EnvironmentVariableTarget target) => throw new MethodAccessException(AccessDenied);
+
+        public string ExpandEnvironmentVariables(string name)
+        {
+            var env = (Dictionary<string, string>)GetEnvironmentVariables();
+            var regex = new Regex("%([^%]+)%");
+            var me = new MatchEvaluator(m => env.ContainsKey(m.Groups[1].Value) ? env[m.Groups[1].Value] : m.Value);
+
+            return regex.Replace(name, me);
+        }
+
+        public void SetEnvironmentVariable(string variable, string value, EnvironmentVariableTarget target = EnvironmentVariableTarget.Process)
+        {
+            if (target == EnvironmentVariableTarget.Process)
+            {
+                _processEnv[variable] = value;
+            }
+            else if (target == EnvironmentVariableTarget.User)
+            {
+                _userEnv[variable] = value;
+            }
+            else if (target == EnvironmentVariableTarget.Machine)
+            {
+                _machineEnv[variable] = value;
+            }
+        }
+        
+        public string GetEnvironmentVariable(string variable, EnvironmentVariableTarget target = EnvironmentVariableTarget.Process)
+        {
+            var searchDictionary = GetEnvironmentVariables(target);
+
+            return searchDictionary.Contains(variable) ? (string)searchDictionary[variable] : null;
+        }
+
+        public IDictionary GetEnvironmentVariables(EnvironmentVariableTarget target = EnvironmentVariableTarget.Process)
+        {
+            Dictionary<string, string> searchDictionary = _machineEnv;
+            if (target != EnvironmentVariableTarget.Machine)
+            {
+                foreach (var kvp in _userEnv)
+                {
+                    searchDictionary[kvp.Key] = kvp.Value;
+                }
+            }
+            if (target == EnvironmentVariableTarget.Process)
+            {
+                foreach (var kvp in _processEnv)
+                {
+                    searchDictionary[kvp.Key] = kvp.Value;
+                }
+            }
+
+            return searchDictionary;
+        }
+
 
         public enum SpecialFolder
         {
