@@ -74,7 +74,7 @@ namespace CSDiscordService.Eval.ResultModels
 
         public IDictionary GetEnvironmentVariables(EnvironmentVariableTarget target = EnvironmentVariableTarget.Process)
         {
-            Dictionary<string, string> searchDictionary = _machineEnv;
+            Dictionary<string, string> searchDictionary = new Dictionary<string, string>(_machineEnv);
             if (target != EnvironmentVariableTarget.Machine)
             {
                 foreach (var kvp in _userEnv)
