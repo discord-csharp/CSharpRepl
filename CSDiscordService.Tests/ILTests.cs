@@ -52,7 +52,6 @@ namespace CSDiscordService
         {
             var (result, code) = await Execute(script);
             Assert.DoesNotContain("Emit Failed", result);
-            Log.WriteLine(result);
         }
 
         private async Task<(string, HttpStatusCode)> Execute(string expr)

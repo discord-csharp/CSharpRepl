@@ -99,16 +99,17 @@ namespace CSDiscordService
             Assert.Equal(message, result.Exception);
         }
 
-        [Fact]
-        public async Task Eval_ConsoleOutputIsCaptured()
+        [Theory]
+        [InlineData(@"Console.WriteLine(""test"");", "test\r\n", null)]
+        [InlineData(@"public static void Test() {Console.WriteLine(""Test"");} Test();", "Test\r\n", null)]
+        public async Task Eval_ConsoleOutputIsCaptured(string expr, string consoleOut, object returnValue)
         {
-            var expr = @"Console.WriteLine(""test"");";
             var (result, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal("test\r\n", result.ConsoleOut);
-            Assert.Null(result.ReturnValue);
+            Assert.Equal(consoleOut, result.ConsoleOut);
+            Assert.Equal(returnValue, result.ReturnValue);
         }
 
         [Fact]

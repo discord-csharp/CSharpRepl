@@ -87,12 +87,10 @@ namespace CSDiscordService.Eval
                 return EvalResult.CreateErrorResult(code, sb.ToString(), sw.Elapsed, compileErrors);
             }
 
-            var globals = new Globals
-            {
-                Random = random,
-                Console = textWr,
-                Environment = env
-            };
+            var globals = new Globals();
+            Globals.Random = random;
+            Globals.Console = textWr;
+            Globals.Environment = env;
 
             sw.Restart();
             var result = await eval.RunAsync(globals, ex => true);
