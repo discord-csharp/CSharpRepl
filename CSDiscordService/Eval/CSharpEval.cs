@@ -1,20 +1,21 @@
+using CSDiscordService.Eval.ResultModels;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Scripting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Reflection;
-using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
 using System.Diagnostics;
-using Newtonsoft.Json;
-using Microsoft.CodeAnalysis.Diagnostics;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Net.Http;
-using Microsoft.CodeAnalysis.CSharp;
-using CSDiscordService.Eval.ResultModels;
-using Newtonsoft.Json.Serialization;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CSDiscordService.Eval
 {
@@ -22,32 +23,35 @@ namespace CSDiscordService.Eval
     {
         private static readonly ImmutableArray<string> DefaultImports =
             ImmutableArray.Create(
+                "Newtonsoft.Json",
+                "Newtonsoft.Json.Linq",
                 "System",
+                "System.Collections",
+                "System.Collections.Generic",
+                "System.Globalization",
                 "System.IO",
                 "System.Linq",
                 "System.Linq.Expressions",
-                "System.Collections.Generic",
-                "System.Text",
-                "System.Text.RegularExpressions",
                 "System.Net",
-                "System.Threading",
-                "System.Threading.Tasks",
                 "System.Net.Http",
-                "Newtonsoft.Json",
-                "Newtonsoft.Json.Linq",
                 "System.Reflection",
                 "System.Reflection.Emit",
-                "System.Globalization"
+                "System.Runtime.CompilerServices",
+                "System.Text",
+                "System.Text.RegularExpressions",
+                "System.Threading",
+                "System.Threading.Tasks"
             );
 
         private static readonly ImmutableArray<Assembly> DefaultReferences =
             ImmutableArray.Create(
                 typeof(Enumerable).GetTypeInfo().Assembly,
-                typeof(List<>).GetTypeInfo().Assembly,
+                typeof(HttpClient).GetTypeInfo().Assembly,
                 typeof(JsonConvert).GetTypeInfo().Assembly,
-                typeof(string).GetTypeInfo().Assembly,
-                typeof(ValueTuple).GetTypeInfo().Assembly,
-                typeof(HttpClient).GetTypeInfo().Assembly
+                typeof(List<>).GetTypeInfo().Assembly,
+                typeof(String).GetTypeInfo().Assembly,
+                typeof(Unsafe).GetTypeInfo().Assembly,
+                typeof(ValueTuple).GetTypeInfo().Assembly
             );
 
         private static readonly ScriptOptions Options =
