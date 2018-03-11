@@ -20,7 +20,7 @@ build_script:
   - ps: |
       cd CSDiscordService
       dotnet publish --configuration Release --output obj/Docker/publish
-      docker build --isolation hyperv .
+      docker build .
 test_script:
   - docker run -d -e "tokens=test" -p 80:80/tcp --name CSDiscord --net nat --isolation hyperv csdiscordservice
   - ps: |
