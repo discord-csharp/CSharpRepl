@@ -3,6 +3,7 @@ version: '3'
 services:
   csdiscordservice:
     image: csdiscordservice
+    isolation: hyperv
     build:
       context: ./CSDiscordService
       dockerfile: Dockerfile

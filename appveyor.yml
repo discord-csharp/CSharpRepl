@@ -11,7 +11,6 @@ install:
       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1"
       & "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR
       $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
-      choco install docker-compose
       dotnet --info
 before_build:
   - dotnet restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
@@ -21,10 +20,9 @@ build_script:
   - ps: |
       cd CSDiscordService
       dotnet publish --configuration Release --output obj/Docker/publish
-      cd ..
-  - docker-compose build
+      docker build --isolation hyperv .
 test_script:
-  - docker run -d -e "tokens=test" -p 80:80/tcp --name CSDiscord --net nat csdiscordservice
+  - docker run -d -e "tokens=test" -p 80:80/tcp --name CSDiscord --net nat --isolation hyperv csdiscordservice
   - ps: |
       $json = (& "docker" "inspect" "CSDiscord" | ConvertFrom-Json)
       $address= $json.NetworkSettings.Networks.nat.ipaddress
