@@ -31,4 +31,8 @@ namespace CSDiscordService.Eval
 
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
     public class ಠ‿ಠAttribute : Attribute { }
+    
+    [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
+    public class 눈ᆺ눈Attribute : Attribute { }
+
 }
