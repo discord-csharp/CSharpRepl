@@ -40,7 +40,8 @@ namespace CSDiscordService.Eval
                 "System.Text",
                 "System.Text.RegularExpressions",
                 "System.Threading",
-                "System.Threading.Tasks"
+                "System.Threading.Tasks",
+                "CSDiscordService.Eval"
             );
 
         private static readonly ImmutableArray<Assembly> DefaultReferences =
@@ -51,7 +52,8 @@ namespace CSDiscordService.Eval
                 typeof(List<>).GetTypeInfo().Assembly,
                 typeof(String).GetTypeInfo().Assembly,
                 typeof(Unsafe).GetTypeInfo().Assembly,
-                typeof(ValueTuple).GetTypeInfo().Assembly
+                typeof(ValueTuple).GetTypeInfo().Assembly,
+                typeof(Globals).GetTypeInfo().Assembly
             );
 
         private static readonly ScriptOptions Options =

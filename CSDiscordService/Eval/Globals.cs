@@ -20,4 +20,6 @@ namespace CSDiscordService.Eval
         }
     }
 
+    [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
+    public class ʘ‿ʘAttribute : Attribute { }
 }

@@ -87,7 +87,7 @@ namespace CSDiscordService
         [Theory]
         [InlineData("return 1+1", "CompilationErrorException", "; expected")]
         [InlineData(@"throw new Exception(""test"");", "Exception", "test")]
-        [InlineData("return Environment.MachineName;", "CompilationErrorException", "Usage of this API is prohibited")]
+        [InlineData("return System.Environment.MachineName;", "CompilationErrorException", "Usage of this API is prohibited\nUsage of this API is prohibited")]
         [InlineData("return DoesNotCompile()", "CompilationErrorException", "; expected\nThe name 'DoesNotCompile' does not exist in the current context")]
         public async Task Eval_FaultyCodeThrowsExpectedException(string expr, string exception, string message)
         {
