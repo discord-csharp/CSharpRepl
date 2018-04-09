@@ -126,6 +126,33 @@ namespace CSDiscordService
         }
 
         [Fact]
+        public async Task Eval_AsyncMethodBuilderTestCompileFails()
+        {
+            var expr = @"[AsyncMethodBuilder(typeof(Builder))]
+                    class async
+                    {
+                        public Awaiter GetAwaiter() => new Awaiter();
+
+                        public class Awaiter : INotifyCompletion
+                        {
+                            public void GetResult() { }
+                            public bool IsCompleted => false;
+                            public void OnCompleted(Action a) { }
+                        }
+
+                        class Builder { }
+                    }
+
+                    class Foo
+                    {
+                        async async async(async async) => await async;
+                    }";
+
+            var (result, statusCode) = await Execute(expr);
+            Assert.Equal(HttpStatusCode.BadRequest, statusCode);
+        }
+
+        [Fact]
         public async Task Eval_CSharp71Supported()
         {
             var expr = @"int thing = default; return thing;";

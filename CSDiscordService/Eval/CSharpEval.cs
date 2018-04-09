@@ -99,7 +99,16 @@ namespace CSDiscordService.Eval
             Globals.Environment = env;
 
             sw.Restart();
-            var result = await eval.RunAsync(globals, ex => true);
+            ScriptState<object> result;
+
+            try
+            {
+                result = await eval.RunAsync(globals, ex => true);
+            }
+            catch (CompilationErrorException ex)
+            {
+                return EvalResult.CreateErrorResult(code, sb.ToString(), sw.Elapsed, ex.Diagnostics);
+            }
             sw.Stop();
             var evalResult = new EvalResult(result, sb.ToString(), sw.Elapsed, compileTime);
 
