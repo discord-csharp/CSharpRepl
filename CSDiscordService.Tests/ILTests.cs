@@ -46,8 +46,7 @@ namespace CSDiscordService
         [InlineData("return 1+1;")]
         [InlineData("int Thing() {return 1+1;} return Thing();")]
         [InlineData("void N(){ ref int M(out int x){x = 10; return ref x;}ref int i = ref M(out _);}N(); return 0;")]
-        [InlineData("1+1")]
-        //[InlineData("System.Console.WriteLine(\"Hi\");")] //disabled until i can figure out why it won't 'Console'
+        [InlineData("System.Console.WriteLine(\"Hi\"); return 0;")] 
         public async Task TestIfWorks(string script)
         {
             var (result, code) = await Execute(script);

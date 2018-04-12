@@ -56,16 +56,20 @@ namespace CSDiscordService.Eval
 
         public string GetIl(string code)
         {
-            code = code.Trim().EndsWith(";") ? code : $"return {code};";
-            var codeLines = code.Split("\\r\\n", StringSplitOptions.RemoveEmptyEntries);
-            var retval = codeLines.Last().Contains("return") ? "object" : "void";
-           
+            StringBuilder imports = new StringBuilder();
+            foreach(var import in Imports) 
+            {
+                imports.AppendLine($"using {import};");
+            }
+
             string toExecute = $@"
+            {imports}
+
             namespace Eval
             {{
               public class Code
               {{
-                public {retval} Main() 
+                public object Main() 
                 {{
                   {code}
                 }}
