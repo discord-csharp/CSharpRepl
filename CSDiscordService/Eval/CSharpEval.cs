@@ -53,7 +53,9 @@ namespace CSDiscordService.Eval
                 typeof(String).GetTypeInfo().Assembly,
                 typeof(Unsafe).GetTypeInfo().Assembly,
                 typeof(ValueTuple).GetTypeInfo().Assembly,
-                typeof(Globals).GetTypeInfo().Assembly
+                typeof(Globals).GetTypeInfo().Assembly,
+                typeof(Span<>).GetTypeInfo().Assembly,
+                typeof(Memory<>).GetTypeInfo().Assembly
             );
 
         private static readonly ScriptOptions Options =

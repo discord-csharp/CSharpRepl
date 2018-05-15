@@ -26,7 +26,7 @@ namespace CSDiscordService.Controllers
         [HttpPost]
         [Produces("text/plain")]
         [Consumes("text/plain")]
-        public async Task<IActionResult> Post([FromBody] string code)
+        public Task<IActionResult> Post([FromBody] string code)
         {
             if (code == null)
             {
@@ -36,7 +36,7 @@ namespace CSDiscordService.Controllers
 
             _logger.LogInformation(final);
 
-            return Ok(final);
+            return Task.FromResult<IActionResult>(Ok(final));
         }
     }
 }
