@@ -5,13 +5,11 @@ platform: Any CPU
 pull_requests:
   do_not_increment_build_number: true
 install:
-  - ps: |
-      choco install docker-compose
-      dotnet --info
+  - choco install docker-compose
+  - dotnet --info
 before_build:
-  - ps: |
-      dotnet restore CSDiscordService/CSDiscordService.csproj --configfile ../.nuget/nuget.config
-      dotnet.exe restore CSDiscordService.Tests/CSDiscordService.Tests.csproj --configfile ../.nuget/nuget.config
+  - dotnet restore CSDiscordService/CSDiscordService.csproj --configfile ../.nuget/nuget.config
+  - dotnet restore CSDiscordService.Tests/CSDiscordService.Tests.csproj --configfile ../.nuget/nuget.config
   - 7z a deploy-script.zip before-deploy.ps1
 build_script:
   - dotnet publish CSDiscordService --configuration Release --output obj/Docker/publish
