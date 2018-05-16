@@ -6,22 +6,20 @@ pull_requests:
   do_not_increment_build_number: true
 install:
   - ps: |
-      $env:DOTNET_INSTALL_DIR = "..\.dotnetsdk"
       mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.1.2xx/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1"
       & "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version 2.1.200 -InstallDir $env:DOTNET_INSTALL_DIR
-      $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
       choco install docker-compose
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet" --info
+      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe"" --info
 before_build:
   - ps: |
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet" restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet" restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
+      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe" restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
+      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe"" restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
   - 7z a deploy-script.zip before-deploy.ps1
 build_script:
   - ps: |
       cd CSDiscordService
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet" publish --configuration Release --output obj/Docker/publish
+      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe" publish --configuration Release --output obj/Docker/publish
       cd ..
   - docker-compose build
 test_script:
@@ -53,6 +51,7 @@ deploy:
       branch: master
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_INSTALL_DIR: "..\.dotnetsdk"
   DOCKER_USER:
     secure: ry9x9cQ9gzMNaPOd45RSHQ==
   DOCKER_PASS:
