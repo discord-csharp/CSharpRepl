@@ -15,8 +15,8 @@ install:
       & "$($env:DOTNET_INSTALL_DIR)\dotnet" --info
 before_build:
   - ps: |
-    & "$($env:DOTNET_INSTALL_DIR)\dotnet" restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
-    & "$($env:DOTNET_INSTALL_DIR)\dotnet" restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
+      & "$($env:DOTNET_INSTALL_DIR)\dotnet" restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
+      & "$($env:DOTNET_INSTALL_DIR)\dotnet" restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
   - 7z a deploy-script.zip before-deploy.ps1
 build_script:
   - ps: |
