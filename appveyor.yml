@@ -8,18 +8,18 @@ install:
   - ps: |
       mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.1.2xx/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1"
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version 2.1.200 -InstallDir $env:DOTNET_INSTALL_DIR
+      & "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1" -Version 2.1.200 -InstallDir $env:DOTNET_INSTALL_DIR
       choco install docker-compose
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe" --info
+      & "$($env:DOTNET_INSTALL_DIR)/dotnet.exe" --info
 before_build:
   - ps: |
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe" restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe" restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
+      & "$($env:DOTNET_INSTALL_DIR)/dotnet.exe" restore CSDiscordService/CSDiscordService.csproj --configfile ../.nuget/nuget.config
+      & "$($env:DOTNET_INSTALL_DIR)/dotnet.exe" restore CSDiscordService.Tests/CSDiscordService.Tests.csproj --configfile ../.nuget/nuget.config
   - 7z a deploy-script.zip before-deploy.ps1
 build_script:
   - ps: |
       cd CSDiscordService
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe" publish --configuration Release --output obj/Docker/publish
+      & "$($env:DOTNET_INSTALL_DIR)/dotnet.exe" publish --configuration Release --output obj/Docker/publish
       cd ..
   - docker-compose build
 test_script:
