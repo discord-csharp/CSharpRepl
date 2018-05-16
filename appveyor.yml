@@ -51,7 +51,7 @@ deploy:
       branch: master
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-  DOTNET_INSTALL_DIR: "..\.dotnetsdk"
+  DOTNET_INSTALL_DIR: "../.dotnetsdk"
   DOCKER_USER:
     secure: ry9x9cQ9gzMNaPOd45RSHQ==
   DOCKER_PASS:
