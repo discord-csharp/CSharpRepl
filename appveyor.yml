@@ -12,15 +12,15 @@ install:
       & "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version 2.1.200 -InstallDir $env:DOTNET_INSTALL_DIR
       $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
       choco install docker-compose
-      dotnet --info
+      $($env:DOTNET_INSTALL_DIR)\dotnet --info
 before_build:
-  - dotnet restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
-  - dotnet restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
+  - $($env:DOTNET_INSTALL_DIR)\dotnet restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
+  - $($env:DOTNET_INSTALL_DIR)\dotnet restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
   - 7z a deploy-script.zip before-deploy.ps1
 build_script:
   - ps: |
       cd CSDiscordService
-      dotnet publish --configuration Release --output obj/Docker/publish
+      $($env:DOTNET_INSTALL_DIR)\dotnet publish --configuration Release --output obj/Docker/publish
       cd ..
   - docker-compose build
 test_script:
