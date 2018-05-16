@@ -10,11 +10,11 @@ install:
       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.1.2xx/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1"
       & "$($env:DOTNET_INSTALL_DIR)\dotnet-install.ps1" -Version 2.1.200 -InstallDir $env:DOTNET_INSTALL_DIR
       choco install docker-compose
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe"" --info
+      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe" --info
 before_build:
   - ps: |
       & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe" restore CSDiscordService\CSDiscordService.csproj --configfile ..\.nuget\nuget.config
-      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe"" restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
+      & "$($env:DOTNET_INSTALL_DIR)\dotnet.exe" restore CSDiscordService.Tests\CSDiscordService.Tests.csproj --configfile ..\.nuget\nuget.config
   - 7z a deploy-script.zip before-deploy.ps1
 build_script:
   - ps: |
