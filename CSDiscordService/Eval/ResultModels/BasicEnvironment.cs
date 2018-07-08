@@ -29,9 +29,9 @@ namespace CSDiscordService.Eval.ResultModels
         public long WorkingSet { get; } = Environment.WorkingSet;
 
         // The last two are marked static to reproduce a real environment, where user and machine variables persists between executions.
-        private Dictionary<string, string> _processEnv = new Dictionary<string, string>();
-        private static Dictionary<string, string> _userEnv = new Dictionary<string, string>();
-        private static Dictionary<string, string> _machineEnv = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _processEnv = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> _userEnv = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> _machineEnv = new Dictionary<string, string>();
 
 
         public void Exit(int exitCode) => throw new ExitException(exitCode);

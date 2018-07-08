@@ -11,12 +11,12 @@ namespace CSDiscordService.Eval
 
         public void ResetButton()
         {
-            Environment.Exit(0);
+            System.Environment.Exit(0);
         }
 
         public void PowerButton()
         {
-            Environment.Exit(1);
+            System.Environment.Exit(1);
         }
     }
 

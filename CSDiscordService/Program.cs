@@ -4,34 +4,20 @@ using Microsoft.AspNetCore.Hosting;
 using System.Threading;
 using System;
 using System.Diagnostics;
+using Microsoft.AspNetCore;
 
 namespace CSDiscordService
 {
     public class Program
     {
-        private static Timer _healthcheckTimer;
-
         public static void Main(string[] args)
         {
-            _healthcheckTimer = new Timer(DoHealthcheck, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(30));
-            var host = new WebHostBuilder()
-                .UseApplicationInsights()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseStartup<Startup>()
-                .Build();
-            host.Run();
+            CreateWebHostBuilder(args).Build().Run();
         }
 
-        private static void DoHealthcheck(object state)
-        {
-            var allocatedBytes = Process.GetCurrentProcess().PrivateMemorySize64;
-            if (allocatedBytes > 2147483648L)
-            {
-                Console.WriteLine($"Allocated bytes is greater than 2gb ({allocatedBytes}), exiting.");
-                Environment.Exit(0);
-            }
-        }
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder()
+                .UseApplicationInsights()
+                .UseStartup<Startup>();
     }
 }

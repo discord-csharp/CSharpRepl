@@ -8,13 +8,12 @@ using CSDiscordService.Eval;
 
 namespace CSDiscordService.Controllers
 {
-    [Authorize(AuthenticationSchemes = "Token")]
     [Route("[controller]")]
-    public class ILController : Controller
+    public class ILController : ControllerBase
     {
-        private TelemetryClient _telemetryClient;
-        private ILogger<ILController> _logger;
-        private DisassemblyService _dasmService;
+        private readonly TelemetryClient _telemetryClient;
+        private readonly ILogger<ILController> _logger;
+        private readonly DisassemblyService _dasmService;
 
         public ILController(DisassemblyService dasmService, TelemetryClient telemetryClient, ILogger<ILController> logger)
         {
@@ -26,7 +25,7 @@ namespace CSDiscordService.Controllers
         [HttpPost]
         [Produces("text/plain")]
         [Consumes("text/plain")]
-        public Task<IActionResult> Post([FromBody] string code)
+        public Task<ActionResult<string>> Post([FromBody] string code)
         {
             if (code == null)
             {
@@ -36,7 +35,7 @@ namespace CSDiscordService.Controllers
 
             _logger.LogInformation(final);
 
-            return Task.FromResult<IActionResult>(Ok(final));
+            return Task.FromResult<ActionResult<string>>(Ok(final));
         }
     }
 }

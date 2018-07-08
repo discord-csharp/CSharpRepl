@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 
 services:
   csdiscordservice:
@@ -8,7 +8,3 @@ services:
       - "80"
     build:
       context: ./CSDiscordService
-networks:
-  default:
-    external:
-      name: nat

@@ -7,7 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{6A062ACF-A939-
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
 		before-deploy.ps1 = before-deploy.ps1
-		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{443496A8-A004-4C46-8C8F-66FD55AB6402}"

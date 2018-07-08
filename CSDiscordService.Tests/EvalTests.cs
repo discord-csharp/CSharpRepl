@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 using Newtonsoft.Json.Linq;
-using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights;
 using CSDiscordService.Eval.ResultModels;
@@ -24,14 +23,12 @@ namespace CSDiscordService
         public EvalTests(ITestOutputHelper outputHelper)
         {
             var host = new WebHostBuilder()
-                .UseSetting("tokens", "test")
                 .UseStartup<Startup>()
                 .ConfigureServices(a => a.AddSingleton(_dummyTelemetryClient));
 
             Log = outputHelper;
             Server = new TestServer(host);
             Client = Server.CreateClient();
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", "test");
         }
 
         private ITestOutputHelper Log { get; }

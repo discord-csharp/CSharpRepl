@@ -9,10 +9,10 @@ namespace CSDiscordService.Infrastructure.Logging
 {
     internal class DiscordWebhookLogger : ILogger
     {
-        private string _categoryName;
-        private string _token;
-        private Func<string, LogLevel, bool> _filter;
-        private ulong _id;
+        private readonly string _categoryName;
+        private readonly string _token;
+        private readonly Func<string, LogLevel, bool> _filter;
+        private readonly ulong _id;
         private static readonly HttpClient _httpClient = new HttpClient();
 
         public DiscordWebhookLogger(string categoryName, ulong id, string token, Func<string, LogLevel, bool> filter)

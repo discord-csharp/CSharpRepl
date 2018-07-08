@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 using CSDiscordService.Eval;
 using Microsoft.Extensions.Logging;
 using CSDiscordService.Infrastructure;
+using CSDiscordService.Eval.ResultModels;
 
 namespace CSDiscordService.Controllers
 {
-    [Authorize(AuthenticationSchemes = "Token")]
     [Route("[controller]")]
-    public class EvalController : Controller
+    public class EvalController : ControllerBase
     {
-        private CSharpEval _eval;
-        private TelemetryClient _telemetryClient;
-        private ILogger<EvalController> _logger;
+        private readonly CSharpEval _eval;
+        private readonly TelemetryClient _telemetryClient;
+        private readonly ILogger<EvalController> _logger;
 
         public EvalController(CSharpEval eval, TelemetryClient telemetryClient, ILogger<EvalController> logger)
         {
@@ -27,7 +27,7 @@ namespace CSDiscordService.Controllers
         [HttpPost]
         [Produces("application/json")]
         [Consumes("text/plain")]
-        public async Task<IActionResult> Post([FromBody] string code)
+        public async Task<ActionResult<EvalResult>> Post([FromBody] string code)
         {
             if (code == null)
             {

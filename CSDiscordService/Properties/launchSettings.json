@@ -3,8 +3,14 @@
     "CSDiscordService": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "tokens": "token1"
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:5000"
+    },
+    "CSDiscordService-Production": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
       },
       "applicationUrl": "http://localhost:5000"
     }
