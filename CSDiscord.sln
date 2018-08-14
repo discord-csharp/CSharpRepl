@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{6A062ACF-A939-480C-838A-9F14D728DB71}"
-	ProjectSection(SolutionItems) = preProject
-		appveyor.yml = appveyor.yml
-		before-deploy.ps1 = before-deploy.ps1
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{443496A8-A004-4C46-8C8F-66FD55AB6402}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\nuget.config = .nuget\nuget.config
@@ -17,8 +11,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSDiscordService", "CSDiscordService\CSDiscordService.csproj", "{0DD73E76-C5B2-4201-B3E3-760EA8C147BF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSDiscordService.Tests", "CSDiscordService.Tests\CSDiscordService.Tests.csproj", "{429C6E16-F570-418D-8924-0E4594C37D1D}"
-EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{C858A03E-09A7-4902-A6DA-D61CC76C3DE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,10 +26,6 @@ Global
 		{429C6E16-F570-418D-8924-0E4594C37D1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{429C6E16-F570-418D-8924-0E4594C37D1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{429C6E16-F570-418D-8924-0E4594C37D1D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C858A03E-09A7-4902-A6DA-D61CC76C3DE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C858A03E-09A7-4902-A6DA-D61CC76C3DE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C858A03E-09A7-4902-A6DA-D61CC76C3DE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C858A03E-09A7-4902-A6DA-D61CC76C3DE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
