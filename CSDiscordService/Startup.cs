@@ -37,6 +37,7 @@ namespace CSDiscordService
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationInsightsTelemetryProcessor<FilterStatusProbeTelemetryProcessor>();
             services.AddSingleton<CSharpEval>();
             services.AddSingleton<DisassemblyService>();
 
