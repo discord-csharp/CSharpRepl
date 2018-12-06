@@ -1,4 +1,4 @@
-﻿using Microsoft.ApplicationInsights;
+﻿//using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,13 +11,13 @@ namespace CSDiscordService.Controllers
     [Route("[controller]")]
     public class ILController : ControllerBase
     {
-        private readonly TelemetryClient _telemetryClient;
+        //private readonly TelemetryClient _telemetryClient;
         private readonly ILogger<ILController> _logger;
         private readonly DisassemblyService _dasmService;
 
-        public ILController(DisassemblyService dasmService, TelemetryClient telemetryClient, ILogger<ILController> logger)
+        public ILController(DisassemblyService dasmService/*, TelemetryClient telemetryClient*/, ILogger<ILController> logger)
         {
-            _telemetryClient = telemetryClient;
+            //_telemetryClient = telemetryClient;
             _logger = logger;
             _dasmService = dasmService;
         }

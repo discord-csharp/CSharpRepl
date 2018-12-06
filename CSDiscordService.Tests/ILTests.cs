@@ -1,38 +1,26 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using Xunit.Abstractions;
-using Microsoft.ApplicationInsights;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Xunit;
 using System.Net;
+using Microsoft.AspNetCore;
 
-namespace CSDiscordService
+namespace CSDiscordService.Tests
 {
     public class ILTests : IDisposable
-    {
-
-        private static readonly JsonSerializerSettings JsonSettings =
-            new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
-
-        public static TelemetryClient _dummyTelemetryClient = new TelemetryClient();
-
-
+    {            
         public ILTests(ITestOutputHelper outputHelper)
         {
-            var host = new WebHostBuilder()
-                .UseSetting("tokens", "test")
-                .UseStartup<Startup>()
-                .ConfigureServices(a => a.AddSingleton(_dummyTelemetryClient));
-
+            var host = WebHost.CreateDefaultBuilder()
+                .UseStartup<Startup>();
+          
             Log = outputHelper;
             Server = new TestServer(host);
             Client = Server.CreateClient();
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", "test");
         }
 
         private ITestOutputHelper Log { get; }

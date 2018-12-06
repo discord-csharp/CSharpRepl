@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
-using Microsoft.Extensions.Logging.Abstractions.Internal;
 using Discord;
 using Discord.Rest;
 
@@ -25,7 +24,7 @@ namespace CSDiscordService.Infrastructure.Logging
 
         public IDisposable BeginScope<TState>(TState state)
         {
-            return NullScope.Instance;
+            return NotScoped.Instance;
         }
 
         public bool IsEnabled(LogLevel logLevel)

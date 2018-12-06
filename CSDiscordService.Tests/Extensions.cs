@@ -2,7 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSDiscordService
+namespace CSDiscordService.Tests
 {
     public static class Extensions
     {

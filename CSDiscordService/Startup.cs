@@ -28,7 +28,7 @@ namespace CSDiscordService
             if (env.IsDevelopment())
             {
                 builder.AddUserSecrets("03629088-8bb9-4faf-8162-debf93066bc4");
-                builder.AddApplicationInsightsSettings(developerMode: true);
+               // builder.AddApplicationInsightsSettings(developerMode: true);
             }
             Configuration = builder.Build();
         }
@@ -37,7 +37,7 @@ namespace CSDiscordService
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetryProcessor<FilterStatusProbeTelemetryProcessor>();
+            //services.AddApplicationInsightsTelemetryProcessor<FilterStatusProbeTelemetryProcessor>();
             services.AddSingleton<CSharpEval>();
             services.AddSingleton<DisassemblyService>();
 

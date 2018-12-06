@@ -77,7 +77,7 @@ namespace CSDiscordService.Eval
             }}
             ";
 
-            var opts = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest).WithKind(SourceCodeKind.Regular);
+            var opts = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp8).WithKind(SourceCodeKind.Regular);
 
             var scriptSyntaxTree = CSharpSyntaxTree.ParseText(toExecute, opts);
             var compOpts = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithOptimizationLevel(OptimizationLevel.Release).WithAllowUnsafe(true).WithPlatform(Platform.AnyCpu);

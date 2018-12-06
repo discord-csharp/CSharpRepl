@@ -9,22 +9,22 @@ using Xunit;
 using Xunit.Abstractions;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.ApplicationInsights;
 using CSDiscordService.Eval.ResultModels;
+using Microsoft.AspNetCore;
 
-namespace CSDiscordService
+namespace CSDiscordService.Tests
 {
     public class EvalTests : IDisposable
     {
         private static readonly JsonSerializerSettings JsonSettings =
             new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
-
-        public static TelemetryClient _dummyTelemetryClient = new TelemetryClient();
+            
         public EvalTests(ITestOutputHelper outputHelper)
         {
-            var host = new WebHostBuilder()
-                .UseStartup<Startup>()
-                .ConfigureServices(a => a.AddSingleton(_dummyTelemetryClient));
+            var host = WebHost.CreateDefaultBuilder()
+                //.UseApplicationInsights()
+                .UseStartup<Startup>();
+                //.ConfigureServices(a => a.AddSingleton(_dummyTelemetryClient));
 
             Log = outputHelper;
             Server = new TestServer(host);
@@ -108,7 +108,7 @@ namespace CSDiscordService
             Assert.Equal(consoleOut, result.ConsoleOut);
             Assert.Equal(returnValue, result.ReturnValue);
         }
-
+        
         [Fact]
         public async Task Eval_ConsoleOutputIsCapturedAndValueReturned()
         {
@@ -206,25 +206,24 @@ namespace CSDiscordService
             Assert.Equal(42L, result.ReturnValue);
             Assert.Equal("int", result.ReturnTypeName);
         }
+        
+        [Fact]
+        public async Task Eval_CSharp80Supported()
+        {
+            var expr = @"public class BaseClass
+                        {
+                            public string? myValue = null;
+                        }
 
-        //until c# 8 support is in roslyn
-        //[Fact]
-        //public async Task Eval_CSharp80Supported()
-        //{
-        //    var expr = @"public class BaseClass
-        //                {
-        //                    public string? myValue = null;
-        //                }
+                        return new BaseClass().myValue;";
 
-        //                return new BaseClass().myValue;";
+            var (result, statusCode) = await Execute(expr);
 
-        //    var (result, statusCode) = await Execute(expr);
-
-        //    Assert.Equal(HttpStatusCode.OK, statusCode);
-        //    Assert.Equal(expr, result.Code);
-        //    Assert.Null(result.ReturnValue);
-        //    Assert.Equal("string", result.ReturnTypeName);
-        //}
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Null(result.ReturnValue);
+            Assert.Equal("string", result.ReturnTypeName);
+        }
 
         [Fact]
         public async Task Eval_CanUseSystemDrawing()
@@ -239,7 +238,7 @@ namespace CSDiscordService
 
         private async Task<(EvalResult, HttpStatusCode)> Execute(string expr)
         {
-            using (var response = await Client.PostAsPlainTextAsync("/eval", expr))
+            using (var response = await Client.PostAsPlainTextAsync("http://testhost/eval", expr))
             {
                 EvalResult result = null;
                 if (response.Content != null)

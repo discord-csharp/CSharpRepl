@@ -17,7 +17,7 @@ namespace CSDiscordService
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder()
-                .UseApplicationInsights()
+                //.UseApplicationInsights()
                 .UseStartup<Startup>();
     }
 }

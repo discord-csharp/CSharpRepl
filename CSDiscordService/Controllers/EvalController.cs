@@ -1,4 +1,4 @@
-﻿using Microsoft.ApplicationInsights;
+﻿//using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,13 +14,13 @@ namespace CSDiscordService.Controllers
     public class EvalController : ControllerBase
     {
         private readonly CSharpEval _eval;
-        private readonly TelemetryClient _telemetryClient;
+        //private readonly TelemetryClient _telemetryClient;
         private readonly ILogger<EvalController> _logger;
 
-        public EvalController(CSharpEval eval, TelemetryClient telemetryClient, ILogger<EvalController> logger)
+        public EvalController(CSharpEval eval/*, TelemetryClient telemetryClient*/, ILogger<EvalController> logger)
         {
             _eval = eval;
-            _telemetryClient = telemetryClient;
+            //_telemetryClient = telemetryClient;
             _logger = logger;
         }
 
@@ -36,7 +36,7 @@ namespace CSDiscordService.Controllers
 
             var result = await _eval.RunEvalAsync(code);
 
-            result.TrackResult(_telemetryClient, _logger);
+            //result.TrackResult(_telemetryClient, _logger);
 
             if (string.IsNullOrWhiteSpace(result.Exception))
             {
