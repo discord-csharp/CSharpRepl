@@ -28,6 +28,7 @@ namespace CSDiscordService.Eval
                 "System",
                 "System.Collections",
                 "System.Collections.Generic",
+                "System.Security.Cryptography",
                 "System.Globalization",
                 "System.IO",
                 "System.Linq",
@@ -50,7 +51,7 @@ namespace CSDiscordService.Eval
                 typeof(HttpClient).GetTypeInfo().Assembly,
                 typeof(JsonConvert).GetTypeInfo().Assembly,
                 typeof(List<>).GetTypeInfo().Assembly,
-                typeof(String).GetTypeInfo().Assembly,
+                typeof(string).GetTypeInfo().Assembly,
                 typeof(Unsafe).GetTypeInfo().Assembly,
                 typeof(ValueTuple).GetTypeInfo().Assembly,
                 typeof(Globals).GetTypeInfo().Assembly,
@@ -131,6 +132,7 @@ namespace CSDiscordService.Eval
                     ReturnValue = $"An exception occurred when serializing the response: {ex.GetType().Name}: {ex.Message}"
                 };
             }
+
             return evalResult;
         }
     }

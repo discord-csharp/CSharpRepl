@@ -1,8 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
 using Discord;
-using Discord.Rest;
 
 namespace CSDiscordService.Infrastructure.Logging
 {
@@ -12,7 +10,6 @@ namespace CSDiscordService.Infrastructure.Logging
         private readonly string _token;
         private readonly Func<string, LogLevel, bool> _filter;
         private readonly ulong _id;
-        private static readonly HttpClient _httpClient = new HttpClient();
 
         public DiscordWebhookLogger(string categoryName, ulong id, string token, Func<string, LogLevel, bool> filter)
         {

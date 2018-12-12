@@ -15,13 +15,13 @@ namespace CSDiscordService.Controllers
     {
         private readonly CSharpEval _eval;
         //private readonly TelemetryClient _telemetryClient;
-        private readonly ILogger<EvalController> _logger;
+        //private readonly ILogger<EvalController> _logger;
 
         public EvalController(CSharpEval eval/*, TelemetryClient telemetryClient*/, ILogger<EvalController> logger)
         {
             _eval = eval;
             //_telemetryClient = telemetryClient;
-            _logger = logger;
+            //_logger = logger;
         }
 
         [HttpPost]
