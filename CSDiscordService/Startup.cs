@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CSDiscordService.Eval;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Linq;
 using Newtonsoft.Json.Serialization;
-using CSDiscordService.Eval;
 using System;
-using System.Threading.Tasks;
+using System.Buffers;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CSDiscordService
 {
@@ -46,6 +48,7 @@ namespace CSDiscordService
                 o.RespectBrowserAcceptHeader = true;
                 o.InputFormatters.Clear();
                 o.InputFormatters.Insert(0, new PlainTextInputFormatter());
+                o.OutputFormatters.Add(new JsonOutputFormatter(JsonSerializerSettingsProvider.CreateSerializerSettings(), ArrayPool<char>.Shared));
             })
              .AddJsonOptions(o =>
              {
