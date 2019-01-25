@@ -1,16 +1,15 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using CSDiscordService.Eval.ResultModels;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
-using Newtonsoft.Json.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using CSDiscordService.Eval.ResultModels;
-using Microsoft.AspNetCore;
 
 namespace CSDiscordService.Tests
 {
@@ -21,10 +20,10 @@ namespace CSDiscordService.Tests
             
         public EvalTests(ITestOutputHelper outputHelper)
         {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", EnvironmentName.Development);
+
             var host = WebHost.CreateDefaultBuilder()
-                //.UseApplicationInsights()
                 .UseStartup<Startup>();
-                //.ConfigureServices(a => a.AddSingleton(_dummyTelemetryClient));
 
             Log = outputHelper;
             Server = new TestServer(host);
@@ -208,7 +207,7 @@ namespace CSDiscordService.Tests
         }
         
         [Fact]
-        public async Task Eval_CSharp80Supported()
+        public async Task Eval_NullableReferenceTypesSupported()
         {
             var expr = @"public class BaseClass
                         {
@@ -222,6 +221,99 @@ namespace CSDiscordService.Tests
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Null(result.ReturnValue);
+            Assert.Null(result.ReturnTypeName);
+        }
+
+        [Fact]
+        public async Task Eval_RangesSupported()
+        {
+            var expr = @"var array = new[] { 1, 2, 3, 4, 5 };
+                        return array[2..^1];";
+
+            var (result, statusCode) = await Execute(expr);
+
+            var returnValue = ((JArray)result.ReturnValue).ToObject<int[]>();
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Collection(returnValue, x => Assert.Equal(3, x), x => Assert.Equal(4, x));
+            Assert.Equal("int[]", result.ReturnTypeName);
+        }
+
+        [Fact]
+        public async Task Eval_AsyncStreamsSupported()
+        {
+            var expr = @"public class AsyncStream
+                        {
+                            public AsyncEnumerator GetAsyncEnumerator() => new AsyncEnumerator();
+
+                            public struct AsyncEnumerator
+                            {
+                                public string Current => default;
+
+                                public ValueTask<bool> MoveNextAsync() => new ValueTask<bool>(false);
+                            }
+                        }
+
+                        await foreach (var item in new AsyncStream())
+                        {
+                        }";
+
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Null(result.ReturnValue);
+            Assert.Null(result.ReturnTypeName);
+        }
+
+        [Fact]
+        public async Task Eval_EnhancedUsingSupported()
+        {
+            var expr = @"public ref struct Disposable
+                        {
+                            public void Dispose() => IsDisposed = true;
+
+                            public static bool IsDisposed;
+                        }
+
+                        void NonAsyncMethod()
+                        {
+                            using var disposable = new Disposable();
+                        }
+
+                        NonAsyncMethod();
+                        return Disposable.IsDisposed;";
+
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Equal(true, result.ReturnValue);
+            Assert.Equal("bool", result.ReturnTypeName);
+        }
+
+        [Fact]
+        public async Task Eval_RecursivePatternMatchingSupported()
+        {
+            var expr = @"public class C
+                        {
+                            public int Value = 1;
+                        }
+
+                        return new C() switch
+                        {
+                            { Value: 0 }            => ""No - 0"",
+                            { Value: 1 } when false => ""No - 1"",
+                            { Value: 1 } when true  => ""Yes"",
+                            _                       => ""No - 2""
+                        };";
+
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Equal("Yes", result.ReturnValue);
             Assert.Equal("string", result.ReturnTypeName);
         }
 
