@@ -21,6 +21,8 @@ namespace CSDiscordService.Tests
             
         public EvalTests(ITestOutputHelper outputHelper)
         {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", EnvironmentName.Development);
+
             var host = WebHost.CreateDefaultBuilder()
                 //.UseApplicationInsights()
                 .UseStartup<Startup>();
@@ -222,7 +224,7 @@ namespace CSDiscordService.Tests
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Null(result.ReturnValue);
-            Assert.Equal("string", result.ReturnTypeName);
+            Assert.Null(result.ReturnTypeName);
         }
 
         [Fact]
