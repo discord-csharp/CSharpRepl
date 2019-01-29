@@ -47,11 +47,10 @@ namespace CSDiscordService
                 o.InputFormatters.Clear();
                 o.InputFormatters.Insert(0, new PlainTextInputFormatter());
             })
-             .AddJsonOptions(o =>
-             {
-                 o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                 o.SerializerSettings.ContractResolver = new DefaultContractResolver();
-             });
+            .AddNewtonsoftJson(o => {
+                o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                o.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, CSharpEval evalService)
