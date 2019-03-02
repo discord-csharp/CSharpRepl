@@ -81,7 +81,7 @@ namespace CSDiscordService.Eval
             var env = new BasicEnvironment();
 
             var sw = Stopwatch.StartNew();
-            var eval = CSharpScript.Create(code, Options, typeof(Globals)).WithLanguageVersion(LanguageVersion.CSharp8);
+            var eval = CSharpScript.Create(code, Options, typeof(Globals)).WithLanguageVersion(LanguageVersion.Preview);
 
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
 
