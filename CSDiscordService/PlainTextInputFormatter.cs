@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text;
+using System.IO;
 
 namespace CSDiscordService
 {
@@ -31,14 +32,20 @@ namespace CSDiscordService
 
         public override async Task<InputFormatterResult> ReadAsync(InputFormatterContext context)
         {
-            var reader = context.ReaderFactory.Invoke(context.HttpContext.Request.Body, Encoding.UTF8);
-            return await InputFormatterResult.SuccessAsync(await reader.ReadToEndAsync());
+            using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8))
+            {
+                var content = await reader.ReadToEndAsync();
+                return await InputFormatterResult.SuccessAsync(content);
+            }
         }
 
         public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
         {
-            var reader = context.ReaderFactory.Invoke(context.HttpContext.Request.Body, encoding);
-            return await InputFormatterResult.SuccessAsync(await reader.ReadToEndAsync());
+            using (var reader = new StreamReader(context.HttpContext.Request.Body, encoding))
+            {
+                var content = await reader.ReadToEndAsync();
+                return await InputFormatterResult.SuccessAsync(content);
+            }
         }
     }
 }
