@@ -10,6 +10,7 @@ using CSDiscordService.Eval;
 using System;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace CSDiscordService
 {
@@ -79,6 +80,14 @@ namespace CSDiscordService
                         Environment.Exit(0);
                         return Task.CompletedTask;
                     });
+                }
+
+                //Workaround for https://github.com/aspnet/AspNetCore/issues/7644 , specifically https://github.com/aspnet/AspNetCore/issues/8302
+                //which will be properly resolved when 3.0 releases I assume
+                var syncIOFeature = context.Features.Get<IHttpBodyControlFeature>();
+                if (syncIOFeature != null)
+                {
+                    syncIOFeature.AllowSynchronousIO = true;
                 }
 
                 await next();
