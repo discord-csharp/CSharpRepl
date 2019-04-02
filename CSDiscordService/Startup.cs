@@ -11,13 +11,14 @@ using System;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Hosting;
 
 namespace CSDiscordService
 {
     public class Startup
     {
         private readonly Timer _exitTimer = new Timer((s) => Environment.Exit(0), null, Timeout.Infinite, Timeout.Infinite);
-        public Startup(IHostingEnvironment env, IConfiguration hostBuilderConfig)
+        public Startup(IWebHostEnvironment env, IConfiguration hostBuilderConfig)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -26,7 +27,7 @@ namespace CSDiscordService
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == Environments.Development)
             {
                 builder.AddUserSecrets("03629088-8bb9-4faf-8162-debf93066bc4");
                // builder.AddApplicationInsightsSettings(developerMode: true);
@@ -54,7 +55,7 @@ namespace CSDiscordService
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, CSharpEval evalService)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory, CSharpEval evalService)
         {
             // run eval once on startup so the first time its hit isn't cripplingly slow.
             evalService.RunEvalAsync("1+1").ConfigureAwait(false).GetAwaiter().GetResult();

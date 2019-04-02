@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using CSDiscordService.Eval.ResultModels;
 using Microsoft.AspNetCore;
+using Microsoft.Extensions.Hosting;
 
 namespace CSDiscordService.Tests
 {
@@ -21,7 +22,7 @@ namespace CSDiscordService.Tests
             
         public EvalTests(ITestOutputHelper outputHelper)
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", EnvironmentName.Development);
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", Environments.Development);
 
             var host = WebHost.CreateDefaultBuilder()
                 //.UseApplicationInsights()
@@ -180,7 +181,7 @@ namespace CSDiscordService.Tests
         {
             var expr = code;
 
-            var (result, statusCode) = await Execute(expr);
+            var (_, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
         }

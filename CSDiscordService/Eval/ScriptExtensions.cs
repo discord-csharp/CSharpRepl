@@ -18,7 +18,7 @@ namespace CSDiscordService
             var compilerField = _compilerField = _compilerField ?? typeof(Script<>).GetField("Compiler", BindingFlags.NonPublic | BindingFlags.Instance);
             var compiler = compilerField.GetValue(script);
 
-            var optionsField = _optionsField = _optionsField ?? compiler.GetType().GetField("s_defaultOptions", BindingFlags.NonPublic | BindingFlags.Static);
+            var optionsField = _optionsField = _optionsField ?? compiler.GetType().GetField("DefaultParseOptions", BindingFlags.NonPublic | BindingFlags.Static);
             var options = optionsField.GetValue(compiler);
 
             var langVersionSetter = _langVersionSetter = _langVersionSetter ?? typeof(CSharpParseOptions).GetMethod($"set_{ nameof(CSharpParseOptions.LanguageVersion)}", BindingFlags.NonPublic | BindingFlags.Instance);
