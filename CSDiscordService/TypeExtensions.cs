@@ -28,7 +28,7 @@ namespace CSDiscordService
                 typeName = typeName.Replace(ArrayBrackets, string.Empty);
             }
 
-            var returnValue = typeName;
+            string returnValue;
             switch (typeName)
             {
                 case "Boolean": returnValue = "bool"; break;

@@ -228,6 +228,30 @@ namespace CSDiscordService.Tests
             Assert.Null(result.ReturnTypeName);
         }
 
+        [Fact(Skip = "fails until implemented")]
+        public async Task Eval_CSharp80InterfacesSupported()
+        {
+            var expr = @"public class BaseClass : IInterface
+                        {
+                        }
+
+                        public interface IInterface {
+                            public string DefaultImpl()
+                            {
+                                return ""foo"";
+                            }
+                        }
+                        var basec = new BaseClass();
+                        return basec.DefaultImpl();";
+
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Equal("foo", result.ReturnValue);
+            Assert.Null(result.ReturnTypeName);
+        }
+
         [Fact]
         public async Task Eval_CanUseSystemDrawing()
         {

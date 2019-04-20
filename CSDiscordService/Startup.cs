@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CSDiscordService
 {
@@ -42,31 +43,20 @@ namespace CSDiscordService
             //services.AddApplicationInsightsTelemetryProcessor<FilterStatusProbeTelemetryProcessor>();
             services.AddSingleton<CSharpEval>();
             services.AddSingleton<DisassemblyService>();
-
-            services.AddMvc(o =>
+            services.AddControllers(o =>
             {
                 o.RespectBrowserAcceptHeader = true;
                 o.InputFormatters.Clear();
                 o.InputFormatters.Insert(0, new PlainTextInputFormatter());
-            })
-            .AddNewtonsoftJson(o => {
-                o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                o.SerializerSettings.ContractResolver = new DefaultContractResolver();
-            });
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+            .AddNewtonsoftJson();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory, CSharpEval evalService)
         {
             // run eval once on startup so the first time its hit isn't cripplingly slow.
             evalService.RunEvalAsync("1+1").ConfigureAwait(false).GetAwaiter().GetResult();
-
-            var webhookToken = Configuration["log_webhook_token"];
-            if (!string.IsNullOrWhiteSpace(webhookToken))
-            {
-                var webhookId = ulong.Parse(Configuration["log_webhook_id"]);
-                loggerFactory.AddDiscordWebhook(webhookId, webhookToken);
-            }
-
+            app.UseRouting();
             app.Use(async (context, next) =>
             {
                 if (env.IsProduction() && !context.Response.HasStarted && (context.Request.Path.Equals("/eval", StringComparison.OrdinalIgnoreCase)))
@@ -82,19 +72,14 @@ namespace CSDiscordService
                         return Task.CompletedTask;
                     });
                 }
-
-                //Workaround for https://github.com/aspnet/AspNetCore/issues/7644 , specifically https://github.com/aspnet/AspNetCore/issues/8302
-                //which will be properly resolved when 3.0 releases I assume
-                var syncIOFeature = context.Features.Get<IHttpBodyControlFeature>();
-                if (syncIOFeature != null)
-                {
-                    syncIOFeature.AllowSynchronousIO = true;
-                }
-
+                
                 await next();
             });
 
-            app.UseMvc();
+            app.UseEndpoints(o =>
+            {
+                o.MapControllers();
+            });
         }
     }
 }
