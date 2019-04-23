@@ -28,7 +28,7 @@ namespace CSDiscordService.Eval
                 "System",
                 "System.Collections",
                 "System.Collections.Concurrent",
-                "System.Collections.Immutable"
+                "System.Collections.Immutable",
                 "System.Collections.Generic",
                 "System.Security.Cryptography",
                 "System.Globalization",
