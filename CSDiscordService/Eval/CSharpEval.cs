@@ -42,7 +42,8 @@ namespace CSDiscordService.Eval
                 "System.Text.RegularExpressions",
                 "System.Threading",
                 "System.Threading.Tasks",
-                "CSDiscordService.Eval"
+                "CSDiscordService.Eval",
+                "System.Numerics"
             );
 
         private static readonly ImmutableArray<Assembly> DefaultReferences =
