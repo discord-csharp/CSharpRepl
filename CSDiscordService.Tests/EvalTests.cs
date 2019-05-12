@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 using Newtonsoft.Json.Linq;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using CSDiscordService.Eval.ResultModels;
 using Microsoft.AspNetCore;
 using Microsoft.Extensions.Hosting;
@@ -25,9 +25,8 @@ namespace CSDiscordService.Tests
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", Environments.Development);
 
             var host = WebHost.CreateDefaultBuilder()
-                //.UseApplicationInsights()
-                .UseStartup<Startup>();
-                //.ConfigureServices(a => a.AddSingleton(_dummyTelemetryClient));
+                .UseStartup<Startup>()
+                .ConfigureLogging(b => { b.ClearProviders(); });
 
             Log = outputHelper;
             Server = new TestServer(host);
@@ -108,7 +107,7 @@ namespace CSDiscordService.Tests
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal(consoleOut, result.ConsoleOut);
+            Assert.Equal(consoleOut.Replace("\r\n", Environment.NewLine), result.ConsoleOut);
             Assert.Equal(returnValue, result.ReturnValue);
         }
         
@@ -120,7 +119,7 @@ namespace CSDiscordService.Tests
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal("test\r\n", result.ConsoleOut);
+            Assert.Equal($"test{Environment.NewLine}", result.ConsoleOut);
             Assert.Equal("abcdefg", result.ReturnValue);
             Assert.Equal("string", result.ReturnTypeName);
         }
@@ -228,7 +227,7 @@ namespace CSDiscordService.Tests
             Assert.Null(result.ReturnTypeName);
         }
 
-        [Fact(Skip = "fails until implemented")]
+        [Fact]
         public async Task Eval_CSharp80InterfacesSupported()
         {
             var expr = @"public class BaseClass : IInterface
@@ -241,7 +240,7 @@ namespace CSDiscordService.Tests
                                 return ""foo"";
                             }
                         }
-                        var basec = new BaseClass();
+                        IInterface basec = new BaseClass();
                         return basec.DefaultImpl();";
 
             var (result, statusCode) = await Execute(expr);
@@ -249,7 +248,6 @@ namespace CSDiscordService.Tests
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Equal("foo", result.ReturnValue);
-            Assert.Null(result.ReturnTypeName);
         }
 
         [Fact]
@@ -260,7 +258,7 @@ namespace CSDiscordService.Tests
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal("Color [Red]\r\n", result.ConsoleOut);
+            Assert.Equal($"Color [Red]{Environment.NewLine}", result.ConsoleOut);
         }
 
         private async Task<(EvalResult, HttpStatusCode)> Execute(string expr)

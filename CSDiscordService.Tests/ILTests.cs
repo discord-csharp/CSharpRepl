@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using System;
 using Xunit.Abstractions;
 using System.Net.Http;
@@ -16,8 +16,9 @@ namespace CSDiscordService.Tests
         public ILTests(ITestOutputHelper outputHelper)
         {
             var host = WebHost.CreateDefaultBuilder()
-                .UseStartup<Startup>();
-          
+                .UseStartup<Startup>()
+                .ConfigureLogging(b => { b.ClearProviders(); });
+
             Log = outputHelper;
             Server = new TestServer(host);
             Client = Server.CreateClient();
