@@ -1,9 +1,5 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using System.Threading;
-using System;
-using System.Diagnostics;
 using Microsoft.AspNetCore;
 
 namespace CSDiscordService

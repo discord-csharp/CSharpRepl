@@ -72,7 +72,7 @@ namespace CSDiscordService
                         return Task.CompletedTask;
                     });
                 }
-                
+
                 await next();
             });
 
