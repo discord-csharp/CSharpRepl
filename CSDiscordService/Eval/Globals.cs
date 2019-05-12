@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using CSDiscordService.Eval.ResultModels;
 
 namespace CSDiscordService.Eval
@@ -18,6 +19,19 @@ namespace CSDiscordService.Eval
         {
             System.Environment.Exit(1);
         }
+        public void Cmd(string name, string args = "")
+        {
+            var psi = new ProcessStartInfo(name);
+            psi.RedirectStandardOutput = true;
+            psi.RedirectStandardError = true;
+            psi.Arguments = args;
+
+            var p = Process.Start(psi);
+            p.WaitForExit();
+            Console.WriteLine(p.StandardOutput.ReadToEnd());
+            Console.WriteLine(p.StandardError.ReadToEnd());
+        }
+
     }
 
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
