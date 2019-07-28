@@ -21,10 +21,12 @@ namespace CSDiscordService.Eval
         }
         public void Cmd(string name, string args = "")
         {
-            var psi = new ProcessStartInfo(name);
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
-            psi.Arguments = args;
+            var psi = new ProcessStartInfo(name)
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                Arguments = args
+            };
 
             var p = Process.Start(psi);
             p.WaitForExit();
