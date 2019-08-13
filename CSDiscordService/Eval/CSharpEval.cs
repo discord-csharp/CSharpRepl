@@ -43,6 +43,8 @@ namespace CSDiscordService.Eval
                 "System.Reflection.Emit",
                 "System.Runtime.CompilerServices",
                 "System.Runtime.InteropServices",
+                "System.Runtime.Intrinsics",
+                "System.Runtime.Intrinsics.X86",
                 "System.Text",
                 "System.Text.RegularExpressions",
                 "System.Threading",
