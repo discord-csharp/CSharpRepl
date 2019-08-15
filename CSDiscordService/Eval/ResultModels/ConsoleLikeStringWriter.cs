@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 
+#pragma warning disable IDE0060 // Remove unused parameter
 namespace CSDiscordService.Eval.ResultModels
 {
     public class ConsoleLikeStringWriter : StringWriter
@@ -62,3 +63,5 @@ namespace CSDiscordService.Eval.ResultModels
         public void SetWindowSize(int a, int b) { }
     }
 }
+
+#pragma warning restore IDE0060 // Remove unused parameter

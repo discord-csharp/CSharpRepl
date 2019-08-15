@@ -48,11 +48,10 @@ namespace CSDiscordService
                 o.RespectBrowserAcceptHeader = true;
                 o.InputFormatters.Clear();
                 o.InputFormatters.Insert(0, new PlainTextInputFormatter());
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-            .AddNewtonsoftJson();
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory, CSharpEval evalService)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CSharpEval evalService)
         {
             // run eval once on startup so the first time its hit isn't cripplingly slow.
             evalService.RunEvalAsync("1+1").ConfigureAwait(false).GetAwaiter().GetResult();

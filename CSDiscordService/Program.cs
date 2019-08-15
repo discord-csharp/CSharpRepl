@@ -6,14 +6,13 @@ namespace CSDiscordService
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateWebHostBuilder().Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+        public static IWebHostBuilder CreateWebHostBuilder() =>
             WebHost.CreateDefaultBuilder()
-                //.UseApplicationInsights()
                 .UseStartup<Startup>();
     }
 }

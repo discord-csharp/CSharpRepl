@@ -83,41 +83,37 @@ namespace CSDiscordService.Eval
             var compilation = CSharpCompilation.Create(Guid.NewGuid().ToString(), options: compOpts, references: References).AddSyntaxTrees(scriptSyntaxTree);
 
             var sb = new StringBuilder();
-            using (var pdb = new MemoryStream())
-            using (var dll = new MemoryStream())
+            using var pdb = new MemoryStream();
+            using var dll = new MemoryStream();
+            var result = compilation.Emit(dll, pdb);
+            if (!result.Success)
             {
-                var result = compilation.Emit(dll, pdb);
-                if (!result.Success)
-                {
-                    sb.AppendLine("Emit Failed");
-                    sb.AppendLine(string.Join(Environment.NewLine, result.Diagnostics.Select(a => a.GetMessage())));
-                }
-                else
-                {
-                    dll.Seek(0, SeekOrigin.Begin);
-                    using (var module = ModuleDefinition.ReadModule(dll))
-                    using (var writer = new StringWriter(sb))
-                    {
-                        module.Name = compilation.AssemblyName;
-                        var plainOutput = new PlainTextOutput(writer);
-                        var rd = new ReflectionDisassembler(plainOutput, CancellationToken.None)
-                        {
-                            DetectControlStructure = true
-                        };
-                        var ignoredMethods = new[] { ".ctor" };
-                        var methods = module.Types.SelectMany(a => a.Methods).Where(a => !ignoredMethods.Contains(a.Name));
-                        foreach (var method in methods)
-                        {
-                            rd.DisassembleMethod(method);
-                            plainOutput.WriteLine();
-                        }
-                    }
-                }
-
-                var final = sb.ToString();
-
-                return final;
+                sb.AppendLine("Emit Failed");
+                sb.AppendLine(string.Join(Environment.NewLine, result.Diagnostics.Select(a => a.GetMessage())));
             }
+            else
+            {
+                dll.Seek(0, SeekOrigin.Begin);
+                using var module = ModuleDefinition.ReadModule(dll);
+                using var writer = new StringWriter(sb);
+                module.Name = compilation.AssemblyName;
+                var plainOutput = new PlainTextOutput(writer);
+                var rd = new ReflectionDisassembler(plainOutput, CancellationToken.None)
+                {
+                    DetectControlStructure = true
+                };
+                var ignoredMethods = new[] { ".ctor" };
+                var methods = module.Types.SelectMany(a => a.Methods).Where(a => !ignoredMethods.Contains(a.Name));
+                foreach (var method in methods)
+                {
+                    rd.DisassembleMethod(method);
+                    plainOutput.WriteLine();
+                }
+            }
+
+            var final = sb.ToString();
+
+            return final;
         }
     }
 }

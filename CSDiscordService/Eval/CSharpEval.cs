@@ -4,8 +4,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Scripting;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -16,6 +14,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace CSDiscordService.Eval
 {
@@ -49,6 +48,7 @@ namespace CSDiscordService.Eval
                 "System.Text.RegularExpressions",
                 "System.Threading",
                 "System.Threading.Tasks",
+                "System.Text.Json",
                 "CSDiscordService.Eval"
             );
 
@@ -56,7 +56,6 @@ namespace CSDiscordService.Eval
             ImmutableArray.Create(
                 typeof(Enumerable).GetTypeInfo().Assembly,
                 typeof(HttpClient).GetTypeInfo().Assembly,
-                typeof(JsonConvert).GetTypeInfo().Assembly,
                 typeof(List<>).GetTypeInfo().Assembly,
                 typeof(string).GetTypeInfo().Assembly,
                 typeof(Unsafe).GetTypeInfo().Assembly,
@@ -75,20 +74,18 @@ namespace CSDiscordService.Eval
 
         private static readonly Random random = new Random();
 
-        private static readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings
-        {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            ContractResolver = new DefaultContractResolver()
+        private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions {
+            PropertyNameCaseInsensitive = true
         };
 
         public async Task<EvalResult> RunEvalAsync(string code)
         {
             var sb = new StringBuilder();
-            var textWr = new ConsoleLikeStringWriter(sb);
+            using var textWr = new ConsoleLikeStringWriter(sb);
             var env = new BasicEnvironment();
 
             var sw = Stopwatch.StartNew();
-            var eval = CSharpScript.Create(code, Options, typeof(Globals)).WithLanguageVersion(LanguageVersion.CSharp8);
+            var eval = CSharpScript.Create(code, Options, typeof(Globals));
 
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
 
@@ -119,13 +116,13 @@ namespace CSDiscordService.Eval
                 return EvalResult.CreateErrorResult(code, sb.ToString(), sw.Elapsed, ex.Diagnostics);
             }
             sw.Stop();
-            var evalResult = new EvalResult(result, sb.ToString(), sw.Elapsed, compileTime);
 
+            var evalResult = new EvalResult(result, sb.ToString(), sw.Elapsed, compileTime);
             //this hack is to test if we're about to send an object that can't be serialized back to the caller.
             //if the object can't be serialized, return a failure instead.
             try
             {
-                JsonConvert.SerializeObject(evalResult, jsonSettings);
+                _ = JsonSerializer.Serialize(evalResult, SerializerOptions);
             }
             catch (Exception ex)
             {
