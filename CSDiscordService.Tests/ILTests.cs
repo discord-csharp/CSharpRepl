@@ -38,28 +38,26 @@ namespace CSDiscordService.Tests
         [InlineData("System.Console.WriteLine(\"Hi\"); return 0;")] 
         public async Task TestIfWorks(string script)
         {
-            var (result, code) = await Execute(script);
+            var (result, _) = await Execute(script);
             Assert.DoesNotContain("Emit Failed", result);
         }
 
         private async Task<(string, HttpStatusCode)> Execute(string expr)
         {
-            using (var response = await Client.PostAsPlainTextAsync("/il", expr))
+            using var response = await Client.PostAsPlainTextAsync("/il", expr);
+            string result = string.Empty;
+            if (response.Content != null)
             {
-                string result = string.Empty;
-                if (response.Content != null)
+                var content = await response.Content.ReadAsStringAsync();
+                Log.WriteLine(content.Replace(@"\r\n", Environment.NewLine));
+
+                if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest)
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    Log.WriteLine(content.Replace(@"\r\n", Environment.NewLine));
-
-                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest)
-                    {
-                        result = content;
-                    }
+                    result = content;
                 }
-
-                return (result, response.StatusCode);
             }
+
+            return (result, response.StatusCode);
         }
 
 

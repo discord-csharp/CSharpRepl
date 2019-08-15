@@ -6,6 +6,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CSDiscordService.Eval.ResultModels
 {
@@ -72,8 +74,24 @@ namespace CSDiscordService.Eval.ResultModels
 
         public string ConsoleOut { get; set; }
 
+        [JsonConverter(typeof(TimeSpanConverter))]
         public TimeSpan ExecutionTime { get; set; }
 
+        [JsonConverter(typeof(TimeSpanConverter))]
         public TimeSpan CompileTime { get; set; }
+    }
+
+    internal class TimeSpanConverter : JsonConverter<TimeSpan>
+    {
+        public override TimeSpan Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            TimeSpan.TryParse(reader.GetString(), out var ts);
+            return ts;
+        }
+        public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value.ToString());
+        }
+
     }
 }

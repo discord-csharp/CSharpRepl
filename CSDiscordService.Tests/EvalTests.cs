@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 using Newtonsoft.Json.Linq;
@@ -12,17 +11,17 @@ using Microsoft.Extensions.Logging;
 using CSDiscordService.Eval.ResultModels;
 using Microsoft.AspNetCore;
 using Microsoft.Extensions.Hosting;
+using System.Text.Json;
+using System.ComponentModel;
 
 namespace CSDiscordService.Tests
 {
     public class EvalTests : IDisposable
     {
-        private static readonly JsonSerializerSettings JsonSettings =
-            new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
-            
         public EvalTests(ITestOutputHelper outputHelper)
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", Environments.Development);
+
 
             var host = WebHost.CreateDefaultBuilder()
                 .UseStartup<Startup>()
@@ -39,6 +38,11 @@ namespace CSDiscordService.Tests
 
         private HttpClient Client { get; }
 
+        private static JsonSerializerOptions SerializerOptions { get; } = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+        };
+
         [Theory]
         [InlineData("1+1", 2L, "int")]
         [InlineData("return 1+1;", 2L, "int")]
@@ -49,15 +53,26 @@ namespace CSDiscordService.Tests
         public async Task Eval_WellFormattedCodeExecutes(string expr, object expected, string type)
         {
             var (result, statusCode) = await Execute(expr);
+            var res = result.ReturnValue as JsonElement?;
+            object convertedValue;
+            if(expected is string || expected is null)
+            {
+                convertedValue = res?.GetString();
+            }
+            else
+            {
+               var value = res.Value.GetRawText();
+                convertedValue = Convert.ChangeType(value, expected.GetType());
+            }
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal(expected, result.ReturnValue);
+            Assert.Equal(expected, convertedValue);
             Assert.Equal(type, result.ReturnTypeName);
         }
 
         [Theory]
-        [InlineData(@"new DirectoryInfo(""C:\\"")", "An exception occurred when serializing the response: JsonSerializationException: Unable to serialize instance of 'System.IO.DirectoryInfo'.")]
+        [InlineData(@"new DirectoryInfo(""C:\\"")", "An exception occurred when serializing the response: JsonException: CurrentDepth (64) is equal to or larger than the maximum allowed depth of 64. Cannot write the next JSON object or array.")]
         [InlineData(@"return 4896.ToString().Select(Char.GetNumericValue).Cast<int>();", "An exception occurred when serializing the response: InvalidCastException: Unable to cast object of type 'System.Double' to type 'System.Int32'.")]
         public async Task Eval_JsonNetSerializationFailureHandled(string expr, string message)
         {
@@ -65,7 +80,7 @@ namespace CSDiscordService.Tests
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal(message, result.ReturnValue);
+            Assert.Equal(message, ((JsonElement)result.ReturnValue).GetString());
         }
 
         [Theory]
@@ -75,11 +90,12 @@ namespace CSDiscordService.Tests
         {
             var (result, statusCode) = await Execute(expr);
 
-            var res = result.ReturnValue as JArray;
+            var res = result.ReturnValue as JsonElement?;
+            
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal(expected, res[0].Value<string>());
-            Assert.Equal(count, res.Count);
+            Assert.Equal(expected, res.Value[0].GetString());
+            Assert.Equal(count, res.Value.GetArrayLength());
             Assert.Equal(type, result.ReturnTypeName);
         }
 
@@ -120,7 +136,7 @@ namespace CSDiscordService.Tests
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Equal($"test{Environment.NewLine}", result.ConsoleOut);
-            Assert.Equal("abcdefg", result.ReturnValue);
+            Assert.Equal("abcdefg", ((JsonElement)result.ReturnValue).GetString());
             Assert.Equal("string", result.ReturnTypeName);
         }
 
@@ -147,7 +163,7 @@ namespace CSDiscordService.Tests
                         async async async(async async) => await async;
                     }";
 
-            var (result, statusCode) = await Execute(expr);
+            var (_, statusCode) = await Execute(expr);
             Assert.Equal(HttpStatusCode.BadRequest, statusCode);
         }
 
@@ -156,10 +172,10 @@ namespace CSDiscordService.Tests
         {
             var expr = @"int thing = default; return thing;";
             var (result, statusCode) = await Execute(expr);
-
+            Log.WriteLine(JsonSerializer.Serialize(result, SerializerOptions));
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal(0L, result.ReturnValue);
+            Assert.Equal(0, ((JsonElement)result.ReturnValue).GetInt32());
             Assert.Equal("int", result.ReturnTypeName);
         }
 
@@ -205,7 +221,7 @@ namespace CSDiscordService.Tests
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal(42L, result.ReturnValue);
+            Assert.Equal(42, ((JsonElement)result.ReturnValue).GetInt32());
             Assert.Equal("int", result.ReturnTypeName);
         }
         
@@ -247,7 +263,7 @@ namespace CSDiscordService.Tests
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal("foo", result.ReturnValue);
+            Assert.Equal("foo", ((JsonElement)result.ReturnValue).GetString());
         }
 
         [Fact]
@@ -263,22 +279,20 @@ namespace CSDiscordService.Tests
 
         private async Task<(EvalResult, HttpStatusCode)> Execute(string expr)
         {
-            using (var response = await Client.PostAsPlainTextAsync("http://testhost/eval", expr))
+            using var response = await Client.PostAsPlainTextAsync("http://testhost/eval", expr);
+            EvalResult result = null;
+            if (response.Content != null)
             {
-                EvalResult result = null;
-                if (response.Content != null)
+                var content = await response.Content.ReadAsStringAsync();
+                Log.WriteLine(content.Replace(@"\r\n", Environment.NewLine));
+
+                if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest)
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    Log.WriteLine(content.Replace(@"\r\n", Environment.NewLine));
-
-                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.BadRequest)
-                    {
-                        result = JsonConvert.DeserializeObject<EvalResult>(content, JsonSettings);
-                    }
+                    result = JsonSerializer.Deserialize<EvalResult>(content, SerializerOptions);
                 }
-
-                return (result, response.StatusCode);
             }
+
+            return (result, response.StatusCode);
         }
 
         public void Dispose()

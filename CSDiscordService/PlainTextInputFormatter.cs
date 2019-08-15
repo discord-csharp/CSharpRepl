@@ -32,20 +32,16 @@ namespace CSDiscordService
 
         public override async Task<InputFormatterResult> ReadAsync(InputFormatterContext context)
         {
-            using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8))
-            {
-                var content = await reader.ReadToEndAsync();
-                return await InputFormatterResult.SuccessAsync(content);
-            }
+            using var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8);
+            var content = await reader.ReadToEndAsync();
+            return await InputFormatterResult.SuccessAsync(content);
         }
 
         public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
         {
-            using (var reader = new StreamReader(context.HttpContext.Request.Body, encoding))
-            {
-                var content = await reader.ReadToEndAsync();
-                return await InputFormatterResult.SuccessAsync(content);
-            }
+            using var reader = new StreamReader(context.HttpContext.Request.Body, encoding);
+            var content = await reader.ReadToEndAsync();
+            return await InputFormatterResult.SuccessAsync(content);
         }
     }
 }

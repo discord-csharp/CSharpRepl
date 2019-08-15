@@ -7,11 +7,8 @@ namespace CSDiscordService.Controllers
     [Route("[controller]")]
     public class StatusController : Controller
     {
-        //private readonly ILogger<StatusController> _logger;
-
-        public StatusController(ILogger<StatusController> logger)
+        public StatusController()
         {
-            //_logger = logger;
         }
 
         [HttpGet("probe")]
