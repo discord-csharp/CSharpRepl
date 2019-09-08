@@ -2,17 +2,15 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System.Linq;
-using Newtonsoft.Json.Serialization;
 using CSDiscordService.Eval;
 using System;
 using System.Threading.Tasks;
 using System.Threading;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+using CSDiscordService.Infrastructure.JsonFormatters;
 
 namespace CSDiscordService
 {
@@ -31,7 +29,6 @@ namespace CSDiscordService
             if (env.EnvironmentName == Environments.Development)
             {
                 builder.AddUserSecrets("03629088-8bb9-4faf-8162-debf93066bc4");
-               // builder.AddApplicationInsightsSettings(developerMode: true);
             }
             Configuration = builder.Build();
         }
@@ -40,15 +37,38 @@ namespace CSDiscordService
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddApplicationInsightsTelemetryProcessor<FilterStatusProbeTelemetryProcessor>();
             services.AddSingleton<CSharpEval>();
             services.AddSingleton<DisassemblyService>();
+            var jsonOptions = new JsonSerializerOptions
+            {
+                MaxDepth = 10240,
+                PropertyNameCaseInsensitive = true,
+                Converters = { new TimeSpanConverter(),  new TypeJsonConverter(), new TypeInfoJsonConverter(),
+                    new RuntimeTypeHandleJsonConverter(), new TypeJsonConverterFactory(), new AssemblyJsonConverter(),
+                    new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), new DirectoryInfoJsonConverter()}
+            };
+
             services.AddControllers(o =>
             {
                 o.RespectBrowserAcceptHeader = true;
                 o.InputFormatters.Clear();
                 o.InputFormatters.Insert(0, new PlainTextInputFormatter());
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            }).AddJsonOptions(o =>
+            {
+                o.JsonSerializerOptions.MaxDepth = 10240;
+                o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                o.JsonSerializerOptions.Converters.Add(new TimeSpanConverter());
+                o.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
+                o.JsonSerializerOptions.Converters.Add(new TypeInfoJsonConverter());
+                o.JsonSerializerOptions.Converters.Add(new RuntimeTypeHandleJsonConverter());
+                o.JsonSerializerOptions.Converters.Add(new TypeJsonConverterFactory());
+                o.JsonSerializerOptions.Converters.Add(new AssemblyJsonConverter());
+                o.JsonSerializerOptions.Converters.Add(new ModuleJsonConverter());
+                o.JsonSerializerOptions.Converters.Add(new AssemblyJsonConverterFactory());
+                o.JsonSerializerOptions.Converters.Add(new DirectoryInfoJsonConverter());
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddSingleton(jsonOptions);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CSharpEval evalService)

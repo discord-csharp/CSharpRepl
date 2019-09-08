@@ -66,6 +66,7 @@ namespace CSDiscordService.Eval
 
         private static readonly ScriptOptions Options =
             ScriptOptions.Default
+                .WithLanguageVersion(LanguageVersion.Preview)
                 .WithImports(DefaultImports)
                 .WithReferences(DefaultReferences);
 
@@ -73,10 +74,12 @@ namespace CSDiscordService.Eval
             ImmutableArray.Create<DiagnosticAnalyzer>(new BlacklistedTypesAnalyzer());
 
         private static readonly Random random = new Random();
+        private readonly JsonSerializerOptions _serializerOptions;
 
-        private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions {
-            PropertyNameCaseInsensitive = true
-        };
+        public CSharpEval(JsonSerializerOptions serializerOptons)
+        {
+            _serializerOptions = serializerOptons;
+        }
 
         public async Task<EvalResult> RunEvalAsync(string code)
         {
@@ -122,7 +125,7 @@ namespace CSDiscordService.Eval
             //if the object can't be serialized, return a failure instead.
             try
             {
-                _ = JsonSerializer.Serialize(evalResult, SerializerOptions);
+                _ = JsonSerializer.Serialize(evalResult, _serializerOptions);
             }
             catch (Exception ex)
             {
@@ -132,8 +135,8 @@ namespace CSDiscordService.Eval
                     CompileTime = compileTime,
                     ConsoleOut = sb.ToString(),
                     ExecutionTime = sw.Elapsed,
-                    ReturnTypeName = result.ReturnValue.GetType().Name,
-                    ReturnValue = $"An exception occurred when serializing the response: {ex.GetType().Name}: {ex.Message}"
+                    Exception = $"An exception occurred when serializing the response: {ex.GetType().Name}: {ex.Message}",
+                    ExceptionType = ex.GetType().Name
                 };
             }
 
