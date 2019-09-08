@@ -6,13 +6,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Xunit;
 using Xunit.Abstractions;
-using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Logging;
 using CSDiscordService.Eval.ResultModels;
 using Microsoft.AspNetCore;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json;
-using System.ComponentModel;
+using CSDiscordService.Infrastructure.JsonFormatters;
+using System.Reflection;
+using System.Collections.Generic;
+using System.IO;
 
 namespace CSDiscordService.Tests
 {
@@ -41,6 +43,19 @@ namespace CSDiscordService.Tests
         private static JsonSerializerOptions SerializerOptions { get; } = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
+            MaxDepth = 10240,
+            Converters = {
+                new TimeSpanConverter(),
+                new TypeJsonConverter(),
+                new TypeInfoJsonConverter(),
+                new RuntimeTypeHandleJsonConverter(),
+                new TypeJsonConverterFactory(),
+                new AssemblyJsonConverter(),
+                new ModuleJsonConverter(),
+                 new AssemblyJsonConverterFactory(),
+                 new DirectoryInfoJsonConverter()
+            }
+
         };
 
         [Theory]
@@ -50,18 +65,25 @@ namespace CSDiscordService.Tests
         [InlineData(@"var a = ""thing""; return a;", "thing", "string")]
         [InlineData("Math.Pow(1,2)", 1D, "double")]
         [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"");", null, null)]
+        [InlineData("typeof(int)", "System.Int32, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e", "RuntimeType")]
+        [InlineData("Assembly.GetExecutingAssembly()", true, "RuntimeAssembly")]
+
         public async Task Eval_WellFormattedCodeExecutes(string expr, object expected, string type)
         {
             var (result, statusCode) = await Execute(expr);
             var res = result.ReturnValue as JsonElement?;
             object convertedValue;
-            if(expected is string || expected is null)
+            if (expected is string || expected is null)
             {
                 convertedValue = res?.GetString();
             }
+            else if (res.Value.ValueKind == JsonValueKind.Object)
+            {
+                convertedValue = res.HasValue;
+            }
             else
             {
-               var value = res.Value.GetRawText();
+                var value = res.Value.GetRawText();
                 convertedValue = Convert.ChangeType(value, expected.GetType());
             }
 
@@ -71,16 +93,43 @@ namespace CSDiscordService.Tests
             Assert.Equal(type, result.ReturnTypeName);
         }
 
+        [Fact]
+        public async Task Eval_WellFormedCodeExecutes_ComputedExpected()
+        {
+            var tests = new List<(string code, object expected)>() {
+                (code: @"new DirectoryInfo(""app"")", expected: new DirectoryInfo("app").FullName)
+            };
+
+            foreach(var (code, expected) in tests)
+            {
+                var (result, statusCode) = await Execute(code);
+                var res = result.ReturnValue as JsonElement?;
+                object convertedValue;
+                if (expected is string || expected is null)
+                {
+                    convertedValue = res?.GetString();
+                }
+                else if (res.Value.ValueKind == JsonValueKind.Object)
+                {
+                    convertedValue = res.HasValue;
+                }
+                else
+                {
+                    var value = res.Value.GetRawText();
+                    convertedValue = Convert.ChangeType(value, expected.GetType());
+                }
+            }
+        }
+
         [Theory]
-        [InlineData(@"new DirectoryInfo(""C:\\"")", "An exception occurred when serializing the response: JsonException: CurrentDepth (64) is equal to or larger than the maximum allowed depth of 64. Cannot write the next JSON object or array.")]
         [InlineData(@"return 4896.ToString().Select(Char.GetNumericValue).Cast<int>();", "An exception occurred when serializing the response: InvalidCastException: Unable to cast object of type 'System.Double' to type 'System.Int32'.")]
         public async Task Eval_JsonNetSerializationFailureHandled(string expr, string message)
         {
             var (result, statusCode) = await Execute(expr);
 
-            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, statusCode);
             Assert.Equal(expr, result.Code);
-            Assert.Equal(message, ((JsonElement)result.ReturnValue).GetString());
+            Assert.Equal(message, result.Exception);
         }
 
         [Theory]
@@ -91,7 +140,7 @@ namespace CSDiscordService.Tests
             var (result, statusCode) = await Execute(expr);
 
             var res = result.ReturnValue as JsonElement?;
-            
+
             Assert.Equal(HttpStatusCode.OK, statusCode);
             Assert.Equal(expr, result.Code);
             Assert.Equal(expected, res.Value[0].GetString());
@@ -126,7 +175,7 @@ namespace CSDiscordService.Tests
             Assert.Equal(consoleOut.Replace("\r\n", Environment.NewLine), result.ConsoleOut);
             Assert.Equal(returnValue, result.ReturnValue);
         }
-        
+
         [Fact]
         public async Task Eval_ConsoleOutputIsCapturedAndValueReturned()
         {
@@ -224,7 +273,7 @@ namespace CSDiscordService.Tests
             Assert.Equal(42, ((JsonElement)result.ReturnValue).GetInt32());
             Assert.Equal("int", result.ReturnTypeName);
         }
-        
+
         [Fact]
         public async Task Eval_CSharp80Supported()
         {
