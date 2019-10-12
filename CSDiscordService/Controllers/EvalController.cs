@@ -35,8 +35,14 @@ namespace CSDiscordService.Controllers
 
                 var result = await _eval.RunEvalAsync(code);
 
-                _logger.LogInformation($"{(result.Exception != null ? "Successful" : "Failed")} {result.ReturnValue}");
-
+                try
+                {
+                    _logger.LogInformation($"{(result.Exception != null ? "Successful" : "Failed")} {result.ReturnValue}");
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogCritical(ex, "Failed to log eval response");
+                }
                 if (string.IsNullOrWhiteSpace(result.Exception))
                 {
                     return Ok(result);
