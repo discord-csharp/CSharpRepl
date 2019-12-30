@@ -10,6 +10,7 @@ namespace CSDiscordService.Infrastructure.JsonFormatters
         public override bool CanConvert(Type typeToConvert)
             => typeToConvert.Namespace == nameof(System)
             && typeToConvert.IsValueType
+            && typeToConvert.Name.StartsWith("ValueTuple")
             && typeof(ITuple).IsAssignableFrom(typeToConvert);
 
         public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
