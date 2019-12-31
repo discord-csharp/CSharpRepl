@@ -52,8 +52,9 @@ namespace CSDiscordService.Tests
                 new TypeJsonConverterFactory(),
                 new AssemblyJsonConverter(),
                 new ModuleJsonConverter(),
-                 new AssemblyJsonConverterFactory(),
-                 new DirectoryInfoJsonConverter()
+                new AssemblyJsonConverterFactory(),
+                new DirectoryInfoJsonConverter(),
+                new ValueTupleConverterFactory(),
             }
 
         };
@@ -100,7 +101,7 @@ namespace CSDiscordService.Tests
                 (code: @"new DirectoryInfo(""app"")", expected: new DirectoryInfo("app").FullName)
             };
 
-            foreach(var (code, expected) in tests)
+            foreach (var (code, expected) in tests)
             {
                 var (result, statusCode) = await Execute(code);
                 var res = result.ReturnValue as JsonElement?;

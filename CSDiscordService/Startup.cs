@@ -45,7 +45,8 @@ namespace CSDiscordService
                 PropertyNameCaseInsensitive = true,
                 Converters = { new TimeSpanConverter(),  new TypeJsonConverter(), new TypeInfoJsonConverter(),
                     new RuntimeTypeHandleJsonConverter(), new TypeJsonConverterFactory(), new AssemblyJsonConverter(),
-                    new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), new DirectoryInfoJsonConverter()}
+                    new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), new DirectoryInfoJsonConverter(),
+                    new ValueTupleConverterFactory(), }
             };
 
             services.AddControllers(o =>
@@ -66,6 +67,7 @@ namespace CSDiscordService
                 o.JsonSerializerOptions.Converters.Add(new ModuleJsonConverter());
                 o.JsonSerializerOptions.Converters.Add(new AssemblyJsonConverterFactory());
                 o.JsonSerializerOptions.Converters.Add(new DirectoryInfoJsonConverter());
+                o.JsonSerializerOptions.Converters.Add(new ValueTupleConverterFactory());
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddSingleton(jsonOptions);
