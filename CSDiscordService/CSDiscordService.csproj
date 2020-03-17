@@ -1,26 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
-        <LangVersion>8</LangVersion>
+        <TargetFramework>netcoreapp5.0</TargetFramework>
         <OutputType>Exe</OutputType>
         <UserSecretsId>03629088-8bb9-4faf-8162-debf93066bc4</UserSecretsId>
         <ApplicationInsightsResourceId>/subscriptions/a46288ed-15a1-40ee-8fb2-d8867d876013/resourcegroups/CSharpDiscord/providers/microsoft.insights/components/CSDiscordService</ApplicationInsightsResourceId>
         <ApplicationInsightsAnnotationResourceId>/subscriptions/a46288ed-15a1-40ee-8fb2-d8867d876013/resourcegroups/CSharpDiscord/providers/microsoft.insights/components/CSDiscordService</ApplicationInsightsAnnotationResourceId>
-
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="ICSharpCode.Decompiler" Version="3.2.0.3856" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.4.0-beta3-19511-04" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
-        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.6.0-2.20166.4" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0-preview.1.20120.4" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0-preview.1.20120.5" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="System.Memory" Version="4.5.3" />
-    </ItemGroup>
-    <ItemGroup>
-        <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
     </ItemGroup>
     <ItemGroup>
       <None Update="start.sh">
