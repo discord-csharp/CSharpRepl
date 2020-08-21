@@ -102,21 +102,21 @@ namespace CSDiscordService.Tests
 
             foreach (var (code, expected) in tests)
             {
-                var (result, statusCode) = await Execute(code);
+                var (result, _) = await Execute(code);
                 var res = result.ReturnValue as JsonElement?;
-                object convertedValue;
+
                 if (expected is string || expected is null)
                 {
-                    convertedValue = res?.GetString();
+                    _ = res?.GetString();
                 }
                 else if (res.Value.ValueKind == JsonValueKind.Object)
                 {
-                    convertedValue = res.HasValue;
+                    _ = res.HasValue;
                 }
                 else
                 {
                     var value = res.Value.GetRawText();
-                    convertedValue = Convert.ChangeType(value, expected.GetType());
+                    _ = Convert.ChangeType(value, expected.GetType());
                 }
             }
         }
