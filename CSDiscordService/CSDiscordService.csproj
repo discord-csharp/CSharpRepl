@@ -10,10 +10,17 @@
 
     <ItemGroup>
         <PackageReference Include="ICSharpCode.Decompiler" Version="3.2.0.3856" />
+<<<<<<< Updated upstream
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.6.0-2.20166.4" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0-preview.1.20120.4" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0-preview.1.20120.5" />
+=======
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.7.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0-preview.7.20364.11" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0-preview.7.20364.11" />
+>>>>>>> Stashed changes
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="System.Memory" Version="4.5.3" />
     </ItemGroup>

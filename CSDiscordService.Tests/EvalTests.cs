@@ -12,7 +12,6 @@ using Microsoft.AspNetCore;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json;
 using CSDiscordService.Infrastructure.JsonFormatters;
-using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 
