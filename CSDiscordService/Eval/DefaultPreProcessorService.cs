@@ -12,7 +12,7 @@ namespace CSDiscordService.Eval
         {
             _directives = directives;
         }
-        public async Task PreProcess(ScriptExecutionContext context)
+        public async Task PreProcess(ScriptExecutionContext context, Action<string> logger)
         {
             var codeLines = context.Code.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
             var remainingLines = new List<string>();
@@ -34,7 +34,7 @@ namespace CSDiscordService.Eval
                     }
 
                     lineHandled = true;
-                    await directive.PreProcess(line, context);
+                    await directive.PreProcess(line, context, logger);
                 }
 
                 if(!lineHandled)

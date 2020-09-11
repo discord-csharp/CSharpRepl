@@ -1,4 +1,5 @@
-﻿using NuGet.Common;
+﻿using ICSharpCode.Decompiler.Util;
+using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Frameworks;
 using NuGet.Packaging;
@@ -27,8 +28,9 @@ namespace CSDiscordService.Eval
             return directive != null && directive.StartsWith("#nuget");
         }
 
-        public async Task PreProcess(string directive, ScriptExecutionContext context)
+        public async Task PreProcess(string directive, ScriptExecutionContext context, Action<string> logger)
         {
+            var actionLogger = new NugetLogger(logger);
             var nugetDirective = NugetPreProcessorDirective.Parse(directive);
             string frameworkName = Assembly.GetEntryAssembly()!.GetCustomAttributes(true)
               .OfType<System.Runtime.Versioning.TargetFrameworkAttribute>()
@@ -39,15 +41,25 @@ namespace CSDiscordService.Eval
               : NuGetFramework.ParseFrameworkName(frameworkName, new DefaultFrameworkNameProvider());
 
             using var cache = new SourceCacheContext();
+            var packagesPath = Path.Combine(Path.GetTempPath(), "packages");
+
+            await CreateEmptyNugetConfig(packagesPath, nugetDirective.FeedUrl);
+
+            var settings = Settings.LoadImmutableSettingsGivenConfigPaths(new[] { Path.Combine(packagesPath, "empty.config")  }, new SettingsLoadingContext());
+            
             var availablePackages = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
-            var repository = Repository.Factory.GetCoreV3(nugetDirective.FeedUrl, FeedType.HttpV3);
-            var packageMetadataResource = await repository.GetResourceAsync<PackageMetadataResource>();
+            #pragma warning disable CS0618 // Type or member is obsolete
+            var repositoryProvider = new SourceRepositoryProvider(settings, Repository.Provider.GetCoreV3());
+            #pragma warning restore CS0618 // Type or member is obsolete
+
+            var repository = repositoryProvider.GetRepositories().FirstOrDefault();
+            var packageMetadataResource = await repository.GetResourceAsync<PackageMetadataResource>(CancellationToken.None);
             var searchMetadata = await packageMetadataResource.GetMetadataAsync(
                 nugetDirective.PackageId,
                 includePrerelease: false,
                 includeUnlisted: false,
                 cache,
-                NullLogger.Instance,
+                actionLogger,
                 CancellationToken.None);
 
             if (!searchMetadata.Any())
@@ -71,7 +83,7 @@ namespace CSDiscordService.Eval
                 cache,
                 repository,
                 dependencyResource,
-                availablePackages);
+                availablePackages, actionLogger);
 
             var resolverContext = new PackageResolverContext(
                 DependencyBehavior.Lowest,
@@ -81,26 +93,24 @@ namespace CSDiscordService.Eval
                 Enumerable.Empty<PackageIdentity>(),
                 availablePackages,
                 new[] { repository.PackageSource },
-                NullLogger.Instance);
+                actionLogger);
 
             var resolver = new PackageResolver();
             var toInstall = resolver.Resolve(resolverContext, CancellationToken.None)
                 .Select(a => availablePackages.Single(b => PackageIdentityComparer.Default.Equals(b, a)));
 
-
-            var pathResolver = new PackagePathResolver(Path.Combine(Path.GetTempPath(), "packages"));
+            var pathResolver = new PackagePathResolver(packagesPath);
             var extractionContext = new PackageExtractionContext(
                 PackageSaveMode.Defaultv3,
                 XmlDocFileSaveMode.None,
-                ClientPolicyContext.GetClientPolicy(Settings.LoadDefaultSettings(null),
-                    NullLogger.Instance),
-                NullLogger.Instance);
+                ClientPolicyContext.GetClientPolicy(settings, actionLogger),
+                actionLogger);
             var libraries = new List<string>();
             var frameworkReducer = new FrameworkReducer();
             var downloadResource = await repository.GetResourceAsync<DownloadResource>(CancellationToken.None);
             foreach (var package in toInstall)
             {
-                libraries.AddRange(await Install(downloadResource, package, pathResolver, extractionContext, frameworkReducer, framework));
+                libraries.AddRange(await Install(downloadResource, package, pathResolver, extractionContext, frameworkReducer, framework, packagesPath, actionLogger));
             }
 
             foreach (var path in libraries)
@@ -116,20 +126,42 @@ namespace CSDiscordService.Eval
             }
         }
 
+        private async Task CreateEmptyNugetConfig(string packagesPath, string feedUrl)
+        {
+            var filename = "empty.config";
+            var fullPath = Path.Combine(packagesPath, filename);
+            Directory.CreateDirectory(packagesPath);
+            
+            if(!File.Exists(fullPath))
+            {
+                await File.WriteAllTextAsync(fullPath, $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<configuration>
+  <config>
+    <add key=""repositoryPath"" value=""{packagesPath}"" />
+    <add key=""globalPackagesFolder"" value=""{packagesPath}"" />
+  </config>
+  <packageSources>
+    <add key=""Feed"" value=""{feedUrl}"" />
+  </packageSources>
+</configuration>");
+            }
+        }
+
         private async Task GetPackageDependencies(PackageIdentity package,
             NuGetFramework framework,
             SourceCacheContext cacheContext,
             SourceRepository repository,
             DependencyInfoResource dependencyInfoResource,
-            ISet<SourcePackageDependencyInfo> availablePackages)
+            ISet<SourcePackageDependencyInfo> availablePackages,
+            ILogger logger)
         {
             if (availablePackages.Contains(package)) return;
 
             var dependencyInfo = await dependencyInfoResource.ResolvePackage(
                 package,
-                framework, 
-                cacheContext, 
-                NullLogger.Instance, 
+                framework,
+                cacheContext,
+                logger,
                 CancellationToken.None);
 
             if (dependencyInfo == null)
@@ -142,13 +174,13 @@ namespace CSDiscordService.Eval
             {
                 await GetPackageDependencies(
                     new PackageIdentity(
-                        dependency.Id, 
+                        dependency.Id,
                         dependency.VersionRange.MinVersion),
                     framework,
                     cacheContext,
-                    repository, 
+                    repository,
                     dependencyInfoResource,
-                    availablePackages);
+                    availablePackages, logger);
             }
         }
 
@@ -158,13 +190,15 @@ namespace CSDiscordService.Eval
             PackagePathResolver pathResolver,
             PackageExtractionContext extractionContext,
             FrameworkReducer reducer,
-            NuGetFramework framework)
+            NuGetFramework framework,
+            string packagesPath,
+            ILogger logger)
         {
             var packageResult = await downloadResource.GetDownloadResourceResultAsync(
                 package,
                 new PackageDownloadContext(cache),
-                ".",
-                NullLogger.Instance,
+                packagesPath,
+                logger,
                 CancellationToken.None);
             await PackageExtractor.ExtractPackageAsync(
                 packageResult.PackageSource,
@@ -195,6 +229,72 @@ namespace CSDiscordService.Eval
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        private class NugetLogger : ILogger
+        {
+            private readonly Action<string> _logger;
+
+            public NugetLogger(Action<string> logger)
+            {
+                _logger = logger;
+            }
+            public void Log(LogLevel level, string data)
+            {
+                _logger($"{level}: {data}");
+            }
+
+            public void Log(ILogMessage message)
+            {
+                _logger($"{message.Level}: {message.Message}");
+            }
+
+            public Task LogAsync(LogLevel level, string data)
+            {
+                _logger($"{level}: {data}");
+                return Task.CompletedTask;
+            }
+
+            public Task LogAsync(ILogMessage message)
+            {
+                _logger($"{message.Level}: {message.Message}");
+                return Task.CompletedTask;
+            }
+
+            public void LogDebug(string data)
+            {
+                Log(LogLevel.Debug, data);
+            }
+
+            public void LogError(string data)
+            {
+                Log(LogLevel.Error, data);
+            }
+
+            public void LogInformation(string data)
+            {
+                Log(LogLevel.Information, data);
+            }
+
+            public void LogInformationSummary(string data)
+            {
+                Log(LogLevel.Information, data);
+            }
+
+            public void LogMinimal(string data)
+            {
+                Log(LogLevel.Minimal, data);
+            }
+
+            public void LogVerbose(string data)
+            {
+                Log(LogLevel.Debug, data);
+            }
+
+            public void LogWarning(string data)
+            {
+                Log(LogLevel.Warning, data);
+            }
         }
 
     }

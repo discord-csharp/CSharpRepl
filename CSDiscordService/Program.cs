@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
 
 namespace CSDiscordService
 {
@@ -9,6 +11,7 @@ namespace CSDiscordService
     {
         public static void Main()
         {
+            Environment.SetEnvironmentVariable("HOME", Path.GetTempPath());
             CreateWebHostBuilder().Build().Run();
         }
 

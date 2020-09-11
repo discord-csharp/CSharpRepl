@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace CSDiscordService.Eval
 {
     public interface IDirectiveProcessor
     {
         bool CanProcessDirective(string directive);
-        Task PreProcess(string directive, ScriptExecutionContext context);
+        Task PreProcess(string directive, ScriptExecutionContext context, Action<string> logger);
     }
 }

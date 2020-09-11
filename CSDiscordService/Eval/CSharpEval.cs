@@ -1,6 +1,5 @@
 using CSDiscordService.Eval.ResultModels;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Scripting;
@@ -12,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.Extensions.Logging;
 
 namespace CSDiscordService.Eval
 {
@@ -23,11 +23,13 @@ namespace CSDiscordService.Eval
         private static readonly Random random = new Random();
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly IPreProcessorService _preProcessor;
+        private readonly ILogger<CSharpEval> _logger;
 
-        public CSharpEval(JsonSerializerOptions serializerOptons, IPreProcessorService preProcessor)
+        public CSharpEval(JsonSerializerOptions serializerOptons, IPreProcessorService preProcessor, ILogger<CSharpEval> logger)
         {
             _serializerOptions = serializerOptons;
             _preProcessor = preProcessor;
+            _logger = logger;
         }
 
         public async Task<EvalResult> RunEvalAsync(string code)
@@ -41,13 +43,14 @@ namespace CSDiscordService.Eval
             var context = new ScriptExecutionContext(code);
             try
             {
-                await _preProcessor.PreProcess(context);
+                await _preProcessor.PreProcess(context, s => _logger.LogInformation(s));
             }
             catch(Exception ex)
             {
                 var diagnostics = Diagnostic.Create(new DiagnosticDescriptor("REPL01", ex.Message, ex.Message, "Code", DiagnosticSeverity.Error, true), 
                     Location.Create("", TextSpan.FromBounds(0,0), new LinePositionSpan(LinePosition.Zero, LinePosition.Zero)));
-                return EvalResult.CreateErrorResult(code, string.Empty, TimeSpan.Zero, new[] { diagnostics }.ToImmutableArray());
+                _logger.LogCritical(ex, ex.Message);
+                return EvalResult.CreateErrorResult(code, sb.ToString(), sw.Elapsed, new[] { diagnostics }.ToImmutableArray());
             }
             var eval = CSharpScript.Create(context.Code, context.Options, typeof(Globals));
 
