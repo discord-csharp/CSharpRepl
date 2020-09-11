@@ -16,9 +16,13 @@ namespace CSDiscordService
 {
     public class Startup
     {
-        private readonly Timer _exitTimer = new Timer((s) => Environment.Exit(0), null, Timeout.Infinite, Timeout.Infinite);
+        private readonly Timer _exitTimer;
+        private  IHostApplicationLifetime _appLifetime;
+
         public Startup(IWebHostEnvironment env, IConfiguration hostBuilderConfig)
         {
+            _exitTimer = new Timer((s) => _appLifetime?.StopApplication(), null, Timeout.Infinite, Timeout.Infinite);
+
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddInMemoryCollection(hostBuilderConfig.AsEnumerable())
@@ -73,8 +77,9 @@ namespace CSDiscordService
             services.AddSingleton(jsonOptions);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CSharpEval evalService)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CSharpEval evalService, IHostApplicationLifetime appLifetime)
         {
+            _appLifetime = appLifetime;
             // run eval once on startup so the first time its hit isn't cripplingly slow.
             evalService.RunEvalAsync("1+1").ConfigureAwait(false).GetAwaiter().GetResult();
             app.UseRouting();
@@ -87,10 +92,10 @@ namespace CSDiscordService
 
                     // terminate the process when the rquest finishes (assume the code is malicious. 
                     // Should be hosted in a container/host system that destroys/re-builds the container)
-                    context.Response.OnCompleted(() =>
+                    context.Response.OnCompleted(async () =>
                     {
-                        Environment.Exit(0);
-                        return Task.CompletedTask;
+                        await Task.Delay(5000);
+                        _appLifetime.StopApplication();
                     });
                 }
 
