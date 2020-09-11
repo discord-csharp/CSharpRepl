@@ -14,11 +14,14 @@ using System.Text.Json;
 using CSDiscordService.Infrastructure.JsonFormatters;
 using System.Collections.Generic;
 using System.IO;
+using CSDiscordService.Eval;
 
 namespace CSDiscordService.Tests
 {
     public class EvalTests : IDisposable
     {
+        private bool disposedValue;
+
         public EvalTests(ITestOutputHelper outputHelper)
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", Environments.Development);
@@ -174,6 +177,52 @@ namespace CSDiscordService.Tests
             Assert.Equal(expr, result.Code);
             Assert.Equal(consoleOut.Replace("\r\n", Environment.NewLine), result.ConsoleOut);
             Assert.Equal(returnValue, result.ReturnValue);
+        }
+
+        [Fact]
+        public async Task Eval_SupportsNugetDirective()
+        {
+            var expr = "#nuget Newtonsoft.Json\nConsole.WriteLine(\"foo\");";
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.StartsWith("Console", result.Code);
+        }
+
+        [Fact]
+        public async Task Eval_FaultyDirectiveFailsGracefully()
+        {
+            var expr = "#nuget asdasd asdasd asda\nConsole.WriteLine(\"foo\");";
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.BadRequest, statusCode);
+            Assert.StartsWith("#nuget", result.Code);
+            Assert.Equal("Unable to resolve asdasd", result.Exception);
+        }
+
+        [Fact]
+        public void Eval_MissingArgumentsThrowsOnParse()
+        {
+            var expr = "#nuget";
+
+            Assert.Throws<ArgumentException>(() => NugetPreProcessorDirective.Parse(expr));
+        }
+
+        [Fact]
+        public async Task Eval_SupportsNugetDirectiveWithActualUsage()
+        {
+            var expr = @"#nuget ByteSize
+            var input = ""80527998976 B"";
+            if (ByteSize.TryParse(input, out var output))
+            {
+                Console.WriteLine(output);
+            }";
+
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.StartsWith("            var input", result.Code);
+            Assert.StartsWith("80.53 GB", result.ConsoleOut);
         }
 
         [Fact]
@@ -344,10 +393,24 @@ namespace CSDiscordService.Tests
             return (result, response.StatusCode);
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Client.Dispose();
+                    Server.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+
+
         public void Dispose()
         {
-            Client.Dispose();
-            Server.Dispose();
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

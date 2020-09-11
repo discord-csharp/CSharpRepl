@@ -14,7 +14,9 @@ using CSDiscordService.Infrastructure.JsonFormatters;
 
 namespace CSDiscordService
 {
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable - Member disposing doesn't matter, it's purpose is to exit the process.
     public class Startup
+#pragma warning restore CA1001 // Types that own disposable fields should be disposable
     {
         private readonly Timer _exitTimer = new Timer((s) => Environment.Exit(0), null, Timeout.Infinite, Timeout.Infinite);
         public Startup(IWebHostEnvironment env, IConfiguration hostBuilderConfig)
@@ -71,6 +73,9 @@ namespace CSDiscordService
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddSingleton(jsonOptions);
+
+            services.AddTransient<IPreProcessorService, DefaultPreProcessorService>();
+            services.AddTransient<IDirectiveProcessor, NugetDirectiveProcessor>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CSharpEval evalService)
