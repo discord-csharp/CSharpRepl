@@ -186,7 +186,6 @@ namespace CSDiscordService.Tests
             var (result, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
-            Assert.StartsWith("Console", result.Code);
         }
 
         [Fact]
@@ -221,7 +220,6 @@ namespace CSDiscordService.Tests
             var (result, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
-            Assert.StartsWith("            var input", result.Code);
             Assert.StartsWith("80.53 GB", result.ConsoleOut);
         }
 

@@ -15,7 +15,7 @@ namespace CSDiscordService.Eval.ResultModels
         {
         }
 
-        public EvalResult(ScriptState<object> state, string consoleOut, TimeSpan executionTime, TimeSpan compileTime)
+        public EvalResult(string code, ScriptState<object> state, string consoleOut, TimeSpan executionTime, TimeSpan compileTime)
         {
             state = state ?? throw new ArgumentNullException(nameof(state));
             
@@ -38,7 +38,7 @@ namespace CSDiscordService.Eval.ResultModels
             ExecutionTime = executionTime;
             CompileTime = compileTime;
             ConsoleOut = consoleOut;
-            Code = state.Script.Code;
+            Code = code;
             Exception = state.Exception?.Message;
             ExceptionType = state.Exception?.GetType().Name;
         }
