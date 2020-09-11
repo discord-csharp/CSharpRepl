@@ -5,80 +5,29 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Scripting;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using Microsoft.CodeAnalysis.Text;
 
 namespace CSDiscordService.Eval
 {
     public class CSharpEval
     {
-        private static readonly ImmutableArray<string> DefaultImports =
-            ImmutableArray.Create(
-                "Newtonsoft.Json",
-                "Newtonsoft.Json.Linq",
-                "System",
-                "System.Collections",
-                "System.Collections.Concurrent",
-                "System.Collections.Immutable",
-                "System.Collections.Generic",
-                "System.Dynamic",
-                "System.Security.Cryptography",
-                "System.Globalization",
-                "System.IO",
-                "System.Linq",
-                "System.Linq.Expressions",
-                "System.Net",
-                "System.Net.Http",
-                "System.Numerics",
-                "System.Reflection",
-                "System.Reflection.Emit",
-                "System.Runtime.CompilerServices",
-                "System.Runtime.InteropServices",
-                "System.Runtime.Intrinsics",
-                "System.Runtime.Intrinsics.X86",
-                "System.Text",
-                "System.Text.RegularExpressions",
-                "System.Threading",
-                "System.Threading.Tasks",
-                "System.Text.Json",
-                "CSDiscordService.Eval"
-            );
-
-        private static readonly ImmutableArray<Assembly> DefaultReferences =
-            ImmutableArray.Create(
-                typeof(Enumerable).GetTypeInfo().Assembly,
-                typeof(HttpClient).GetTypeInfo().Assembly,
-                typeof(List<>).GetTypeInfo().Assembly,
-                typeof(string).GetTypeInfo().Assembly,
-                typeof(Unsafe).GetTypeInfo().Assembly,
-                typeof(ValueTuple).GetTypeInfo().Assembly,
-                typeof(Globals).GetTypeInfo().Assembly,
-                typeof(Memory<>).GetTypeInfo().Assembly
-            );
-
-        private static readonly ScriptOptions Options =
-            ScriptOptions.Default
-                .WithLanguageVersion(LanguageVersion.Preview)
-                .WithImports(DefaultImports)
-                .WithReferences(DefaultReferences);
-
         private static readonly ImmutableArray<DiagnosticAnalyzer> Analyzers =
             ImmutableArray.Create<DiagnosticAnalyzer>(new BlacklistedTypesAnalyzer());
 
         private static readonly Random random = new Random();
         private readonly JsonSerializerOptions _serializerOptions;
+        private readonly IPreProcessorService _preProcessor;
 
-        public CSharpEval(JsonSerializerOptions serializerOptons)
+        public CSharpEval(JsonSerializerOptions serializerOptons, IPreProcessorService preProcessor)
         {
             _serializerOptions = serializerOptons;
+            _preProcessor = preProcessor;
         }
 
         public async Task<EvalResult> RunEvalAsync(string code)
@@ -88,7 +37,19 @@ namespace CSDiscordService.Eval
             var env = new BasicEnvironment();
 
             var sw = Stopwatch.StartNew();
-            var eval = CSharpScript.Create(code, Options, typeof(Globals));
+
+            var context = new ScriptExecutionContext(code);
+            try
+            {
+                await _preProcessor.PreProcess(context);
+            }
+            catch(Exception ex)
+            {
+                var diagnostics = Diagnostic.Create(new DiagnosticDescriptor("REPL01", ex.Message, ex.Message, "Code", DiagnosticSeverity.Error, true), 
+                    Location.Create("", TextSpan.FromBounds(0,0), new LinePositionSpan(LinePosition.Zero, LinePosition.Zero)));
+                return EvalResult.CreateErrorResult(code, string.Empty, TimeSpan.Zero, new[] { diagnostics }.ToImmutableArray());
+            }
+            var eval = CSharpScript.Create(context.Code, context.Options, typeof(Globals));
 
             var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
 
@@ -97,7 +58,7 @@ namespace CSDiscordService.Eval
             sw.Stop();
 
             var compileTime = sw.Elapsed;
-            if (compileErrors.Length > 0)
+            if (!compileErrors.IsEmpty)
             {
                 return EvalResult.CreateErrorResult(code, sb.ToString(), sw.Elapsed, compileErrors);
             }

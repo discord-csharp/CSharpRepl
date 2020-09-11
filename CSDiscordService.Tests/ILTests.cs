@@ -12,7 +12,9 @@ using Microsoft.AspNetCore;
 namespace CSDiscordService.Tests
 {
     public class ILTests : IDisposable
-    {            
+    {
+        private bool disposedValue;
+
         public ILTests(ITestOutputHelper outputHelper)
         {
             var host = WebHost.CreateDefaultBuilder()
@@ -60,11 +62,24 @@ namespace CSDiscordService.Tests
             return (result, response.StatusCode);
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Client.Dispose();
+                    Server.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+
 
         public void Dispose()
         {
-            Client.Dispose();
-            Server.Dispose();
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
