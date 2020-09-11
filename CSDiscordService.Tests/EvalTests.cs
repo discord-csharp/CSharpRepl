@@ -197,7 +197,7 @@ namespace CSDiscordService.Tests
 
             Assert.Equal(HttpStatusCode.BadRequest, statusCode);
             Assert.StartsWith("#nuget", result.Code);
-            Assert.Equal("Unable to resolve asdasd", result.Exception);
+            Assert.Equal("Unable to resolve nuget package with id asdasd", result.Exception);
         }
 
         [Fact]
