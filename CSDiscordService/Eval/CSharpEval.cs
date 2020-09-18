@@ -84,8 +84,10 @@ namespace CSDiscordService.Eval
             }
             sw.Stop();
 
-            var evalResult = new EvalResult(code, result, sb.ToString(), sw.Elapsed, compileTime);
-            evalResult.Code = code;
+            var evalResult = new EvalResult(code, result, sb.ToString(), sw.Elapsed, compileTime)
+            {
+                Code = code
+            };
             //this hack is to test if we're about to send an object that can't be serialized back to the caller.
             //if the object can't be serialized, return a failure instead.
             try

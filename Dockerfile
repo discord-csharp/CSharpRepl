@@ -3,7 +3,7 @@ WORKDIR /src
 COPY . .
 RUN dotnet --info
 RUN dotnet restore CSDiscord.sln --configfile .nuget/nuget.config
-#RUN dotnet test CSDiscordService.Tests/CSDiscordService.Tests.csproj
+RUN dotnet test CSDiscordService.Tests/CSDiscordService.Tests.csproj
 RUN dotnet publish CSDiscordService/CSDiscordService.csproj -o /app
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 RUN apt-get update && apt-get install -y ca-certificates
