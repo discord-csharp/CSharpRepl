@@ -183,7 +183,7 @@ namespace CSDiscordService.Tests
         public async Task Eval_SupportsNugetDirective()
         {
             var expr = "#nuget Newtonsoft.Json\nConsole.WriteLine(\"foo\");";
-            var (result, statusCode) = await Execute(expr);
+            var (_, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
         }
