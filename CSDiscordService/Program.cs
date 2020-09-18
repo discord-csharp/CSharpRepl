@@ -4,6 +4,7 @@ using Microsoft.AspNetCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using Microsoft.Extensions.Logging.Console;
 
 namespace CSDiscordService
 {
@@ -24,7 +25,7 @@ namespace CSDiscordService
                     builder.AddConfiguration(context.Configuration);
                     builder.AddSimpleConsole(o =>
                     {
-                        o.DisableColors = true;
+                        o.ColorBehavior = LoggerColorBehavior.Disabled;
                         o.SingleLine = true;
                         o.TimestampFormat = "yyyy-MM-ddThh:mm:ss.zzzz ";
                     });
