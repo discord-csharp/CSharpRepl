@@ -16,7 +16,9 @@ namespace CSDiscordService.Eval
         private const string Category = "Discord";
 
         internal static DiagnosticDescriptor Rule =
+#pragma warning disable RS2008 // Enable analyzer release tracking
             new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, true);
+#pragma warning restore RS2008 // Enable analyzer release tracking
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
