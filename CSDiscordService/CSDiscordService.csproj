@@ -15,13 +15,13 @@
     <ItemGroup>
         <PackageReference Include="ICSharpCode.Decompiler" Version="3.2.0.3856" />
 
-        <PackageReference Include="Newtonsoft.Json" Version="12.*" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
 
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.7.0-6.20517.6" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.9.0-2.20521.12" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-        <PackageReference Include="NuGet.Packaging" Version="5.8.0-preview.3.6823" />
-        <PackageReference Include="NuGet.Protocol" Version="5.8.0-preview.3.6823" />
-        <PackageReference Include="NuGet.Resolver" Version="5.8.0-preview.3.6823" />
+        <PackageReference Include="NuGet.Packaging" Version="5.9.0-preview.1.6917" />
+        <PackageReference Include="NuGet.Protocol" Version="5.9.0-preview.1.6917" />
+        <PackageReference Include="NuGet.Resolver" Version="5.9.0-preview.1.6917" />
     </ItemGroup>
     <ItemGroup>
       <None Update="start.sh">
