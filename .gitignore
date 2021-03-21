@@ -22,7 +22,7 @@ Dockerfile-dev
 bld/
 [Bb]in/
 [Oo]bj/
-
+[Pp]lain/
 # Visual Studio 2015 cache/options directory
 .vs/
 .vscode

@@ -24,6 +24,7 @@ namespace CSDiscordService.Tests
 
         public EvalTests(ITestOutputHelper outputHelper)
         {
+
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", Environments.Development);
 
 
