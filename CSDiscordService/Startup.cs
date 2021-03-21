@@ -74,8 +74,7 @@ namespace CSDiscordService
                 o.JsonSerializerOptions.Converters.Add(new AssemblyJsonConverterFactory());
                 o.JsonSerializerOptions.Converters.Add(new DirectoryInfoJsonConverter());
                 o.JsonSerializerOptions.Converters.Add(new ValueTupleConverterFactory());
-            })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            });
             services.AddSingleton(jsonOptions);
 
             services.AddTransient<IPreProcessorService, DefaultPreProcessorService>();
