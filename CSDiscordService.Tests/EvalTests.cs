@@ -190,6 +190,15 @@ namespace CSDiscordService.Tests
         }
 
         [Fact]
+        public async Task Eval_LoadDLLThatExposesTypeOfADependency()
+		{
+            var expr = "#nuget CK.ActivityMonitor\nvar m = new ActivityMonitor();";
+            var (_, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+        }
+
+        [Fact]
         public async Task Eval_FaultyDirectiveFailsGracefully()
         {
             var expr = "#nuget asdasd asdasd asda\nConsole.WriteLine(\"foo\");";
