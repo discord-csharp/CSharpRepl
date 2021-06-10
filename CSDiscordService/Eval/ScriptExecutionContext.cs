@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using AngouriMath;
 
 namespace CSDiscordService.Eval
 {
@@ -41,7 +42,9 @@ namespace CSDiscordService.Eval
                 "System.Threading",
                 "System.Threading.Tasks",
                 "System.Text.Json",
-                "CSDiscordService.Eval"
+                "CSDiscordService.Eval",
+                "AngouriMath",
+                "AngouriMath.Extensions"
             };
 
         private static readonly List<Assembly> DefaultReferences =
@@ -53,7 +56,8 @@ namespace CSDiscordService.Eval
                 typeof(Unsafe).GetTypeInfo().Assembly,
                 typeof(ValueTuple).GetTypeInfo().Assembly,
                 typeof(Globals).GetTypeInfo().Assembly,
-                typeof(Memory<>).GetTypeInfo().Assembly
+                typeof(Memory<>).GetTypeInfo().Assembly,
+                typeof(Entity).GetTypeInfo().Assembly
         };
         public ScriptOptions Options =>
             ScriptOptions.Default

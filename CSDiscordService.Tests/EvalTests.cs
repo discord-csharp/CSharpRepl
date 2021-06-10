@@ -47,6 +47,7 @@ namespace CSDiscordService.Tests
         {
             PropertyNameCaseInsensitive = true,
             MaxDepth = 10240,
+            IncludeFields = true,
             Converters = {
                 new TimeSpanConverter(),
                 new TypeJsonConverter(),
@@ -57,9 +58,9 @@ namespace CSDiscordService.Tests
                 new ModuleJsonConverter(),
                 new AssemblyJsonConverterFactory(),
                 new DirectoryInfoJsonConverter(),
-                new ValueTupleConverterFactory(),
+                new AngouriMathEntityConverter(),
+                new AngouriMathEntityVarsConverter()
             }
-
         };
 
         [Theory]
@@ -244,6 +245,28 @@ namespace CSDiscordService.Tests
             Assert.Equal($"test{Environment.NewLine}", result.ConsoleOut);
             Assert.Equal("abcdefg", ((JsonElement)result.ReturnValue).GetString());
             Assert.Equal("string", result.ReturnTypeName);
+        }
+
+        [Fact]
+        public async Task Eval_AngouriMathConverterReturned()
+        {
+            var expr = @"""x + sin(x)"".Differentiate(""x"")";
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Equal($"Sumf", result.ReturnTypeName);
+        }
+
+        [Fact]
+        public async Task Eval_ValueTupleFieldsReturned()
+        {
+            var expr = @"(1, 2)";
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+            Assert.Equal(expr, result.Code);
+            Assert.Equal($"ValueTuple<int, int>", result.ReturnTypeName);
         }
 
         [Fact]

@@ -48,11 +48,13 @@ namespace CSDiscordService
             var jsonOptions = new JsonSerializerOptions
             {
                 MaxDepth = 10240,
+                IncludeFields = true,
                 PropertyNameCaseInsensitive = true,
                 Converters = { new TimeSpanConverter(),  new TypeJsonConverter(), new TypeInfoJsonConverter(),
                     new RuntimeTypeHandleJsonConverter(), new TypeJsonConverterFactory(), new AssemblyJsonConverter(),
                     new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), new DirectoryInfoJsonConverter(),
-                    new ValueTupleConverterFactory(), }
+                    new AngouriMathEntityConverter(),
+                    new AngouriMathEntityVarsConverter() }
             };
 
             services.AddControllers(o =>
@@ -63,6 +65,7 @@ namespace CSDiscordService
             }).AddJsonOptions(o =>
             {
                 o.JsonSerializerOptions.MaxDepth = 10240;
+                o.JsonSerializerOptions.IncludeFields = true;
                 o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 o.JsonSerializerOptions.Converters.Add(new TimeSpanConverter());
                 o.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
@@ -73,7 +76,8 @@ namespace CSDiscordService
                 o.JsonSerializerOptions.Converters.Add(new ModuleJsonConverter());
                 o.JsonSerializerOptions.Converters.Add(new AssemblyJsonConverterFactory());
                 o.JsonSerializerOptions.Converters.Add(new DirectoryInfoJsonConverter());
-                o.JsonSerializerOptions.Converters.Add(new ValueTupleConverterFactory());
+                o.JsonSerializerOptions.Converters.Add(new AngouriMathEntityConverter());
+                o.JsonSerializerOptions.Converters.Add(new AngouriMathEntityVarsConverter());
             });
             services.AddSingleton(jsonOptions);
 
