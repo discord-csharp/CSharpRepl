@@ -115,20 +115,13 @@ namespace CSDiscordService.Eval
 
             foreach (var path in libraries)
             {
-                try
+                var assembly = Assembly.LoadFrom(path);
+                if (context.TryAddReferenceAssembly(assembly))
                 {
-                    var assembly = Assembly.LoadFile(path);
-                    if (context.TryAddReferenceAssembly(assembly))
+                    foreach (var ns in assembly.GetTypes().Select(a => a.Namespace).Distinct())
                     {
-                        foreach (var ns in assembly.GetTypes().Select(a => a.Namespace).Distinct())
-                        {
-                            context.AddImport(ns);
-                        }
+                        context.AddImport(ns);
                     }
-                }
-                catch(Exception ex)
-                {
-                    logger(ex.ToString());
                 }
             }
         }
