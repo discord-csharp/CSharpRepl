@@ -1,4 +1,4 @@
-name: Build, and push, and publish CSharpRepl
+name: build-csharprepl
 on:
   push:
     branches: [ main ]
