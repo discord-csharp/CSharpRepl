@@ -44,7 +44,9 @@ namespace CSDiscordService.Eval
                 "System.Text.Json",
                 "CSDiscordService.Eval",
                 "AngouriMath",
-                "AngouriMath.Extensions"
+                "AngouriMath.Extensions",
+                "HonkSharp.Fluency",
+                "HonkSharp.Functional"
             };
 
         private static readonly List<Assembly> DefaultReferences =
