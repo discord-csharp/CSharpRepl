@@ -9,7 +9,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.0-preview.4.21253.5" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.0-preview.5.21301.17" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0-release-20210407-01" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.reporters" Version="2.4.1" />
