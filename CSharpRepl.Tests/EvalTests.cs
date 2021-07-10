@@ -181,14 +181,16 @@ namespace CSDiscordService.Tests
             Assert.Equal(returnValue, result.ReturnValue);
         }
 
-  //      [Fact]
-  //      public async Task Eval_LoadDLLThatExposesTypeOfADependency()
-		//{
-  //          var expr = "#nuget CK.ActivityMonitor\nvar m = new ActivityMonitor();";
-  //          var (_, statusCode) = await Execute(expr);
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "Test causes CI to hang, run manually")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
+        public async Task Eval_LoadDLLThatExposesTypeOfADependency()
+		{
+            var expr = "#nuget CK.ActivityMonitor\nvar m = new ActivityMonitor();";
+            var (_, statusCode) = await Execute(expr);
 
-  //          Assert.Equal(HttpStatusCode.OK, statusCode);
-  //      }
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+        }
 
         [Fact]
         public async Task Eval_FaultyDirectiveFailsGracefully()
