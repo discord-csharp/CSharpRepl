@@ -181,6 +181,7 @@ namespace CSDiscordService.Tests
             Assert.Equal(returnValue, result.ReturnValue);
         }
 
+        [Fact]
         public async Task Eval_LoadDLLThatExposesTypeOfADependency()
 		{
             var expr = "#nuget CK.ActivityMonitor\nvar m = new ActivityMonitor();";
@@ -208,6 +209,7 @@ namespace CSDiscordService.Tests
             Assert.Throws<ArgumentException>(() => NugetPreProcessorDirective.Parse(expr));
         }
 
+        [Fact]
         public async Task Eval_SupportsNugetDirectiveWithActualUsage()
         {
             var expr = @"#nuget ByteSize
