@@ -50,11 +50,12 @@ namespace CSDiscordService
                 MaxDepth = 10240,
                 IncludeFields = true,
                 PropertyNameCaseInsensitive = true,
-                Converters = { new TimeSpanConverter(),  new TypeJsonConverter(), new TypeInfoJsonConverter(),
+                Converters = { 
+                    new TimeSpanConverter(),  new TypeJsonConverter(), new TypeInfoJsonConverter(),
                     new RuntimeTypeHandleJsonConverter(), new TypeJsonConverterFactory(), new AssemblyJsonConverter(),
                     new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), new DirectoryInfoJsonConverter(),
-                    new AngouriMathEntityConverter(),
-                    new AngouriMathEntityVarsConverter() }
+                    new AngouriMathEntityConverter(), new AngouriMathEntityVarsConverter(), new IntPtrJsonConverter() 
+                    }
             };
 
             services.AddControllers(o =>
@@ -78,6 +79,7 @@ namespace CSDiscordService
                 o.JsonSerializerOptions.Converters.Add(new DirectoryInfoJsonConverter());
                 o.JsonSerializerOptions.Converters.Add(new AngouriMathEntityConverter());
                 o.JsonSerializerOptions.Converters.Add(new AngouriMathEntityVarsConverter());
+                o.JsonSerializerOptions.Converters.Add(new IntPtrJsonConverter());
             });
             services.AddSingleton(jsonOptions);
 
