@@ -181,14 +181,14 @@ namespace CSDiscordService.Tests
             Assert.Equal(returnValue, result.ReturnValue);
         }
 
-        [Fact]
-        public async Task Eval_LoadDLLThatExposesTypeOfADependency()
-		{
-            var expr = "#nuget CK.ActivityMonitor\nvar m = new ActivityMonitor();";
-            var (_, statusCode) = await Execute(expr);
+  //      [Fact]
+  //      public async Task Eval_LoadDLLThatExposesTypeOfADependency()
+		//{
+  //          var expr = "#nuget CK.ActivityMonitor\nvar m = new ActivityMonitor();";
+  //          var (_, statusCode) = await Execute(expr);
 
-            Assert.Equal(HttpStatusCode.OK, statusCode);
-        }
+  //          Assert.Equal(HttpStatusCode.OK, statusCode);
+  //      }
 
         [Fact]
         public async Task Eval_FaultyDirectiveFailsGracefully()
