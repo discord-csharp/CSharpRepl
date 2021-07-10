@@ -181,9 +181,6 @@ namespace CSDiscordService.Tests
             Assert.Equal(returnValue, result.ReturnValue);
         }
 
-#pragma warning disable xUnit1004 // Test methods should not be skipped
-        [Fact(Skip = "Test causes CI to hang, run manually")]
-#pragma warning restore xUnit1004 // Test methods should not be skipped
         public async Task Eval_LoadDLLThatExposesTypeOfADependency()
 		{
             var expr = "#nuget CK.ActivityMonitor\nvar m = new ActivityMonitor();";
@@ -211,9 +208,6 @@ namespace CSDiscordService.Tests
             Assert.Throws<ArgumentException>(() => NugetPreProcessorDirective.Parse(expr));
         }
 
-#pragma warning disable xUnit1004 // Test methods should not be skipped
-        [Fact(Skip = "Test causes CI to hang, run manually")]
-#pragma warning restore xUnit1004 // Test methods should not be skipped
         public async Task Eval_SupportsNugetDirectiveWithActualUsage()
         {
             var expr = @"#nuget ByteSize
