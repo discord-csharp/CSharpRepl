@@ -1,13 +1,13 @@
 {
   "profiles": {
-    "CSDiscordService": {
+    "CSharpRepl": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:5000"
     },
-    "CSDiscordService-Production": {
+    "CSharpRepl-Production": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"

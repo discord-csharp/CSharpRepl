@@ -4,8 +4,6 @@
         <TargetFramework>net6.0</TargetFramework>
         <OutputType>Exe</OutputType>
         <UserSecretsId>03629088-8bb9-4faf-8162-debf93066bc4</UserSecretsId>
-        <ApplicationInsightsResourceId>/subscriptions/a46288ed-15a1-40ee-8fb2-d8867d876013/resourcegroups/CSharpDiscord/providers/microsoft.insights/components/CSDiscordService</ApplicationInsightsResourceId>
-        <ApplicationInsightsAnnotationResourceId>/subscriptions/a46288ed-15a1-40ee-8fb2-d8867d876013/resourcegroups/CSharpDiscord/providers/microsoft.insights/components/CSDiscordService</ApplicationInsightsAnnotationResourceId>
     </PropertyGroup>
 
     <ItemGroup>

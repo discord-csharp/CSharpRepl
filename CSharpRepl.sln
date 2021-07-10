@@ -8,21 +8,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{443496
 		.nuget\nuget.config = .nuget\nuget.config
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSDiscordService", "CSDiscordService\CSDiscordService.csproj", "{0DD73E76-C5B2-4201-B3E3-760EA8C147BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpRepl", "CSharpRepl\CSharpRepl.csproj", "{0DD73E76-C5B2-4201-B3E3-760EA8C147BF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSDiscordService.Tests", "CSDiscordService.Tests\CSDiscordService.Tests.csproj", "{429C6E16-F570-418D-8924-0E4594C37D1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpRepl.Tests", "CSharpRepl.Tests\CSharpRepl.Tests.csproj", "{429C6E16-F570-418D-8924-0E4594C37D1D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{05C55267-AFC5-4675-BC86-63396D410CC9}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
-		.gitattributes = .gitattributes
-		.gitignore = .gitignore
 		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C99A7F61-E624-47AC-9782-1B864E2DBB7A}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
