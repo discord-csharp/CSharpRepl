@@ -1,9 +1,12 @@
 .git
+.github
 .vs
 .vscode
 bin
 obj
-readme.md
+bin/**/*
+obj/**/*
+README.md
 LICENSE
 .gitignore
 .gitattributes
