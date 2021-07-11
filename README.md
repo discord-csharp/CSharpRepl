@@ -1,5 +1,5 @@
 <!--
-Based on the README.md template found at https://github.com/discord-csharp/CSharpRepl/blob/master/README.md
+Based on the README.md template found at https://github.com/othneildrew/Best-README-Template/blob/master/README.md
 -->
 
 [![Contributors][contributors-shield]][contributors-url]
