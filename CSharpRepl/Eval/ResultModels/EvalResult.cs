@@ -6,6 +6,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using System.Text.Json;
+using CSDiscordService.Infrastructure.JsonFormatters;
 
 namespace CSDiscordService.Eval.ResultModels
 {
@@ -75,5 +77,21 @@ namespace CSDiscordService.Eval.ResultModels
         public TimeSpan ExecutionTime { get; set; }
 
         public TimeSpan CompileTime { get; set; }
+
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this, new JsonSerializerOptions
+            {
+                MaxDepth = 10240,
+                IncludeFields = true,
+                PropertyNameCaseInsensitive = true,
+                Converters = {
+                    new TimeSpanConverter(),  new TypeJsonConverter(), new TypeInfoJsonConverter(),
+                    new RuntimeTypeHandleJsonConverter(), new TypeJsonConverterFactory(), new AssemblyJsonConverter(),
+                    new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), new DirectoryInfoJsonConverter(),
+                    new AngouriMathEntityConverter(), new AngouriMathEntityVarsConverter(), new IntPtrJsonConverter()
+                    }
+            });
+        }
     }
 }

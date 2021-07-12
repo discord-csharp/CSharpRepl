@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using Microsoft.Extensions.Logging.Console;
+using Microsoft.Extensions.Hosting;
 
 namespace CSDiscordService
 {
@@ -21,13 +22,18 @@ namespace CSDiscordService
                 .ConfigureLogging((context, builder) =>
                 {
                     builder.ClearProviders();
-                    builder.AddDebug();
                     builder.AddConfiguration(context.Configuration);
+                    if (context.HostingEnvironment.IsDevelopment())
+                    {
+                        builder.AddDebug();
+                    }
+
                     builder.AddSimpleConsole(o =>
                     {
                         o.ColorBehavior = LoggerColorBehavior.Disabled;
                         o.SingleLine = true;
                         o.TimestampFormat = "yyyy-MM-ddThh:mm:ss.zzzz ";
+                        o.UseUtcTimestamp = true;
                     });
                     builder.SetMinimumLevel(LogLevel.Trace);
                     builder.AddFilter(level => true);

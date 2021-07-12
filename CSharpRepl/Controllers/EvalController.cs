@@ -29,20 +29,14 @@ namespace CSDiscordService.Controllers
                 throw new ArgumentNullException(nameof(code));
             }
 
-            using ( _logger.BeginScope(this))
+            using (_logger.BeginScope(this))
             {
                 _logger.LogInformation(code);
 
                 var result = await _eval.RunEvalAsync(code);
 
-                try
-                {
-                    _logger.LogInformation($"{(result.Exception != null ? "Successful" : "Failed")} {result.ReturnValue}");
-                }
-                catch(Exception ex)
-                {
-                    _logger.LogCritical(ex, "Failed to log eval response");
-                }
+                _logger.LogInformation($"{(string.IsNullOrWhiteSpace(result.Exception) ? "Successful" : "Failed")}: {result}");
+
                 if (string.IsNullOrWhiteSpace(result.Exception))
                 {
                     return Ok(result);
