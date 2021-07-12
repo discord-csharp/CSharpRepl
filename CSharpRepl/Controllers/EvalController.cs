@@ -35,7 +35,15 @@ namespace CSDiscordService.Controllers
 
                 var result = await _eval.RunEvalAsync(code);
 
-                _logger.LogInformation($"{(string.IsNullOrWhiteSpace(result.Exception) ? "Successful" : "Failed")}: {result}");
+                if(Request.Headers.ContainsKey("X-Modix-DiscordUserId"))
+                {
+                    _logger.LogInformation("Headers: {X-Modix-DiscordUserId}\n{X-Modix-DiscordUsername}\n{X-Modix-MessageLink}", 
+                        Request.Headers["X-Modix-DiscordUserId"][0],
+                        Request.Headers["X-Modix-DiscordUsername"][0],
+                        Request.Headers["X-Modix-MessageLink"][0]);
+                }
+
+                _logger.LogInformation($"{(string.IsNullOrWhiteSpace(result.Exception) ? "Successful" : "Failed")}: {{Result}}", result);
 
                 if (string.IsNullOrWhiteSpace(result.Exception))
                 {

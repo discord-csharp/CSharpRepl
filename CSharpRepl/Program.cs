@@ -27,6 +27,10 @@ namespace CSDiscordService
                     {
                         builder.AddDebug();
                     }
+                    if (context.HostingEnvironment.IsProduction())
+                    {
+                        builder.AddSeq("http://seq:5341");
+                    }
 
                     builder.AddSimpleConsole(o =>
                     {
