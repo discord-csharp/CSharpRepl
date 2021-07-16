@@ -6,15 +6,22 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace CSDiscordService
 {
     public class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
             Environment.SetEnvironmentVariable("HOME", Path.GetTempPath());
-            CreateWebHostBuilder().Build().Run();
+            var host = CreateWebHostBuilder().Build();
+
+            using (host.Services.GetRequiredService<ILogger>().BeginScope("{Service}", "REPL"))
+            {
+                await host.RunAsync();
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder() =>
