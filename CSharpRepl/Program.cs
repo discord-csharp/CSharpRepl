@@ -18,7 +18,7 @@ namespace CSDiscordService
             Environment.SetEnvironmentVariable("HOME", Path.GetTempPath());
             var host = CreateWebHostBuilder().Build();
 
-            using (host.Services.GetRequiredService<ILogger>().BeginScope("{Service}", "REPL"))
+            using (host.Services.GetRequiredService<ILogger<Program>>().BeginScope("{Service}", "REPL"))
             {
                 await host.RunAsync();
             }
