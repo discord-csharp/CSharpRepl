@@ -43,13 +43,13 @@ namespace CSDiscordService.Eval
             var context = new ScriptExecutionContext(code);
             try
             {
-                await _preProcessor.PreProcess(context, s => _logger.LogInformation(s));
+                await _preProcessor.PreProcess(context, s => _logger.LogInformation("{message}",s));
             }
             catch(Exception ex)
             {
                 var diagnostics = Diagnostic.Create(new DiagnosticDescriptor("REPL01", ex.Message, ex.Message, "Code", DiagnosticSeverity.Error, true), 
                     Location.Create("", TextSpan.FromBounds(0,0), new LinePositionSpan(LinePosition.Zero, LinePosition.Zero)));
-                _logger.LogCritical(ex, ex.Message);
+                _logger.LogCritical(ex, "{message}", ex.Message);
                 return EvalResult.CreateErrorResult(code, sb.ToString(), sw.Elapsed, new[] { diagnostics }.ToImmutableArray());
             }
             var eval = CSharpScript.Create(context.Code, context.Options, typeof(Globals));

@@ -118,7 +118,7 @@ namespace CSDiscordService.Eval
                 var assembly = Assembly.LoadFrom(path);
                 if (context.TryAddReferenceAssembly(assembly))
                 {
-                    foreach (var ns in assembly.GetTypes().Select(a => a.Namespace).Distinct())
+                    foreach (var ns in assembly.GetTypes().Where(a => a.Namespace != null).Select(a => a.Namespace).Distinct())
                     {
                         context.AddImport(ns);
                     }
