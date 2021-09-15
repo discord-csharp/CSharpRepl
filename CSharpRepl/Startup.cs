@@ -8,7 +8,6 @@ using System;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using CSDiscordService.Infrastructure.JsonFormatters;
 

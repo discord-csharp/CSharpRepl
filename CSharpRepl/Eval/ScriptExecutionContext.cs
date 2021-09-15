@@ -14,7 +14,8 @@ namespace CSDiscordService.Eval
     public class ScriptExecutionContext
     {
         private static readonly List<string> DefaultImports =
-            new List<string> {
+            new()
+            {
                 "Newtonsoft.Json",
                 "Newtonsoft.Json.Linq",
                 "System",
@@ -22,6 +23,7 @@ namespace CSDiscordService.Eval
                 "System.Collections.Concurrent",
                 "System.Collections.Immutable",
                 "System.Collections.Generic",
+                "System.Diagnostics",
                 "System.Dynamic",
                 "System.Security.Cryptography",
                 "System.Globalization",
@@ -50,7 +52,8 @@ namespace CSDiscordService.Eval
             };
 
         private static readonly List<Assembly> DefaultReferences =
-            new List<Assembly> {
+            new()
+            {
                 typeof(Enumerable).GetTypeInfo().Assembly,
                 typeof(HttpClient).GetTypeInfo().Assembly,
                 typeof(List<>).GetTypeInfo().Assembly,
@@ -59,7 +62,8 @@ namespace CSDiscordService.Eval
                 typeof(ValueTuple).GetTypeInfo().Assembly,
                 typeof(Globals).GetTypeInfo().Assembly,
                 typeof(Memory<>).GetTypeInfo().Assembly,
-                typeof(Entity).GetTypeInfo().Assembly
+                typeof(Entity).GetTypeInfo().Assembly,
+                typeof(INumber<>).GetTypeInfo().Assembly
         };
         public ScriptOptions Options =>
             ScriptOptions.Default

@@ -209,6 +209,19 @@ namespace CSDiscordService.Tests
             Assert.Throws<ArgumentException>(() => NugetPreProcessorDirective.Parse(expr));
         }
 
+        [Fact]
+        public async void Eval_ValidateGenericMathSupport()
+        {
+            var expr = @"static T Add<T>(T left, T right)
+                            where T : INumber<T>
+                        {
+                            return left + right;
+                        }";
+            var (result, statusCode) = await Execute(expr);
+
+            Assert.Equal(HttpStatusCode.OK, statusCode);
+        }
+
         [Fact(Skip = "Test is failing presumably because of a bug in ByteSize")]
         public async Task Eval_SupportsNugetDirectiveWithActualUsage()
         {
