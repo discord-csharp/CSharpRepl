@@ -8,6 +8,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using System.Text.Json;
 using CSDiscordService.Infrastructure.JsonFormatters;
+using System.Text.Json.Serialization;
 
 namespace CSDiscordService.Eval.ResultModels
 {
@@ -85,11 +86,14 @@ namespace CSDiscordService.Eval.ResultModels
                 MaxDepth = 10240,
                 IncludeFields = true,
                 PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
                 Converters = {
-                    new TimeSpanConverter(),  new TypeJsonConverter(), new TypeInfoJsonConverter(),
+                    new TypeJsonConverter(), new TypeInfoJsonConverter(),
                     new RuntimeTypeHandleJsonConverter(), new TypeJsonConverterFactory(), new AssemblyJsonConverter(),
-                    new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), new DirectoryInfoJsonConverter(),
-                    new AngouriMathEntityConverter(), new AngouriMathEntityVarsConverter(), new IntPtrJsonConverter()
+                    new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), 
+                    new DirectoryInfoJsonConverter(),
+                    new AngouriMathEntityConverter(), new AngouriMathEntityVarsConverter(), 
+                    new IntPtrJsonConverter()
                     }
             });
         }

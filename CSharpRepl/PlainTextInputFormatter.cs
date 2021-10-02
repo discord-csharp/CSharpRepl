@@ -3,12 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text;
-using System.IO;
 
 namespace CSDiscordService
 {
     public class PlainTextInputFormatter : TextInputFormatter
     {
+        private static readonly UTF8Encoding _utf8Encoder = new(false, true);
+
         public PlainTextInputFormatter()
         {
             SupportedMediaTypes.Clear();
@@ -32,16 +33,16 @@ namespace CSDiscordService
 
         public override async Task<InputFormatterResult> ReadAsync(InputFormatterContext context)
         {
-            using var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8);
-            var content = await reader.ReadToEndAsync();
-            return await InputFormatterResult.SuccessAsync(content);
+            var content = await context.HttpContext.Request.BodyReader.ReadAsync();
+            var encoded = _utf8Encoder.GetString(content.Buffer);
+            return await InputFormatterResult.SuccessAsync(encoded);
         }
 
         public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
         {
-            using var reader = new StreamReader(context.HttpContext.Request.Body, encoding);
-            var content = await reader.ReadToEndAsync();
-            return await InputFormatterResult.SuccessAsync(content);
+            var content = await context.HttpContext.Request.BodyReader.ReadAsync();
+            var encoded = _utf8Encoder.GetString(content.Buffer);
+            return await InputFormatterResult.SuccessAsync(encoded);
         }
     }
 }

@@ -15,6 +15,7 @@ using CSDiscordService.Infrastructure.JsonFormatters;
 using System.Collections.Generic;
 using System.IO;
 using CSDiscordService.Eval;
+using System.Text.Json.Serialization;
 
 namespace CSDiscordService.Tests
 {
@@ -48,8 +49,8 @@ namespace CSDiscordService.Tests
             PropertyNameCaseInsensitive = true,
             MaxDepth = 10240,
             IncludeFields = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
             Converters = {
-                new TimeSpanConverter(),
                 new TypeJsonConverter(),
                 new TypeInfoJsonConverter(),
                 new RuntimeTypeHandleJsonConverter(),
@@ -58,8 +59,6 @@ namespace CSDiscordService.Tests
                 new ModuleJsonConverter(),
                 new AssemblyJsonConverterFactory(),
                 new DirectoryInfoJsonConverter(),
-                new AngouriMathEntityConverter(),
-                new AngouriMathEntityVarsConverter()
             }
         };
 
@@ -72,7 +71,7 @@ namespace CSDiscordService.Tests
         [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"");", null, null)]
         [InlineData("typeof(int)", "System.Int32, System.Private.CoreLib, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e", "RuntimeType")]
         [InlineData("Assembly.GetExecutingAssembly()", true, "RuntimeAssembly")]
-
+        [InlineData("TimeSpan.FromSeconds(2310293892)", "26739.12:18:12", "TimeSpan")]
         public async Task Eval_WellFormattedCodeExecutes(string expr, object expected, string type)
         {
             var (result, statusCode) = await Execute(expr);
@@ -107,7 +106,9 @@ namespace CSDiscordService.Tests
 
             foreach (var (code, expected) in tests)
             {
-                var (result, _) = await Execute(code);
+                var (result, status) = await Execute(code);
+                Assert.Equal(HttpStatusCode.OK, status);
+                
                 var res = result.ReturnValue as JsonElement?;
 
                 if (expected is string || expected is null)

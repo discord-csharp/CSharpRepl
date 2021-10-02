@@ -31,7 +31,7 @@ namespace CSDiscordService.Controllers
 
             using (_logger.BeginScope(this))
             {
-                _logger.LogInformation(code);
+                _logger.LogInformation("{code}", code);
 
                 var result = await _eval.RunEvalAsync(code);
 
@@ -43,7 +43,7 @@ namespace CSDiscordService.Controllers
                         Request.Headers["X-Modix-MessageLink"][0]);
                 }
 
-                _logger.LogInformation($"{(string.IsNullOrWhiteSpace(result.Exception) ? "Successful" : "Failed")}: {{Result}}", result);
+                _logger.LogInformation("{status}: {result}", string.IsNullOrWhiteSpace(result.Exception) ? "Successful" : "Failed", result);
 
                 if (string.IsNullOrWhiteSpace(result.Exception))
                 {

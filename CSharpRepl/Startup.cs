@@ -10,35 +10,22 @@ using System.Threading;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json;
 using CSDiscordService.Infrastructure.JsonFormatters;
+using System.Text.Json.Serialization;
 
 namespace CSDiscordService
 {
-#pragma warning disable CA1001 // Types that own disposable fields should be disposable - Member disposing doesn't matter, it's purpose is to exit the process.
     public class Startup
-#pragma warning restore CA1001 // Types that own disposable fields should be disposable
     {
         private readonly Timer _exitTimer;
         private  IHostApplicationLifetime _appLifetime;
 
-        public Startup(IWebHostEnvironment env, IConfiguration hostBuilderConfig)
+        public Startup(IConfiguration config)
         {
             _exitTimer = new Timer((s) => _appLifetime?.StopApplication(), null, Timeout.Infinite, Timeout.Infinite);
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddInMemoryCollection(hostBuilderConfig.AsEnumerable())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-
-            if (env.EnvironmentName == Environments.Development)
-            {
-                builder.AddUserSecrets("03629088-8bb9-4faf-8162-debf93066bc4");
-            }
-            Configuration = builder.Build();
+            Configuration = config;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -49,11 +36,14 @@ namespace CSDiscordService
                 MaxDepth = 10240,
                 IncludeFields = true,
                 PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
                 Converters = { 
-                    new TimeSpanConverter(),  new TypeJsonConverter(), new TypeInfoJsonConverter(),
+                    new TypeJsonConverter(), new TypeInfoJsonConverter(),
                     new RuntimeTypeHandleJsonConverter(), new TypeJsonConverterFactory(), new AssemblyJsonConverter(),
-                    new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), new DirectoryInfoJsonConverter(),
-                    new AngouriMathEntityConverter(), new AngouriMathEntityVarsConverter(), new IntPtrJsonConverter() 
+                    new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), 
+                    new DirectoryInfoJsonConverter(),
+                     new AngouriMathEntityConverter(), new AngouriMathEntityVarsConverter(),
+                    new IntPtrJsonConverter() 
                     }
             };
 
@@ -67,7 +57,7 @@ namespace CSDiscordService
                 o.JsonSerializerOptions.MaxDepth = 10240;
                 o.JsonSerializerOptions.IncludeFields = true;
                 o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-                o.JsonSerializerOptions.Converters.Add(new TimeSpanConverter());
+                o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 o.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
                 o.JsonSerializerOptions.Converters.Add(new TypeInfoJsonConverter());
                 o.JsonSerializerOptions.Converters.Add(new RuntimeTypeHandleJsonConverter());
