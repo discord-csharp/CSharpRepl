@@ -1,26 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>CSDiscordService.Tests</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<EnablePreviewFeatures>true</EnablePreviewFeatures>
+		<LangVersion>preview</LangVersion>
+		<TargetFramework>net6.0</TargetFramework>
+		<RootNamespace>CSDiscordService.Tests</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0-preview-20211112-03" />
-    <PackageReference Include="xunit" Version="2.4.2-pre.12" />
-    <PackageReference Include="xunit.runner.reporters" Version="2.4.2-pre.12" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta3-build3705" />
-  </ItemGroup>
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0-preview-20211112-03" />
+		<PackageReference Include="xunit" Version="2.4.2-pre.12" />
+		<PackageReference Include="xunit.runner.reporters" Version="2.4.2-pre.12" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta3-build3705" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CSharpRepl\CSharpRepl.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\CSharpRepl\CSharpRepl.csproj" />
+	</ItemGroup>
 </Project>
