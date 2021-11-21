@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AngouriMath;
+using Microsoft.CodeAnalysis;
 
 namespace CSDiscordService.Eval
 {
@@ -68,6 +69,7 @@ namespace CSDiscordService.Eval
         public ScriptOptions Options =>
             ScriptOptions.Default
             .WithLanguageVersion(LanguageVersion.Preview)
+            .WithOptimizationLevel(OptimizationLevel.Release)
             .WithImports(Imports)
             .WithReferences(References);
 
