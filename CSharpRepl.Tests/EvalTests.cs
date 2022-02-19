@@ -69,7 +69,7 @@ namespace CSDiscordService.Tests
         [InlineData(@"var a = ""thing""; return a;", "thing", "string")]
         [InlineData("Math.Pow(1,2)", 1D, "double")]
         [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"");", null, null)]
-        [InlineData("typeof(int)", "System.Int32, System.Private.CoreLib, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e", "RuntimeType")]
+        [InlineData("typeof(int)", "System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e", "RuntimeType")]
         [InlineData("Assembly.GetExecutingAssembly()", true, "RuntimeAssembly")]
         [InlineData("TimeSpan.FromSeconds(2310293892)", "26739.12:18:12", "TimeSpan")]
         public async Task Eval_WellFormattedCodeExecutes(string expr, object expected, string type)
