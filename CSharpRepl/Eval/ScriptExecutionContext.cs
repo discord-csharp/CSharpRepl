@@ -59,7 +59,6 @@ namespace CSDiscordService.Eval
                 typeof(HttpClient).GetTypeInfo().Assembly,
                 typeof(List<>).GetTypeInfo().Assembly,
                 typeof(string).GetTypeInfo().Assembly,
-                typeof(Unsafe).GetTypeInfo().Assembly,
                 typeof(ValueTuple).GetTypeInfo().Assembly,
                 typeof(Globals).GetTypeInfo().Assembly,
                 typeof(Memory<>).GetTypeInfo().Assembly,

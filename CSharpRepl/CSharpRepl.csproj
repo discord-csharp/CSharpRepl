@@ -18,13 +18,13 @@
 
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.2.0-2.22118.4" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.3.0-1.22213.10" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-        <PackageReference Include="NuGet.Packaging" Version="6.2.0-preview.2.75" />
-        <PackageReference Include="NuGet.Protocol" Version="6.2.0-preview.2.75" />
-        <PackageReference Include="NuGet.Resolver" Version="6.2.0-preview.2.75" />
+        <PackageReference Include="NuGet.Packaging" Version="6.3.0-preview.1.10" />
+        <PackageReference Include="NuGet.Protocol" Version="6.3.0-preview.1.10" />
+        <PackageReference Include="NuGet.Resolver" Version="6.3.0-preview.1.10" />
         <PackageReference Include="Seq.Extensions.Logging" Version="6.1.0-dev-00091" />
-        <PackageReference Include="System.Runtime.Experimental" Version="7.0.0-preview.1.22076.8" />
+        <PackageReference Include="System.Runtime.Experimental" Version="7.0.0-preview.2.22152.2" />
     </ItemGroup>
     <ItemGroup>
       <None Update="start.sh">

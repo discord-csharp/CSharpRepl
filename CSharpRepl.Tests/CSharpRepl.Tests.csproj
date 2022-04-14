@@ -11,8 +11,8 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.0-preview.1.22109.13" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0-release-20220209-04" />
+		<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.0-preview.3.22178.4" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.0-preview-20220414-03" />
 		<PackageReference Include="xunit" Version="2.4.2-pre.12" />
 		<PackageReference Include="xunit.runner.reporters" Version="2.4.2-pre.12" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
