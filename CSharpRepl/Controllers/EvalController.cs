@@ -37,9 +37,8 @@ namespace CSDiscordService.Controllers
 
                 if(Request.Headers.ContainsKey("X-Modix-DiscordUserId"))
                 {
-                    _logger.LogInformation("Headers: {X-Modix-DiscordUserId}\n{X-Modix-DiscordUsername}\n{X-Modix-MessageLink}", 
+                    _logger.LogInformation("Headers: {X-Modix-DiscordUserId}\n{X-Modix-MessageLink}", 
                         Request.Headers["X-Modix-DiscordUserId"][0],
-                        Request.Headers["X-Modix-DiscordUsername"][0],
                         Request.Headers["X-Modix-MessageLink"][0]);
                 }
 
