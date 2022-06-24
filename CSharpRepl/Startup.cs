@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 using CSDiscordService.Eval;
 using System;
 using System.Threading.Tasks;
@@ -42,7 +41,7 @@ namespace CSDiscordService
                     new RuntimeTypeHandleJsonConverter(), new TypeJsonConverterFactory(), new AssemblyJsonConverter(),
                     new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), 
                     new DirectoryInfoJsonConverter(),
-                     new AngouriMathEntityConverter(), new AngouriMathEntityVarsConverter(),
+                    new AngouriMathEntityConverter(), new AngouriMathEntityVarsConverter(),
                     new IntPtrJsonConverter() 
                     }
             };
@@ -76,11 +75,9 @@ namespace CSDiscordService
             services.AddTransient<IDirectiveProcessor, NugetDirectiveProcessor>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CSharpEval evalService, IHostApplicationLifetime appLifetime)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime appLifetime)
         {
             _appLifetime = appLifetime;
-            // run eval once on startup so the first time its hit isn't cripplingly slow.
-            evalService.RunEvalAsync("1+1").ConfigureAwait(false).GetAwaiter().GetResult();
             app.UseRouting();
             app.Use(async (context, next) =>
             {

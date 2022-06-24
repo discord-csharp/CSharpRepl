@@ -206,7 +206,6 @@ namespace CSDiscordService.Tests
         public void Eval_MissingArgumentsThrowsOnParse()
         {
             var expr = "#nuget";
-
             Assert.Throws<ArgumentException>(() => NugetPreProcessorDirective.Parse(expr));
         }
 

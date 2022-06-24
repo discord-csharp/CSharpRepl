@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
+using CSDiscordService.Eval;
 
 namespace CSDiscordService
 {
@@ -17,7 +18,10 @@ namespace CSDiscordService
         {
             Environment.SetEnvironmentVariable("HOME", Path.GetTempPath());
             var host = CreateWebHostBuilder().Build();
+            var replService = host.Services.GetRequiredService<CSharpEval>();
 
+            // run eval once on startup so the first time its hit isn't cripplingly slow.
+            await replService.RunEvalAsync("1+1");
             await host.RunAsync();
         }
 

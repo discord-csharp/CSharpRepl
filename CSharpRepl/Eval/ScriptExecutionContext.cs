@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using AngouriMath;
 using Microsoft.CodeAnalysis;
 
@@ -62,8 +61,7 @@ namespace CSDiscordService.Eval
                 typeof(ValueTuple).GetTypeInfo().Assembly,
                 typeof(Globals).GetTypeInfo().Assembly,
                 typeof(Memory<>).GetTypeInfo().Assembly,
-                typeof(Entity).GetTypeInfo().Assembly,
-                typeof(INumber<>).GetTypeInfo().Assembly
+                typeof(Entity).GetTypeInfo().Assembly
         };
         public ScriptOptions Options =>
             ScriptOptions.Default
