@@ -2,7 +2,6 @@
 using ICSharpCode.Decompiler.Disassembler;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Mono.Cecil;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using ICSharpCode.Decompiler.Metadata;
 
 namespace CSDiscordService.Eval
 {
@@ -75,17 +75,21 @@ namespace CSDiscordService.Eval
             }}
             ";
 
-            var opts = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview).WithKind(SourceCodeKind.Regular);
+            var opts = CSharpParseOptions.Default
+                .WithLanguageVersion(LanguageVersion.Preview)
+                .WithKind(SourceCodeKind.Regular);
 
             var scriptSyntaxTree = CSharpSyntaxTree.ParseText(toExecute, opts);
-            var compOpts = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithOptimizationLevel(OptimizationLevel.Debug).WithAllowUnsafe(true).WithPlatform(Platform.AnyCpu);
+            var compOpts = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithOptimizationLevel(OptimizationLevel.Debug)
+                .WithAllowUnsafe(true).WithPlatform(Platform.AnyCpu);
 
-            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToString(), options: compOpts, references: References).AddSyntaxTrees(scriptSyntaxTree);
+            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToString(), options: compOpts, references: References)
+                .AddSyntaxTrees(scriptSyntaxTree);
 
             var sb = new StringBuilder();
-            using var pdb = new MemoryStream();
             using var dll = new MemoryStream();
-            var result = compilation.Emit(dll, pdb);
+            var result = compilation.Emit(dll);
             if (!result.Success)
             {
                 sb.AppendLine("Emit Failed");
@@ -94,19 +98,22 @@ namespace CSDiscordService.Eval
             else
             {
                 dll.Seek(0, SeekOrigin.Begin);
-                using var module = ModuleDefinition.ReadModule(dll);
+                using var file = new PEFile(compilation.AssemblyName!, dll);
                 using var writer = new StringWriter(sb);
-                module.Name = compilation.AssemblyName;
                 var plainOutput = new PlainTextOutput(writer);
                 var rd = new ReflectionDisassembler(plainOutput, CancellationToken.None)
                 {
                     DetectControlStructure = true
                 };
                 var ignoredMethods = new[] { ".ctor" };
-                var methods = module.Types.SelectMany(a => a.Methods).Where(a => !ignoredMethods.Contains(a.Name));
+                var methods = file.Metadata.MethodDefinitions.Where(a =>
+                {
+                    var methodName = file.Metadata.GetString(file.Metadata.GetMethodDefinition(a).Name);
+                    return !ignoredMethods.Contains(methodName);
+                });
                 foreach (var method in methods)
                 {
-                    rd.DisassembleMethod(method);
+                    rd.DisassembleMethod(file, method);
                     plainOutput.WriteLine();
                 }
             }
