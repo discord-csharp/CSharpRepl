@@ -65,7 +65,7 @@ namespace CSDiscordService.Eval
 
             namespace Eval
             {{
-              public class Code
+              public unsafe class Code
               {{
                 public object Main() 
                 {{
@@ -82,7 +82,8 @@ namespace CSDiscordService.Eval
             var scriptSyntaxTree = CSharpSyntaxTree.ParseText(toExecute, opts);
             var compOpts = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                 .WithOptimizationLevel(OptimizationLevel.Debug)
-                .WithAllowUnsafe(true).WithPlatform(Platform.AnyCpu);
+                .WithAllowUnsafe(true)
+                .WithPlatform(Platform.AnyCpu);
 
             var compilation = CSharpCompilation.Create(Guid.NewGuid().ToString(), options: compOpts, references: References)
                 .AddSyntaxTrees(scriptSyntaxTree);

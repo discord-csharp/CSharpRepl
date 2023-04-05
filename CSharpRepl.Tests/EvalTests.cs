@@ -72,6 +72,7 @@ namespace CSDiscordService.Tests
         [InlineData("typeof(int)", "System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e", "RuntimeType")]
         [InlineData("Assembly.GetExecutingAssembly()", true, "RuntimeAssembly")]
         [InlineData("TimeSpan.FromSeconds(2310293892)", "26739.12:18:12", "TimeSpan")]
+        [InlineData("float.PositiveInfinity", "Infinity", "float")]
         public async Task Eval_WellFormattedCodeExecutes(string expr, object expected, string type)
         {
             var (result, statusCode) = await Execute(expr);

@@ -36,6 +36,7 @@ namespace CSDiscordService
                 IncludeFields = true,
                 PropertyNameCaseInsensitive = true,
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
                 Converters = { 
                     new TypeJsonConverter(), new TypeInfoJsonConverter(),
                     new RuntimeTypeHandleJsonConverter(), new TypeJsonConverterFactory(), new AssemblyJsonConverter(),
@@ -57,6 +58,7 @@ namespace CSDiscordService
                 o.JsonSerializerOptions.IncludeFields = true;
                 o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                o.JsonSerializerOptions.NumberHandling |= JsonNumberHandling.AllowNamedFloatingPointLiterals;
                 o.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
                 o.JsonSerializerOptions.Converters.Add(new TypeInfoJsonConverter());
                 o.JsonSerializerOptions.Converters.Add(new RuntimeTypeHandleJsonConverter());
