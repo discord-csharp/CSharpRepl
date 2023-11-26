@@ -3,7 +3,7 @@
     <PropertyGroup>
 		<EnablePreviewFeatures>true</EnablePreviewFeatures>
         <LangVersion>preview</LangVersion>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <OutputType>Exe</OutputType>
         <UserSecretsId>03629088-8bb9-4faf-8162-debf93066bc4</UserSecretsId>
     </PropertyGroup>
@@ -14,10 +14,10 @@
 
     <ItemGroup>
         <PackageReference Include="AngouriMath" Version="1.3.0" />
-        <PackageReference Include="ICSharpCode.Decompiler" Version="8.0.0.7313-preview4" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.5.0" />
+        <PackageReference Include="ICSharpCode.Decompiler" Version="8.2.0.7535" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.8.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="NuGet.Resolver" Version="6.5.0" />
+        <PackageReference Include="NuGet.Resolver" Version="6.8.0" />
         <PackageReference Include="Seq.Extensions.Logging" Version="6.1.0" />
     </ItemGroup>
     <ItemGroup>

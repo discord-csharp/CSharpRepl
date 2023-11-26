@@ -122,7 +122,7 @@ namespace CSDiscordService.Infrastructure.JsonFormatters
 
     public class AssemblyJsonConverterFactory : JsonConverterFactory
     {
-        public override bool CanConvert(Type typeToConvert) => typeToConvert == Type.GetType("System.RuntimeAssembly");
+        public override bool CanConvert(Type typeToConvert) => typeToConvert == Type.GetType("System.Reflection.RuntimeAssembly");
         public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {
             return new RuntimeAssemblyJsonConverter();
