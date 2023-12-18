@@ -32,7 +32,7 @@ namespace CSDiscordService.Eval
         {
             var actionLogger = new NugetLogger(logger);
             var nugetDirective = NugetPreProcessorDirective.Parse(directive);
-            string frameworkName = Assembly.GetEntryAssembly()!.GetCustomAttributes(true)
+            string frameworkName = typeof(NugetDirectiveProcessor).Assembly.GetCustomAttributes(true)
               .OfType<System.Runtime.Versioning.TargetFrameworkAttribute>()
               .Select(x => x.FrameworkName)
               .FirstOrDefault()!;

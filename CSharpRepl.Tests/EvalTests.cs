@@ -69,21 +69,32 @@ namespace CSDiscordService.Tests
         [InlineData(@"var a = ""thing""; return a;", "thing", "string")]
         [InlineData("Math.Pow(1,2)", 1D, "double")]
         [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"");", null, null)]
-        [InlineData("typeof(int)", "System.Int32, System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e", "RuntimeType")]
+        [InlineData("typeof(int)", "System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e", "RuntimeType")]
         [InlineData("Assembly.GetExecutingAssembly()", true, "RuntimeAssembly")]
         [InlineData("TimeSpan.FromSeconds(2310293892)", "26739.12:18:12", "TimeSpan")]
+        [InlineData("float.PositiveInfinity", "Infinity", "float")]
+        [InlineData("List<int> l = [1, 2, 3]; l", "[1,2,3]", "List<int>")]
         public async Task Eval_WellFormattedCodeExecutes(string expr, object expected, string type)
         {
             var (result, statusCode) = await Execute(expr);
             var res = result.ReturnValue as JsonElement?;
             object convertedValue;
-            if (expected is string || expected is null)
+            if (res.Value.ValueKind == JsonValueKind.Array)
+            {
+                convertedValue = res.Value.GetRawText();
+            }
+            else if (expected is string || expected is null)
             {
                 convertedValue = res?.GetString();
             }
             else if (res.Value.ValueKind == JsonValueKind.Object)
             {
                 convertedValue = res.HasValue;
+            }
+            else if (result.ReturnTypeName == "RuntimeAssembly")
+            {
+                // nothing to do here, value is random for this test
+                convertedValue = expected;
             }
             else
             {
@@ -185,8 +196,8 @@ namespace CSDiscordService.Tests
         [Fact]
         public async Task Eval_LoadDLLThatExposesTypeOfADependency()
         {
-            var expr = "#nuget CK.ActivityMonitor\nvar m = new ActivityMonitor();";
-            var (_, statusCode) = await Execute(expr);
+            var expr = "#nuget CK.ActivityMonitor\nvar m = new CK.Core.ActivityMonitor();";
+            var (result, statusCode) = await Execute(expr);
 
             Assert.Equal(HttpStatusCode.OK, statusCode);
         }

@@ -87,6 +87,7 @@ namespace CSDiscordService.Eval.ResultModels
                 IncludeFields = true,
                 PropertyNameCaseInsensitive = true,
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
                 Converters = {
                     new TypeJsonConverter(), new TypeInfoJsonConverter(),
                     new RuntimeTypeHandleJsonConverter(), new TypeJsonConverterFactory(), new AssemblyJsonConverter(),

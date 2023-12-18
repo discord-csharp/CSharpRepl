@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 as dotnet-build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 as dotnet-build
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 WORKDIR /src
@@ -10,7 +10,7 @@ RUN dotnet build --configuration Release --no-restore
 #RUN dotnet test --configuration Release CSharpRepl.Tests/CSharpRepl.Tests.csproj --no-build --no-restore
 RUN dotnet publish --configuration Release CSharpRepl/CSharpRepl.csproj --no-build --no-restore -o /app
 
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:7.0
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 WORKDIR /app
