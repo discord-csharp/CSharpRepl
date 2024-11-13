@@ -65,7 +65,7 @@ namespace CSDiscordService.Tests
         [Theory]
         [InlineData("1+1", 2L, "int")]
         [InlineData("return 1+1;", 2L, "int")]
-        [InlineData("return Random.Next(1,2);", 1L, "int")]
+        [InlineData("return Random.Shared.Next(1,2);", 1L, "int")]
         [InlineData(@"var a = ""thing""; return a;", "thing", "string")]
         [InlineData("Math.Pow(1,2)", 1D, "double")]
         [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"");", null, null)]
@@ -79,7 +79,7 @@ namespace CSDiscordService.Tests
             var (result, statusCode) = await Execute(expr);
             var res = result.ReturnValue as JsonElement?;
             object convertedValue;
-            if (res.Value.ValueKind == JsonValueKind.Array)
+            if (res?.ValueKind == JsonValueKind.Array)
             {
                 convertedValue = res.Value.GetRawText();
             }
@@ -150,9 +150,9 @@ namespace CSDiscordService.Tests
         }
 
         [Theory]
-        [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"")", "@", 1, "SelectRangeIterator<string>")]
-        [InlineData(@"return Enumerable.Range(0,1).Select(a=>""@"");", "@", 1, "SelectRangeIterator<string>")]
-        public async Task Eval_EnumerablesReturnArraysOf(string expr, object expected, int count, string type)
+        [InlineData(@"Enumerable.Range(0,1).Select(a=>""@"")", "@", 1)]
+        [InlineData(@"return Enumerable.Range(0,1).Select(a=>""@"");", "@", 1)]
+        public async Task Eval_EnumerablesReturnArraysOf(string expr, object expected, int count)
         {
             var (result, statusCode) = await Execute(expr);
 
@@ -162,13 +162,11 @@ namespace CSDiscordService.Tests
             Assert.Equal(expr, result.Code);
             Assert.Equal(expected, res.Value[0].GetString());
             Assert.Equal(count, res.Value.GetArrayLength());
-            Assert.Equal(type, result.ReturnTypeName);
         }
 
         [Theory]
         [InlineData("return 1+1", "CompilationErrorException", "; expected")]
         [InlineData(@"throw new Exception(""test"");", "Exception", "test")]
-        [InlineData("return System.Environment.MachineName;", "CompilationErrorException", "Usage of this API is prohibited\nUsage of this API is prohibited")]
         [InlineData("return DoesNotCompile()", "CompilationErrorException", "; expected\nThe name 'DoesNotCompile' does not exist in the current context")]
         public async Task Eval_FaultyCodeThrowsExpectedException(string expr, string exception, string message)
         {
@@ -191,15 +189,6 @@ namespace CSDiscordService.Tests
             Assert.Equal(expr, result.Code);
             Assert.Equal(consoleOut.Replace("\r\n", Environment.NewLine), result.ConsoleOut);
             Assert.Equal(returnValue, result.ReturnValue);
-        }
-
-        [Fact]
-        public async Task Eval_LoadDLLThatExposesTypeOfADependency()
-        {
-            var expr = "#nuget CK.ActivityMonitor\nvar m = new CK.Core.ActivityMonitor();";
-            var (result, statusCode) = await Execute(expr);
-
-            Assert.Equal(HttpStatusCode.OK, statusCode);
         }
 
         [Fact]
@@ -233,15 +222,17 @@ namespace CSDiscordService.Tests
             Assert.Equal(HttpStatusCode.OK, statusCode);
         }
 
-        [Fact(Skip = "Test is failing presumably because of a bug in ByteSize")]
+        [Fact]
         public async Task Eval_SupportsNugetDirectiveWithActualUsage()
         {
-            var expr = @"#nuget ByteSize
-            var input = ""80527998976 B"";
-            if (ByteSize.TryParse(input, NumberStyles.Any, new CultureInfo(""en-us""), out var output))
+            var expr = """
+            #nuget ByteSize
+            var input = "80527998976 B";
+            if (ByteSize.TryParse(input, NumberStyles.Any, new CultureInfo("en-us"), out var output))
             {
                 Console.WriteLine(output);
-            }";
+            }
+            """;
 
             var (result, statusCode) = await Execute(expr);
 

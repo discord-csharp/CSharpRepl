@@ -94,8 +94,10 @@ namespace CSDiscordService.Eval.ResultModels
                     new ModuleJsonConverter(), new AssemblyJsonConverterFactory(), 
                     new DirectoryInfoJsonConverter(),
                     new AngouriMathEntityConverter(), new AngouriMathEntityVarsConverter(), 
-                    new IntPtrJsonConverter()
-                    }
+                    new NumberConverter(),
+                    new ByteEnumerableJsonConverter(),
+                    new MultidimArrayConverterFactory()
+                }
             });
         }
     }

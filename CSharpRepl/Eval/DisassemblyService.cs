@@ -2,17 +2,11 @@
 using ICSharpCode.Decompiler.Disassembler;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Net.Http;
-using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using ICSharpCode.Decompiler.Metadata;
 
@@ -20,21 +14,8 @@ namespace CSDiscordService.Eval
 {
     public class DisassemblyService
     {
-        private static readonly IReadOnlyCollection<MetadataReference> References = ImmutableArray.Create(
-            MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(ValueTuple<>).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(List<>).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(JsonConvert).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(string).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(HttpClient).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Regex).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(BinaryExpression).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Console).GetTypeInfo().Assembly.Location),
-            MetadataReference.CreateFromFile(Assembly.Load("System.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a").Location)
-        );
-
-        private static readonly ImmutableArray<string> Imports = ImmutableArray.Create(
+        private static readonly ImmutableArray<string> Imports =
+        [
             "System",
             "System.IO",
             "System.Linq",
@@ -46,11 +27,9 @@ namespace CSDiscordService.Eval
             "System.Threading",
             "System.Threading.Tasks",
             "System.Net.Http",
-            "Newtonsoft.Json",
-            "Newtonsoft.Json.Linq",
             "System.Reflection",
             "System.Reflection.Emit"
-        );
+        ];
 
         public string GetIl(string code)
         {
@@ -85,7 +64,7 @@ namespace CSDiscordService.Eval
                 .WithAllowUnsafe(true)
                 .WithPlatform(Platform.AnyCpu);
 
-            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToString(), options: compOpts, references: References)
+            var compilation = CSharpCompilation.Create(Guid.NewGuid().ToString(), options: compOpts, references: Basic.Reference.Assemblies.Net90.References.All)
                 .AddSyntaxTrees(scriptSyntaxTree);
 
             var sb = new StringBuilder();

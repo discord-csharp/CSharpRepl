@@ -25,11 +25,13 @@ namespace CSDiscordService.Eval
 
         public bool CanProcessDirective(string directive)
         {
+            ObjectDisposedException.ThrowIf(disposedValue, this);
             return directive != null && directive.StartsWith("#nuget");
         }
 
         public async Task PreProcess(string directive, ScriptExecutionContext context, Action<string> logger)
         {
+            ObjectDisposedException.ThrowIf(disposedValue, this);
             var actionLogger = new NugetLogger(logger);
             var nugetDirective = NugetPreProcessorDirective.Parse(directive);
             string frameworkName = typeof(NugetDirectiveProcessor).Assembly.GetCustomAttributes(true)
@@ -115,12 +117,13 @@ namespace CSDiscordService.Eval
 
             foreach (var path in libraries)
             {
-                var assembly = Assembly.LoadFrom(path);
-                if (context.TryAddReferenceAssembly(assembly))
+                var asm = Assembly.LoadFile(path);
+                if (context.References.Add(asm))
                 {
-                    foreach (var ns in assembly.GetTypes().Where(a => a.Namespace != null).Select(a => a.Namespace).Distinct())
+                    foreach (var type in asm.GetTypes())
                     {
-                        context.AddImport(ns);
+                        if (type.IsPublic && type.Namespace is not null)
+                            context.Imports.Add(type.Namespace);
                     }
                 }
             }
@@ -134,16 +137,20 @@ namespace CSDiscordService.Eval
             
             if(!File.Exists(fullPath))
             {
-                await File.WriteAllTextAsync(fullPath, $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<configuration>
-  <config>
-    <add key=""repositoryPath"" value=""{packagesPath}"" />
-    <add key=""globalPackagesFolder"" value=""{packagesPath}"" />
-  </config>
-  <packageSources>
-    <add key=""Feed"" value=""{feedUrl}"" />
-  </packageSources>
-</configuration>");
+                await File.WriteAllTextAsync(fullPath, 
+                    $"""
+                        <?xml version="1.0" encoding="utf-8"?>
+                        <configuration>
+                            <config>
+                                <add key="repositoryPath" value="{packagesPath}" />
+                                <add key="globalPackagesFolder" value="{packagesPath}" />
+                            </config>
+                            <packageSources>
+                                <add key="Feed" value="{feedUrl}" />
+                            </packageSources>
+                        </configuration>
+                        """
+                    );
             }
         }
 
@@ -212,23 +219,11 @@ namespace CSDiscordService.Eval
             return selected.Where(a => Path.GetExtension(a) == ".dll")
                 .Select(a => Path.Combine(pathResolver.GetInstalledPath(package), a));
         }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    cache.Dispose();
-                }
-                disposedValue = true;
-            }
-        }
-
+        
         public void Dispose()
         {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+            cache.Dispose();
+            disposedValue = true;
         }
 
         private class NugetLogger : ILogger

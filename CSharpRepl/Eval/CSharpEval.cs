@@ -1,7 +1,6 @@
 using CSDiscordService.Eval.ResultModels;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Scripting;
 using System;
 using System.Collections.Immutable;
@@ -17,10 +16,6 @@ namespace CSDiscordService.Eval
 {
     public class CSharpEval
     {
-        private static readonly ImmutableArray<DiagnosticAnalyzer> Analyzers =
-            ImmutableArray.Create<DiagnosticAnalyzer>(new BlacklistedTypesAnalyzer());
-
-        private static readonly Random random = new Random();
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly IPreProcessorService _preProcessor;
         private readonly ILogger<CSharpEval> _logger;
@@ -31,12 +26,10 @@ namespace CSDiscordService.Eval
             _preProcessor = preProcessor;
             _logger = logger;
         }
-
         public async Task<EvalResult> RunEvalAsync(string code)
         {
             var sb = new StringBuilder();
             using var textWr = new ConsoleLikeStringWriter(sb);
-            var env = new BasicEnvironment();
 
             var sw = Stopwatch.StartNew();
 
@@ -47,16 +40,16 @@ namespace CSDiscordService.Eval
             }
             catch(Exception ex)
             {
-                var diagnostics = Diagnostic.Create(new DiagnosticDescriptor("REPL01", ex.Message, ex.Message, "Code", DiagnosticSeverity.Error, true), 
+                var diagnostic = Diagnostic.Create(new DiagnosticDescriptor("REPL01", ex.Message, ex.Message, "Code", DiagnosticSeverity.Error, true), 
                     Location.Create("", TextSpan.FromBounds(0,0), new LinePositionSpan(LinePosition.Zero, LinePosition.Zero)));
                 _logger.LogCritical(ex, "{message}", ex.Message);
-                return EvalResult.CreateErrorResult(code, sb.ToString(), sw.Elapsed, new[] { diagnostics }.ToImmutableArray());
+                return EvalResult.CreateErrorResult(code, sb.ToString(), sw.Elapsed, [diagnostic]);
             }
             var eval = CSharpScript.Create(context.Code, context.Options, typeof(Globals));
 
-            var compilation = eval.GetCompilation().WithAnalyzers(Analyzers);
+            var compilation = eval.GetCompilation();
 
-            var compileResult = await compilation.GetAllDiagnosticsAsync();
+            var compileResult = compilation.GetDiagnostics();
             var compileErrors = compileResult.Where(a => a.Severity == DiagnosticSeverity.Error).ToImmutableArray();
             sw.Stop();
 
@@ -67,16 +60,14 @@ namespace CSDiscordService.Eval
             }
 
             var globals = new Globals();
-            Globals.Random = random;
             Globals.Console = textWr;
-            Globals.Environment = env;
 
             sw.Restart();
             ScriptState<object> result;
 
             try
             {
-                result = await eval.RunAsync(globals, ex => true);
+                result = await eval.RunAsync(globals, _ => true);
             }
             catch (CompilationErrorException ex)
             {

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CSDiscordService
 {
-    public static class TypeExtensions
+    public static partial class TypeExtensions
     {
         public static string ParseGenericArgs(this Type type)
         {
@@ -18,41 +19,40 @@ namespace CSDiscordService
             var returnArgs = args.Select(a => a.ParseGenericArgs());
             return returnTypeName.Replace($"`{args.Length}", $"<{string.Join(", ", returnArgs)}>");
         }
-        private const string ArrayBrackets = "[]";
 
         private static string GetPrimitiveTypeName(Type type)
         {
             var typeName = type.Name;
             if (type.IsArray)
             {
-                typeName = typeName.Replace(ArrayBrackets, string.Empty);
+                typeName = ParseGenericArgs(type.GetElementType()!);
             }
 
-            string returnValue;
-            switch (typeName)
+            var returnValue = typeName switch
             {
-                case "Boolean": returnValue = "bool"; break;
-                case "Byte": returnValue = "byte"; break;
-                case "Char": returnValue = "char"; break;
-                case "Decimal": returnValue = "decimal"; break;
-                case "Double": returnValue = "double"; break;
-                case "Int16": returnValue = "short"; break;
-                case "Int32": returnValue = "int"; break;
-                case "Int64": returnValue = "long"; break;
-                case "SByte": returnValue = "sbyte"; break;
-                case "Single": returnValue = "float"; break;
-                case "String": returnValue = "string"; break;
-                case "UInt16": returnValue = "ushort"; break;
-                case "UInt32": returnValue = "uint"; break;
-                case "UInt64": returnValue = "ulong"; break;
-                case "Object": returnValue = "object"; break;
-                default:
-                    return type.Name;
-            }
+                "Boolean" => "bool",
+                "Byte" => "byte",
+                "Char" => "char",
+                "Decimal" => "decimal",
+                "Double" => "double",
+                "Int16" => "short",
+                "Int32" => "int",
+                "Int64" => "long",
+                "SByte" => "sbyte",
+                "Single" => "float",
+                "String" => "string",
+                "UInt16" => "ushort",
+                "UInt32" => "uint",
+                "UInt64" => "ulong",
+                "Object" => "object",
+                "IntPtr" => "nint",
+                "UIntPtr" => "nuint",
+                _ => typeName
+            };
 
             if (type.IsArray)
             {
-                return string.Join(string.Empty, returnValue, ArrayBrackets);
+                returnValue = $"{returnValue}[{new string(',', type.GetArrayRank() - 1)}]";
             }
             return returnValue;
         }
